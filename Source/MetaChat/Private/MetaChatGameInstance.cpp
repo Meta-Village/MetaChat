@@ -12,8 +12,9 @@ UMetaChatGameInstance::UMetaChatGameInstance()
 {
 
 }
-void UMetaChatGameInstance::BeginPlay()
+void UMetaChatGameInstance::Init()
 {
+	Super::Init();
 	// OnlineSubsystem¿¡ Access
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	if (OnlineSubsystem)
