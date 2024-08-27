@@ -2,7 +2,6 @@
 
 
 #include "UserWidgetTEST.h"
-#include "MetaChatCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
 #include "MetaChatGameInstance.h"

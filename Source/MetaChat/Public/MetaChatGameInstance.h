@@ -31,7 +31,7 @@ public:
 	FOnJoinSessionCompleteDelegate		JoinSessionCompleteDelegate;
 	FOnStartSessionCompleteDelegate		StartSessionCompletetDelegate;
 	FOnDestroySessionCompleteDelegate	DestroySessionCompleteDelegate;
-	virtual void BeginPlay();
+	virtual void Init();
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccssful);
