@@ -8,8 +8,8 @@
 void UUserWidgetTEST::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	ButtonTest->OnClicked.AddDynamic(this,&UUserWidgetTEST::TestButtonCallback);
-	ButtonJoin->OnClicked.AddDynamic(this, &UUserWidgetTEST::JoinCallback);
+	//ButtonTest->OnClicked.AddDynamic(this,&UUserWidgetTEST::TestButtonCallback);
+	//ButtonJoin->OnClicked.AddDynamic(this, &UUserWidgetTEST::JoinCallback);
 }
 
 void UUserWidgetTEST::TestButtonCallback()
