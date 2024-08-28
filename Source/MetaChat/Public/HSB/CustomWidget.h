@@ -6,8 +6,10 @@
 
 
 UCLASS()
-class METACHAT_API UCustomWidget : public UUserWidget
+class METACHAT_API UCustomWidget  : public UUserWidget
 {
 	GENERATED_BODY()
 	
+	UFUNCTION()
+	void OnItemClicked(UObject* Item);
 };
