@@ -23,20 +23,35 @@ class METACHAT_API UMetaChatGameInstance : public UGameInstance
 
 public:
 	UMetaChatGameInstance();
+	class IOnlineSubsystem* OnlineSub;
 	IOnlineSessionPtr OnlineSessionInterface;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 
-	FOnCreateSessionCompleteDelegate	CreateSessionCompleteDelegate;
-	FOnFindSessionsCompleteDelegate		FindSessionCompleteDelegate;
-	FOnJoinSessionCompleteDelegate		JoinSessionCompleteDelegate;
-	FOnStartSessionCompleteDelegate		StartSessionCompletetDelegate;
-	FOnDestroySessionCompleteDelegate	DestroySessionCompleteDelegate;
+	//FOnCreateSessionCompleteDelegate	CreateSessionCompleteDelegate;
+	//FOnFindSessionsCompleteDelegate		FindSessionCompleteDelegate;
+	//FOnJoinSessionCompleteDelegate		JoinSessionCompleteDelegate;
+	//FOnJoinSessionCompleteDelegate		JoinSessionCompleteDelegate;
+	//FOnStartSessionCompleteDelegate		StartSessionCompletetDelegate;
+	//FOnDestroySessionCompleteDelegate	DestroySessionCompleteDelegate;
+	void JoinGameSession();
+	void DestroyGameSession();
+	void CreateGameSession();
+	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnFindSessionsComplete(bool bWasSuccessful);
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
 	virtual void Init();
+	/*
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccssful);
 	void JoinGameSession();
 	void CreateGameSession();
+	*/
+
+
+
 	/**
  *
 
