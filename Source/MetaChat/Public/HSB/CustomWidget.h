@@ -12,4 +12,6 @@ class METACHAT_API UCustomWidget  : public UUserWidget
 	
 	UFUNCTION()
 	void OnItemClicked(UObject* Item);
+
+
 };
