@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "HttpActor.h"
@@ -17,7 +17,7 @@ AHttpActor::AHttpActor()
 void AHttpActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	HttpUI = Cast<UUserWidgetTEST>(CreateWidget(GetWorld(), HttpUIFactory));
 	if (HttpUI)
 	{
@@ -36,18 +36,18 @@ void AHttpActor::Tick(float DeltaTime)
 
 void AHttpActor::RsqGetTest(FString url)
 {
-	//Http ¸ğµâ »ı¼º
+	//Http ëª¨ë“ˆ ìƒì„±
 	FHttpModule& httpModule = FHttpModule::Get();
-	//IHttpRequest = TSharedRef<IHttpRequest> //½º¸¶Æ® Æ÷ÀÎÅÍ //´ó±Û¸µÆ÷ÀÎÅÍ°¡ µÇ´Â°ÍÀ» ¹æÁö
+	//IHttpRequest = TSharedRef<IHttpRequest> //ìŠ¤ë§ˆíŠ¸ í¬ì¸í„° //ëŒ•ê¸€ë§í¬ì¸í„°ê°€ ë˜ëŠ”ê²ƒì„ ë°©ì§€
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
 
-	//¿äÃ»ÇÒ Á¤º¸¸¦ ¼³Á¤
+	//ìš”ì²­í•  ì •ë³´ë¥¼ ì„¤ì •
 	req->SetURL(url);
 	req->SetVerb(TEXT("GET"));
 	req->SetHeader(TEXT("Content-Type"), TEXT("Application/json")); //Http Content type 
-	//ÀÀ´ä¹ŞÀ» ÇÔ¼ö¸¦ ¿¬°á
+	//ì‘ë‹µë°›ì„ í•¨ìˆ˜ë¥¼ ì—°ê²°
 	req->OnProcessRequestComplete().BindUObject(this, &AHttpActor::OnRsqGetTest);
-	//¼­¹ö¿¡ ¿äÃ»
+	//ì„œë²„ì— ìš”ì²­
 	req->ProcessRequest();
 }
 
@@ -56,37 +56,37 @@ void AHttpActor::OnRsqGetTest(FHttpRequestPtr Request, FHttpResponsePtr Response
 {
 	if (bConnectedSuccessfully)
 	{
-		//Åë½Å¼º°ø
-		FString result = Response->GetContentAsString(); //¾î¶² Å¸ÀÔÀ¸·Î ¹ŞÀ» °ÍÀÎÁö
+		//í†µì‹ ì„±ê³µ
+		FString result = Response->GetContentAsString(); //ì–´ë–¤ íƒ€ì…ìœ¼ë¡œ ë°›ì„ ê²ƒì¸ì§€
 
 
-		//ÇÊ¿äÇÑ Á¤º¸¸¦ »Ì¾Æ¼­ È­¸é¿¡ Ãâ·ÂÇÏ°í ½Í´Ù.
+		//í•„ìš”í•œ ì •ë³´ë¥¼ ë½‘ì•„ì„œ í™”ë©´ì— ì¶œë ¥í•˜ê³  ì‹¶ë‹¤.
 
 		HttpUI->SetTextLog(UJsonParseLib::JsonParsePassword(result));
 
 	}
 	else
 	{
-		//Åë½Å¼º°ø
+		//í†µì‹ ì„±ê³µ
 		UE_LOG(LogTemp, Error, TEXT("bConnectedSuccessfully Fail.."));
 	}
 }
 
 void AHttpActor::RsqPostTest(FString url, FString json)
 {
-	//Http ¸ğµâ »ı¼º
+	//Http ëª¨ë“ˆ ìƒì„±
 	FHttpModule& httpModule = FHttpModule::Get();
-	//IHttpRequest = TSharedRef<IHttpRequest> //½º¸¶Æ® Æ÷ÀÎÅÍ //´ó±Û¸µÆ÷ÀÎÅÍ°¡ µÇ´Â°ÍÀ» ¹æÁö
+	//IHttpRequest = TSharedRef<IHttpRequest> //ìŠ¤ë§ˆíŠ¸ í¬ì¸í„° //ëŒ•ê¸€ë§í¬ì¸í„°ê°€ ë˜ëŠ”ê²ƒì„ ë°©ì§€
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
 
-	//¿äÃ»ÇÒ Á¤º¸¸¦ ¼³Á¤
+	//ìš”ì²­í•  ì •ë³´ë¥¼ ì„¤ì •
 	req->SetURL(url);
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("Content-Type"), TEXT("Application/json")); //Http Content type 
 	req->SetContentAsString(json);
-	//ÀÀ´ä¹ŞÀ» ÇÔ¼ö¸¦ ¿¬°á
+	//ì‘ë‹µë°›ì„ í•¨ìˆ˜ë¥¼ ì—°ê²°
 	req->OnProcessRequestComplete().BindUObject(this, &AHttpActor::OnResPostTest);
-	//¼­¹ö¿¡ ¿äÃ»
+	//ì„œë²„ì— ìš”ì²­
 	req->ProcessRequest();
 }
 
@@ -94,14 +94,14 @@ void AHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Respons
 {
 	if (bConnectedSuccessfully)
 	{
-		//Åë½Å¼º°ø
-		FString result = Response->GetContentAsString(); //¾î¶² Å¸ÀÔÀ¸·Î ¹ŞÀ» °ÍÀÎÁö
-		//ÇÊ¿äÇÑ Á¤º¸¸¦ »Ì¾Æ¼­ È­¸é¿¡ Ãâ·ÂÇÏ°í ½Í´Ù.
+		//í†µì‹ ì„±ê³µ
+		FString result = Response->GetContentAsString(); //ì–´ë–¤ íƒ€ì…ìœ¼ë¡œ ë°›ì„ ê²ƒì¸ì§€
+		//í•„ìš”í•œ ì •ë³´ë¥¼ ë½‘ì•„ì„œ í™”ë©´ì— ì¶œë ¥í•˜ê³  ì‹¶ë‹¤.
 		HttpUI->SetTextLog(result);
 	}
 	else
 	{
-		//Åë½Å¼º°ø
+		//í†µì‹ ì„±ê³µ
 		UE_LOG(LogTemp, Error, TEXT("OnResPostTest Fail.."));
 	}
 }
