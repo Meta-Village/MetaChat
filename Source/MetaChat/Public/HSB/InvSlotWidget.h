@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
@@ -28,7 +28,8 @@ class METACHAT_API UInvSlotWidget : public UUserWidget
 public:	
 	// 이미지 바인딩
 	UPROPERTY(meta=(BindWidget))
-	class UImage* Image_ItemIcon;
+	class UImage* Image_ItemIcon_1;
+
 
 	UFUNCTION(BluePrintCallable)
 	void SetItemData(const TArray<FSlot>& ItemsData);

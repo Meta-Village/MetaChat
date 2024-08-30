@@ -1,4 +1,4 @@
-#include "HSB/CustomWidget.h"
+﻿#include "HSB/CustomWidget.h"
 #include "HSB/InvSlotWidget.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/Image.h"
@@ -47,8 +47,6 @@ void UCustomWidget::InitSlot()
                 SlotArray.Add(*fSlot);
 
                 InvSlot->SetItemData(SlotArray);
-
-                PartsPanel->InvalidateLayoutAndVolatility();
 
                 // Grid에 슬롯 추가
                 PartsPanel->AddChildToUniformGrid(InvSlot, Row, Column);
