@@ -3,7 +3,6 @@ MetaChat
 UnrealEngine 5.4.3
 
 Plugins
-  Online Subsystem Steam
-  EOS voice chat
-  Pixel Streaming
-  
+ 1. Online Subsystem Steam
+ 2. EOS voice chat
+ 3. Pixel Streaming
