@@ -10,8 +10,32 @@ class METACHAT_API UCustomWidget  : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	// Panel
+	UPROPERTY(meta=(BindWidget))
+	class UUniformGridPanel* PartsPanel;
+	
+	// TSubClass
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> InvFactory;
+
+	UPROPERTY()
+	class UInvSlotWidget* InvSlot;
+
+	// 카테고리
+	FName DesiredCategory;
+
+	// 초기화
 	UFUNCTION()
+	void InitSlot();
+
+	// 카테고리 클릭하면 슬롯 필터링
+	UFUNCTION(BlueprintCallable)
+	void OnCategoryButtonClicked(FName Category);
+
+	// 아이템 클릭하면 캐릭터 파트에 적용
+	UFUNCTION(BlueprintCallable)
 	void OnItemClicked(UObject* Item);
 
-
+	// 버튼 바인딩
 };
