@@ -3,6 +3,7 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/Image.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/SkeletalMeshComponent.h"
 
 void UCustomWidget::InitSlot()
 {
@@ -80,8 +81,4 @@ void UCustomWidget::OnCategoryButtonClicked(FName Category)
     InitSlot(); // 슬롯 재생성
 }
 
-void UCustomWidget::OnItemClicked(UObject* Item)
-{
-    
-}
 

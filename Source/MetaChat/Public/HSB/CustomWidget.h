@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
@@ -33,9 +33,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnCategoryButtonClicked(FName Category);
 
-	// 아이템 클릭하면 캐릭터 파트에 적용
-	UFUNCTION(BlueprintCallable)
-	void OnItemClicked(UObject* Item);
 
 	// 버튼 바인딩
 };

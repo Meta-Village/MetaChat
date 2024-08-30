@@ -24,3 +24,14 @@ void UInvSlotWidget::SetItemData(const TArray<FSlot>& ItemsData)
 		UE_LOG(LogTemp, Warning, TEXT("SetItemData called with empty ItemsData."));
 	}
 }
+
+void UInvSlotWidget::OnItemClicked(USkeletalMeshComponent* Mesh)
+{
+    // 카테고리를 구분한다
+
+    // 카테고리가 머리일 경우, 머리 이미지에 맞는 Skeletal mesh를 찾는다
+
+    // 캐릭터의 머리 Skeletal Mesh를 찾는다
+
+    // 할당한다. (Set Skeletal Mesh)
+}

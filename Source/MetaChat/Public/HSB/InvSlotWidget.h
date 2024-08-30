@@ -34,4 +34,7 @@ public:
 	UFUNCTION(BluePrintCallable)
 	void SetItemData(const TArray<FSlot>& ItemsData);
 
+	// 아이템 클릭하면 캐릭터 파트에 적용
+	UFUNCTION(BlueprintCallable)
+	void OnItemClicked(USkeletalMeshComponent* Mesh);
 };
