@@ -6,3 +6,4 @@ Plugins
  1. Online Subsystem Steam
  2. EOS voice chat
  3. Pixel Streaming
+ 4. Pixel Streaming Player
