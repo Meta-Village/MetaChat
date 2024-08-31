@@ -5,6 +5,13 @@
 #include "UserWidgetTEST.h"
 #include <HttpModule.h>
 #include "JsonParseLib.h"
+
+#include "Engine/Texture2D.h"
+#include "Engine/Texture2DDynamic.h"
+#include "Windows/AllowWindowsPlatformTypes.h"
+#include <Windows.h>
+#include "Windows/HideWindowsPlatformTypes.h"
+#include <vector> 
 // Sets default values
 AHttpActor::AHttpActor()
 {
@@ -23,6 +30,9 @@ void AHttpActor::BeginPlay()
 	{
 		HttpUI->AddToViewport();
 		HttpUI->SetHttpActor(this);
+		FVector position = GetActorLocation() + GetActorUpVector()*100;
+		AActor* spawnViewer = GetWorld()->SpawnActor<AActor>(windowViewer, position ,GetActorRotation());
+		HttpUI->SetViewer(spawnViewer);
 	}
 
 }
@@ -32,6 +42,8 @@ void AHttpActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(HttpUI)
+		HttpUI->UpdateWidgetTexture();
 }
 
 void AHttpActor::RsqGetTest(FString url)

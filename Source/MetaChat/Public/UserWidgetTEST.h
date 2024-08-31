@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UserWidgetTEST.generated.h"
 
+class UTexture2D;
 /**
  * 
  */
@@ -25,12 +26,15 @@ protected:
 	class UButton* HttpPostButton;
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* TextLog;
+	 UPROPERTY(meta = (BindWidget))
+    class UImage* ImageWidget; 
 protected:
 	virtual void NativeOnInitialized();
 
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct();
 private:
-	// ¹öÆ°À» ´­·¶À» ¶§, È£ÃâµÉ µ¨¸®°ÔÀÌÆ®¿¡ µî·ÏÇÒ ÇÔ¼ö
+	// ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ, í˜¸ì¶œë  ë¸ë¦¬ê²Œì´íŠ¸ì— ë“±ë¡í•  í•¨ìˆ˜
 	UFUNCTION(BlueprintCallable)
 	void TestButtonCallback();
 	UFUNCTION(BlueprintCallable)
@@ -45,4 +49,17 @@ private:
 public:
 	void SetHttpActor(class AHttpActor* actor);
 	void SetTextLog(FString log);
+
+	//window api viewer
+	void SetImageTexture(class UTexture2D* Texture);
+	UTexture2D* GetImageTexture();
+	void SetViewer(AActor* actor);
+	void UpdateWidgetTexture();
+	UTexture2D* CaptureScreenToTexture();
+	UTexture2D* CapturedTexture;
+	TFuture<void> AsyncTaskHandle;
+	bool bIsTaskCancelled = false;
+	class AActor* windowViewer;
+	class UStaticMeshComponent* PlaneMesh;
+		class UMaterialInstanceDynamic * DynamicMaterial;
 };

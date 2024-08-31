@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PixelStreamingSignallingComponent.h"
+#include "IPixelStreamingModule.h" // PixelStreamingModule 헤더 포함
 #include "PixelStreamingActor.generated.h"
+
+
+class UTexture2D;
 
 UCLASS()
 class METACHAT_API APixelStreamingActor : public AActor
@@ -16,14 +19,31 @@ public:
 	// Sets default values for this actor's properties
 	APixelStreamingActor();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // 스트리밍 시작
+    UFUNCTION(BlueprintCallable, Category = "PixelStreaming")
+    void StartPixelStreaming();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	UFUNCTION(BlueprintCallable, Category = "PixelStreaming")
-	void SetSignallingServerUrl(class UPixelStreamingSignallingComponent* Component , const FString& URL);
-	class UPixelStreamingSignallingComponent* PixelStreamingSignallingComp;
+    // 스트리밍 종료
+    UFUNCTION(BlueprintCallable, Category = "PixelStreaming")
+    void StopPixelStreaming();
+
+    //window viewer
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    class UStaticMeshComponent* PlaneMesh;
+    class UMaterialInstanceDynamic* DynamicMaterial;
+protected:
+    virtual void BeginPlay() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+    virtual void Tick( float DeltaSeconds );
+    void StartServers();
+
+    //window viewer
+    void UpdateWidgetTexture();
+    UTexture2D* CaptureScreenToTexture();
+    TFuture<void> AsyncTaskHandle;
+    bool bIsTaskCancelled = false;
+    class AActor* windowViewer;
+private:
+    // 스트리밍을 관리하는 스트리머 포인터
+    TSharedPtr<IPixelStreamingStreamer> MyStreamer;
 };

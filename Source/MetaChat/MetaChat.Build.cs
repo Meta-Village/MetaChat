@@ -8,7 +8,7 @@ public class MetaChat : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput", "OnlineSubsystemSteam", "OnlineSubsystem","UMG", "HTTP", "Json", "JsonUtilities", "PixelStreaming", "PixelStreamingPlayer" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput", "OnlineSubsystemSteam", "OnlineSubsystem","UMG", "HTTP", "Json", "JsonUtilities", "PixelStreaming", "PixelStreamingPlayer" , "RenderCore", "RHI" });
         PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "PixelStreaming" });
 
     }
