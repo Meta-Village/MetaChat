@@ -28,6 +28,9 @@ class METACHAT_API UInvSlotWidget : public UUserWidget
 public:	
 	virtual void NativeConstruct() override;
 
+	UPROPERTY()
+	class UOverlay* OverlayWidget;
+
 	// 이미지 바인딩
 	UPROPERTY(meta=(BindWidget))
 	class UImage* Image_ItemIcon_1;
@@ -42,10 +45,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnItemClicked();
-
-	// TSubClass
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UUserWidget> CustomFactory;
 
 	UPROPERTY()
 	class ACustomCharacter* Character;

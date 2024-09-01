@@ -1,14 +1,16 @@
-﻿#include "HSB/InvSlotWidget.h"
-#include "Engine/Texture2D.h"
-#include "Internationalization/Text.h"
+﻿#include "Components/Button.h"
 #include "Components/Image.h"
-#include "HSB/CustomWidget.h"
-#include "HSB/CustomCharacter.h"
-#include "Kismet/GameplayStatics.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Engine/SkeletalMesh.h"
-#include "Components/Button.h"
 #include "Delegates/Delegate.h"
+#include "Engine/SkeletalMesh.h"
+#include "Engine/Texture2D.h"
+#include "HSB/CustomCharacter.h"
+#include "HSB/CustomWidget.h"
+#include "HSB/InvSlotWidget.h"
+#include "Internationalization/Text.h"
+#include "Kismet/GameplayStatics.h"
+#include <Components/Overlay.h>
+#include "Components/OverlaySlot.h"
 
 void UInvSlotWidget::NativeConstruct()
 {
@@ -34,6 +36,35 @@ void UInvSlotWidget::SetItemData(const TArray<FSlot>& ItemsData)
         {
             // 아이콘 이미지 업데이트
             ImageWidget->SetBrushFromTexture(ItemsData[i].ItemIcon);
+
+            // Overlay 위젯을 동적으로 생성하고, 이미지와 버튼 추가
+            OverlayWidget = NewObject<UOverlay>(this);
+            if ( OverlayWidget )
+            {
+                // Overlay에 이미지 추가
+                UOverlaySlot* ImageSlot = OverlayWidget->AddChildToOverlay(ImageWidget);
+                if ( ImageSlot )
+                {
+                    ImageSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
+                    ImageSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
+                }
+
+                // 버튼 위젯 동적 생성
+                UButton* ButtonWidget = NewObject<UButton>(this , FName(*FString::Printf(TEXT("Button_ItemIcon_%d") , i + 1)));
+                if ( ButtonWidget )
+                {
+                    // 버튼 클릭 이벤트 바인딩
+                    ButtonWidget->OnClicked.AddDynamic(this , &UInvSlotWidget::OnItemClicked);
+
+                    // Overlay에 버튼 추가
+                    UOverlaySlot* ButtonSlot = OverlayWidget->AddChildToOverlay(ButtonWidget);
+                    if ( ButtonSlot )
+                    {
+                        ButtonSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
+                        ButtonSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
+                    }
+                }
+            }
         }
     }
 
