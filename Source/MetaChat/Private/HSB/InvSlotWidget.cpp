@@ -2,6 +2,24 @@
 #include "Engine/Texture2D.h"
 #include "Internationalization/Text.h"
 #include "Components/Image.h"
+#include "HSB/CustomWidget.h"
+#include "HSB/CustomCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/SkeletalMesh.h"
+#include "Components/Button.h"
+#include "Delegates/Delegate.h"
+
+void UInvSlotWidget::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    // 버튼 클릭 이벤트 바인딩
+    if ( Button_ItemIcon_1 )
+    {
+        Button_ItemIcon_1->OnClicked.AddDynamic(this , &UInvSlotWidget::OnItemClicked);
+    }
+}
 
 void UInvSlotWidget::SetItemData(const TArray<FSlot>& ItemsData)
 {
@@ -25,13 +43,46 @@ void UInvSlotWidget::SetItemData(const TArray<FSlot>& ItemsData)
 	}
 }
 
-void UInvSlotWidget::OnItemClicked(USkeletalMeshComponent* Mesh)
+void UInvSlotWidget::OnItemClicked()
 {
     // 카테고리를 구분한다
+    Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld() , 0));
+    // Mesh 설정할 캐릭터의 SkeletalMeshComponent
+    USkeletalMeshComponent* TargetMeshComponent = nullptr;
+    if(Character)
+	{
+        if(Category == "" )
+            UE_LOG(LogTemp , Warning , TEXT("Problem in Loading Category."));
+        if ( Category == "Hair" )
+        {
+            // 해당 그림에 맞는 Skeletal mesh를 찾는다
+         
+            // 카테고리가 Hair라면, 캐릭터의 머리 Skeletal Mesh를 찾는다
+     
+        }
+        else if ( Category == "Upper" )
+        {
 
-    // 카테고리가 머리일 경우, 머리 이미지에 맞는 Skeletal mesh를 찾는다
+        }
+        else if ( Category == "Lower" )
+        {
+            // 해당 그림에 맞는 Skeletal mesh를 찾는다
 
-    // 캐릭터의 머리 Skeletal Mesh를 찾는다
+            TargetMeshComponent = Character->LowerBodyMesh; // 캐릭터의 Skeletal Mesh 참조
+            USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/HSB/Character/Player_test_pants.Player_test_pants'"));
+            if ( NewMesh == nullptr )
+            {
+                UE_LOG(LogTemp , Error , TEXT("Failed to load SkeletalMesh."));
+            }
+            if ( TargetMeshComponent )
+            {
+                UE_LOG(LogTemp , Warning , TEXT("Success to Get Character's Mesh"));
+                TargetMeshComponent->SetSkeletalMeshAsset(NewMesh);
+            }
+        }
+        else if ( Category == "Shoes" )
+        {
 
-    // 할당한다. (Set Skeletal Mesh)
+        }
+	}
 }

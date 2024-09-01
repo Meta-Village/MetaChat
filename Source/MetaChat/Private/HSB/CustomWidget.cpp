@@ -3,7 +3,35 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/Image.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Button.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Delegates/Delegate.h"
+
+void UCustomWidget::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    // 버튼 클릭 이벤트 바인딩
+    if ( BtnHair )
+    {
+        BtnHair->OnClicked.AddDynamic(this , &UCustomWidget::OnHairButtonClicked);
+    }
+    // 버튼 클릭 이벤트 바인딩
+    if ( BtnUpper )
+    {
+        BtnUpper->OnClicked.AddDynamic(this , &UCustomWidget::OnUpperButtonClicked);
+    }
+    // 버튼 클릭 이벤트 바인딩
+    if ( BtnLower )
+    {
+        BtnLower->OnClicked.AddDynamic(this , &UCustomWidget::OnLowerButtonClicked);
+    }
+    // 버튼 클릭 이벤트 바인딩
+    if ( BtnShoes )
+    {
+        BtnShoes->OnClicked.AddDynamic(this , &UCustomWidget::OnShoesButtonClicked);
+    }
+}
 
 void UCustomWidget::InitSlot()
 {
@@ -48,6 +76,8 @@ void UCustomWidget::InitSlot()
                 SlotArray.Add(*fSlot);
 
                 InvSlot->SetItemData(SlotArray);
+                // `InvSlot`의 `Category` 값 설정
+                InvSlot->Category = DesiredCategory;
 
                 // Grid에 슬롯 추가
                 PartsPanel->AddChildToUniformGrid(InvSlot, Row, Column);
@@ -71,14 +101,38 @@ void UCustomWidget::InitSlot()
 			
 		}
 	}
-
-
 }
 
-void UCustomWidget::OnCategoryButtonClicked(FName Category)
+void UCustomWidget::OnHairButtonClicked()
 {
-    DesiredCategory = Category;
+    DesiredCategory = "Hair";
     InitSlot(); // 슬롯 재생성
+
+    UE_LOG(LogTemp , Warning , TEXT("%s"), *DesiredCategory.ToString());
+}
+
+void UCustomWidget::OnUpperButtonClicked()
+{
+    DesiredCategory = "Upper";
+    InitSlot(); // 슬롯 재생성
+
+    UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
+}
+
+void UCustomWidget::OnLowerButtonClicked()
+{
+    DesiredCategory = "Lower";
+    InitSlot(); // 슬롯 재생성
+
+    UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
+}
+
+void UCustomWidget::OnShoesButtonClicked()
+{
+    DesiredCategory = "Shoes";
+    InitSlot(); // 슬롯 재생성
+
+    UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
 }
 
 

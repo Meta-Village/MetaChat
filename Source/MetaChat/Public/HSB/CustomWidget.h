@@ -11,6 +11,8 @@ class METACHAT_API UCustomWidget  : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeConstruct() override;
+
 	// Panel
 	UPROPERTY(meta=(BindWidget))
 	class UUniformGridPanel* PartsPanel;
@@ -30,8 +32,23 @@ public:
 	void InitSlot();
 
 	// 카테고리 클릭하면 슬롯 필터링
-	UFUNCTION(BlueprintCallable)
-	void OnCategoryButtonClicked(FName Category);
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BtnHair;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BtnUpper;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BtnLower;
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BtnShoes;
+
+	UFUNCTION()
+	void OnHairButtonClicked();
+	UFUNCTION()
+	void OnUpperButtonClicked();
+	UFUNCTION()
+	void OnLowerButtonClicked();
+	UFUNCTION()
+	void OnShoesButtonClicked();
 
 
 	// 버튼 바인딩

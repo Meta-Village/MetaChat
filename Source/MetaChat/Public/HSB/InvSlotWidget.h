@@ -26,6 +26,8 @@ class METACHAT_API UInvSlotWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:	
+	virtual void NativeConstruct() override;
+
 	// 이미지 바인딩
 	UPROPERTY(meta=(BindWidget))
 	class UImage* Image_ItemIcon_1;
@@ -35,6 +37,19 @@ public:
 	void SetItemData(const TArray<FSlot>& ItemsData);
 
 	// 아이템 클릭하면 캐릭터 파트에 적용
+	UPROPERTY(meta=(BindWidget))
+	class UButton* Button_ItemIcon_1;
+
 	UFUNCTION(BlueprintCallable)
-	void OnItemClicked(USkeletalMeshComponent* Mesh);
+	void OnItemClicked();
+
+	// TSubClass
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> CustomFactory;
+
+	UPROPERTY()
+	class ACustomCharacter* Character;
+
+	// 카테고리 변수
+	FName Category;
 };
