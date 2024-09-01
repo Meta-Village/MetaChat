@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingServers/Private/SignallingServer.h"
 #include "UserWidgetTEST.generated.h"
 
 class UTexture2D;
@@ -28,6 +29,7 @@ protected:
 	class UTextBlock* TextLog;
 	 UPROPERTY(meta = (BindWidget))
     class UImage* ImageWidget; 
+
 protected:
 	virtual void NativeOnInitialized();
 
@@ -48,6 +50,7 @@ private:
 	class AHttpActor* HttpActor;
 public:
 	void SetHttpActor(class AHttpActor* actor);
+
 	void SetTextLog(FString log);
 
 	//window api viewer
@@ -57,9 +60,17 @@ public:
 	void UpdateWidgetTexture();
 	UTexture2D* CaptureScreenToTexture();
 	UTexture2D* CapturedTexture;
-	TFuture<void> AsyncTaskHandle;
+
 	bool bIsTaskCancelled = false;
 	class AActor* windowViewer;
 	class UStaticMeshComponent* PlaneMesh;
-		class UMaterialInstanceDynamic * DynamicMaterial;
+	class UMaterialInstanceDynamic* DynamicMaterial;
+
+	//pixel streaming
+	//TSharedPtr<UE::PixelStreamingServers::IServer> SignallingServerInstance;
+	//TSharedPtr<UE::PixelStreamingServers::IServer> GetSignallingServer() const { return SignallingServerInstance; }
+	void AccessSignallingServer();
+	void StartLevelOnlyPixelStreaming();
+	//FCriticalSection CriticalSection;
+	//	TFuture<void> AsyncTaskHandle;
 };
