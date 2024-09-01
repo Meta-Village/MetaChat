@@ -37,6 +37,10 @@
 		{
 			"Name": "PixelStreamingPlayer",
 			"Enabled": true
+		},
+		{
+            			"Name": "WebSocketNetworking",
+            			"Enabled": true
 		}
 	]
 }

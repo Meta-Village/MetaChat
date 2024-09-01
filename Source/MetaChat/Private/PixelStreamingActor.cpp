@@ -111,7 +111,7 @@ void APixelStreamingActor::UpdateWidgetTexture()
                        
                         // BaseTexture 파라미터에 텍스처 설정
                         DynamicMaterial->SetTextureParameterValue(TEXT("Base") , CapturedTexture);
-                        UE_LOG(LogTemp , Warning , TEXT("CapturedTexture is valid and applied."));
+              
                     
 
                 }

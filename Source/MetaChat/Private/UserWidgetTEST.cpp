@@ -21,7 +21,12 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
-
+//streamID
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingModule.h"
+#include "Modules/ModuleManager.h"
+//#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingEditor/Private/PixelStreamingEditorModule.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingStreamer.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingSignallingConnection.h"
 void UUserWidgetTEST::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -33,20 +38,26 @@ void UUserWidgetTEST::NativeConstruct()
 }
 void UUserWidgetTEST::NativeDestruct()
 {
-	bIsTaskCancelled = true;  // 종료 시 플래그 설정
+	//bIsTaskCancelled = true;  // 종료 시 플래그 설정
 
-	if ( AsyncTaskHandle.IsValid() && !AsyncTaskHandle.IsReady() )
-	{
-		AsyncTaskHandle.Wait();  // 필요시 Task가 종료되도록 대기
-	}
-
-	Super::NativeDestruct();  // 부모 클래스의 정리 작업 호출
+	//if ( AsyncTaskHandle.IsValid())// && !AsyncTaskHandle.IsReady() )
+	//{
+	//	AsyncTaskHandle.Reset();
+	//	AsyncTaskHandle.Wait();  // 필요시 Task가 종료되도록 대기
+	//}
+	//if (DynamicMaterial)
+	//{
+	//	DynamicMaterial->ConditionalBeginDestroy();
+	//	DynamicMaterial = nullptr;
+	//}
+	
+	//Super::NativeDestruct();  // 부모 클래스의 정리 작업 호출
 }
 
 void UUserWidgetTEST::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
+	AccessSignallingServer();
 }
 void UUserWidgetTEST::SetTextLog(FString log)
 {
@@ -80,7 +91,12 @@ void UUserWidgetTEST::SetViewer(AActor* actor)
 {
 	windowViewer = actor;
 	PlaneMesh = windowViewer->GetComponentByClass<UStaticMeshComponent>();
-	DynamicMaterial = UMaterialInstanceDynamic::Create(PlaneMesh->GetMaterial(0) , this);
+	// 원본 머티리얼을 기반으로 새로운 MaterialInstanceDynamic 생성
+	//UMaterialInterface* BaseMaterial = PlaneMesh->GetMaterial(0);
+	//DynamicMaterial = UMaterialInstanceDynamic::Create(BaseMaterial, this);
+	//DynamicMaterial = TSharedPtr<UMaterialInstanceDynamic>(UMaterialInstanceDynamic::Create(BaseMaterial, this));
+	DynamicMaterial = (UMaterialInstanceDynamic::Create(PlaneMesh->GetMaterial(0), this));
+
 }
 
 void UUserWidgetTEST::UpdateWidgetTexture()
@@ -94,62 +110,98 @@ void UUserWidgetTEST::UpdateWidgetTexture()
 	if ( TimeAccumulator >= CaptureInterval )
 	{
 		TimeAccumulator = 0.0f;
-
-		// 비동기 작업을 관리하는 TFuture를 사용
-		AsyncTaskHandle = Async(EAsyncExecution::ThreadPool , [this]()
+		//UTexture2D* CapturedTexture = nullptr;
+		CapturedTexture = CaptureScreenToTexture();
+		if (this->PlaneMesh && CapturedTexture && !bIsTaskCancelled && IsValid(this) && IsValid(ImageWidget))
 		{
-			if ( bIsTaskCancelled || IsEngineExitRequested() || !IsValid(this) )
+			UTexture2D* OldTexture = GetImageTexture();
+			if (OldTexture)
 			{
-				return;  // 작업 취소 시 즉시 반환
-			}
-			UTexture2D* CapturedTexture = nullptr;
-
-			try
-			{
-				CapturedTexture = CaptureScreenToTexture();
-			}
-			catch ( ... )
-			{
-				// 캡처 중 문제가 발생했을 때의 처리
-				return;
+				OldTexture->ConditionalBeginDestroy();
 			}
 
-			// 메인 스레드에서 UI 업데이트
-			AsyncTask(ENamedThreads::GameThread , [this , CapturedTexture]()
+
+			SetImageTexture(CapturedTexture);
+			
+	
+
+
+			if (this->DynamicMaterial)
 			{
-						if ( CapturedTexture && !bIsTaskCancelled && IsValid(this) && IsValid(ImageWidget) )
-						{
-							UTexture2D* OldTexture = GetImageTexture();
-							if ( OldTexture )
-							{
-								OldTexture->ConditionalBeginDestroy();
-							}
+				CapturedTexture->SRGB = true;
+				// BaseTexture 파라미터에 텍스처 설정
+				this->DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
 
-							try
-							{
-								SetImageTexture(CapturedTexture);
-							}
-							catch ( ... )
-							{
-								// 캡처 중 문제가 발생했을 때의 처리
-								return;
-							}
-						
 
-							if ( DynamicMaterial )
-							{
-								CapturedTexture->SRGB = true;
-								// BaseTexture 파라미터에 텍스처 설정
-								DynamicMaterial->SetTextureParameterValue(TEXT("Base") , CapturedTexture);
 
-								// PlaneMesh에 머티리얼 적용
-								PlaneMesh->SetMaterial(0 , DynamicMaterial);
-								UE_LOG(LogTemp , Warning , TEXT("CapturedTexture is valid and applied."));
-							}
-							
-						}
-			});
-		});
+
+				// PlaneMesh에 머티리얼 적용
+				//this->PlaneMesh->SetMaterial(0 , this->DynamicMaterial);
+				this->PlaneMesh->SetMaterial(0, DynamicMaterial);
+			}
+
+		}
+
+		//// 비동기 작업을 관리하는 TFuture를 사용
+		//AsyncTaskHandle = Async(EAsyncExecution::ThreadPool , [this]()
+		//{
+		//	if ( bIsTaskCancelled || IsEngineExitRequested() || !IsValid(this) )
+		//	{
+		//		return;  // 작업 취소 시 즉시 반환
+		//	}
+		//	UTexture2D* CapturedTexture = nullptr;
+
+		//	try
+		//	{
+		//		CapturedTexture = CaptureScreenToTexture();
+		//	}
+		//	catch ( ... )
+		//	{
+		//		// 캡처 중 문제가 발생했을 때의 처리
+		//		return;
+		//	}
+
+		//	// 메인 스레드에서 UI 업데이트
+		//	AsyncTask(ENamedThreads::GameThread , [this , CapturedTexture]()
+		//	{
+		//		FScopeLock Lock(&CriticalSection);  // 다른 스레드가 이 블록에 접근하지 못하도록 잠금
+
+		//				if (this->PlaneMesh&&CapturedTexture && !bIsTaskCancelled && IsValid(this) && IsValid(ImageWidget) )
+		//				{
+		//					UTexture2D* OldTexture = GetImageTexture();
+		//					if ( OldTexture )
+		//					{
+		//						OldTexture->ConditionalBeginDestroy();
+		//					}
+
+		//					try
+		//					{
+		//						SetImageTexture(CapturedTexture);
+		//					}
+		//					catch ( ... )
+		//					{
+		//						// 캡처 중 문제가 발생했을 때의 처리
+		//						return;
+		//					}
+		//				
+
+		//					if (this->DynamicMaterial )
+		//					{
+		//						CapturedTexture->SRGB = true;
+		//						// BaseTexture 파라미터에 텍스처 설정
+		//						this->DynamicMaterial->SetTextureParameterValue(TEXT("Base") , CapturedTexture);
+
+
+		//			
+
+		//						// PlaneMesh에 머티리얼 적용
+		//						//this->PlaneMesh->SetMaterial(0 , this->DynamicMaterial);
+		//						this->PlaneMesh->SetMaterial(0, DynamicMaterial.Get());
+		//					}
+		//					
+		//				}
+		//	});
+		//});
 	}
 }
 
@@ -231,4 +283,92 @@ void UUserWidgetTEST::OnMyClickSendPost()
 void UUserWidgetTEST::SetHttpActor(AHttpActor* actor)
 {
 	HttpActor = actor;
+}
+
+void UUserWidgetTEST::AccessSignallingServer()
+{
+	// Pixel Streaming 모듈에 접근
+	//FPixelStreamingEditorModule* PixelStreamingEditorModule = FModuleManager::GetModulePtr<FPixelStreamingEditorModule>("PixelStreamingEditor");
+	//
+	//if (PixelStreamingEditorModule)
+	//{
+	//	// Pixel Streaming 모듈이 제공하는 API를 사용해 FSignallingServer 인스턴스에 접근
+	//	SignallingServerInstance = PixelStreamingEditorModule->GetSignallingServer();
+	//	if (SignallingServerInstance.IsValid())
+	//	{
+	//		// SignallingServer를 사용하여 필요한 작업 수행
+	//		FString TestLog = "SignallingServerInstance";
+	//		SetTextLog(TestLog);
+	//	
+	//	}
+	//}
+	IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>("PixelStreaming");
+	if (PixelStreamingModule)
+	{
+		// 현재 모든 스트리머 ID 가져오기
+		TArray<FString> StreamerIds = PixelStreamingModule->GetStreamerIds();
+
+		for (const FString& StreamerId : StreamerIds)
+		{
+			// 각 스트리머 인스턴스 가져오기
+			if(PixelStreamingModule==nullptr)
+				break;
+			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(StreamerId);
+
+			if (Streamer.IsValid())
+			{
+				// 현재 스트리밍 중인 스트리머인지 확인
+				if (Streamer->IsStreaming())
+				{
+					FString MyStreamId = Streamer->GetId();
+					UE_LOG(LogTemp, Log, TEXT("My Stream ID: %s"), *MyStreamId);
+					SetTextLog(MyStreamId);
+					break;  // 내가 실행하고 있는 스트리머를 찾았으므로 루프 종료
+				}
+			}
+		}
+	}
+}
+
+void UUserWidgetTEST::StartLevelOnlyPixelStreaming()
+{
+	// Pixel Streaming 모듈 접근
+	IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>("PixelStreaming");
+
+	if (PixelStreamingModule)
+	{
+		FString StreamerId = "MyLevelStreamer";
+		TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->CreateStreamer(StreamerId);
+
+		if (Streamer.IsValid())
+		{
+			// 신호 서버 URL 설정
+			FString SignallingServerURL = TEXT("ws://127.0.0.1:8888");
+			Streamer->SetSignallingServerURL(SignallingServerURL);
+
+			// 신호 서버와 연결 설정
+			TWeakPtr<IPixelStreamingSignallingConnection> SignallingConnection = Streamer->GetSignallingConnection();
+			if (SignallingConnection.IsValid())
+			{
+				SignallingConnection.Pin()->TryConnect(SignallingServerURL);
+			}
+
+			// 현재 게임 월드의 뷰포트를 타겟으로 설정
+			UGameViewportClient* GameViewport = GEngine->GameViewport;
+			if (GameViewport)
+			{
+				TSharedPtr<SViewport> ViewportWidget = GameViewport->GetGameViewportWidget();
+				if (ViewportWidget.IsValid())
+				{
+					Streamer->SetTargetViewport(ViewportWidget);
+				}
+			}
+
+			// 스트리밍 시작
+			Streamer->StartStreaming();
+
+			FString MyStreamId = Streamer->GetId();
+			UE_LOG(LogTemp, Log, TEXT("Streaming started with Stream ID: %s (Level only)"), *MyStreamId);
+		}
+	}
 }
