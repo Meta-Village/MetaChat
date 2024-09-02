@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -30,13 +30,16 @@ public:
 	UPROPERTY()
 	class UUserWidgetTEST* HttpUI;
 
-	// Send ¹öÆ°À» ´­·¶À»¶§ ¿äÃ»ÇÒ ÇÔ¼ö
+	// Send ë²„íŠ¼ì„ ëˆŒë €ì„ë•Œ ìš”ì²­í•  í•¨ìˆ˜
 	void RsqGetTest(FString url);
-	//ÀÀ´ä¹ŞÀ» ÇÔ¼ö
+	//ì‘ë‹µë°›ì„ í•¨ìˆ˜
 
 	void OnRsqGetTest(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 
 	void RsqPostTest(FString url, FString json);
 	void OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 
+	//window api viewer
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	TSubclassOf<AActor> windowViewer;
 };
