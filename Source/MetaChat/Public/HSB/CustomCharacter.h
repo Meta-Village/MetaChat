@@ -46,4 +46,8 @@ public:
     // Feet
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Character Parts")
     USkeletalMeshComponent* FeetMesh;
+
+    // level 넘어갈 때 로드될 정보
+	UFUNCTION(BlueprintCallable)
+	void Load();
 };

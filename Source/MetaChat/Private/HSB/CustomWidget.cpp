@@ -49,7 +49,7 @@ void UCustomWidget::NativeConstruct()
 void UCustomWidget::InitSlot()
 {
     // DataTable 불러오기
-    UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/HSB/BluePrints/DT_InvInfo.DT_InvInfo'"));
+    UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/XR_HSB/BluePrints/DT_InvInfo.DT_InvInfo'"));
     if (!DataTable)
     {
         UE_LOG(LogTemp, Error, TEXT("DataTable failed to load."));
@@ -189,6 +189,8 @@ void UCustomWidget::OnButtonApply()
 		UE_LOG(LogTemp , Warning , TEXT("Mesh states have been saved."));
 	}
 }
+
+
 
 // void UCustomWidget::OnButtonUndo()
 // {

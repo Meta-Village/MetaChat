@@ -56,8 +56,5 @@ public:
 	void OnShoesButtonClicked();
 
 	UFUNCTION()
-	void OnButtonApply();
-
-
-	// 버튼 바인딩
+	void OnButtonApply(); // 저장된 내용은 SaveGame에서 load함수로 불러올 수 있음
 };
