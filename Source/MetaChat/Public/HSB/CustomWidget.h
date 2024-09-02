@@ -41,6 +41,11 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BtnShoes;
 
+	// 적용 버튼 바인딩
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BtnApply;
+
+
 	UFUNCTION()
 	void OnHairButtonClicked();
 	UFUNCTION()
@@ -49,6 +54,9 @@ public:
 	void OnLowerButtonClicked();
 	UFUNCTION()
 	void OnShoesButtonClicked();
+
+	UFUNCTION()
+	void OnButtonApply();
 
 
 	// 버튼 바인딩

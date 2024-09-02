@@ -6,6 +6,9 @@
 #include "Components/Button.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Delegates/Delegate.h"
+#include "HSB/CustomCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "SB/CustomSaveGame.h"
 
 void UCustomWidget::NativeConstruct()
 {
@@ -31,6 +34,16 @@ void UCustomWidget::NativeConstruct()
     {
         BtnShoes->OnClicked.AddDynamic(this , &UCustomWidget::OnShoesButtonClicked);
     }
+    // 버튼 클릭 이벤트 바인딩
+    if ( BtnApply )
+    {
+        BtnApply->OnClicked.AddDynamic(this , &UCustomWidget::OnButtonApply);
+    }
+//     // 버튼 클릭 이벤트 바인딩
+//     if ( BtnUndo )
+//     {
+//         BtnUndo->OnClicked.AddDynamic(this , &UCustomWidget::OnButtonUndo);
+//     }
 }
 
 void UCustomWidget::InitSlot()
@@ -135,4 +148,111 @@ void UCustomWidget::OnShoesButtonClicked()
     UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
 }
 
+void UCustomWidget::OnButtonApply()
+{
+    UE_LOG(LogTemp , Warning , TEXT("Apply Button Click"));
 
+    ACustomCharacter* Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+    if ( !Character )
+    {
+        UE_LOG(LogTemp , Error , TEXT("Failed to get player character"));
+        return;
+    }
+
+    // 현재 메쉬 상태 저장
+    UCustomSaveGame* SaveGameInstance = CastChecked<UCustomSaveGame>(UGameplayStatics::CreateSaveGameObject(UCustomSaveGame::StaticClass()));
+    if(SaveGameInstance )
+	{
+		if ( Character->HairMesh )
+		{
+			FString MeshPath = Character->HairMesh->SkeletalMesh->GetPathName();
+			SaveGameInstance->SavedMeshes.Add("Hair" , MeshPath);
+		}
+		if ( Character->UpperBodyMesh )
+		{
+			FString MeshPath = Character->UpperBodyMesh->SkeletalMesh->GetPathName();
+			SaveGameInstance->SavedMeshes.Add("Upper" , MeshPath);
+		}
+		if ( Character->LowerBodyMesh )
+		{
+			FString MeshPath = Character->LowerBodyMesh->SkeletalMesh->GetPathName();
+			SaveGameInstance->SavedMeshes.Add("Lower" , MeshPath);
+		}
+		if ( Character->FeetMesh )
+		{
+			FString MeshPath = Character->FeetMesh->SkeletalMesh->GetPathName();
+			SaveGameInstance->SavedMeshes.Add("Feet" , MeshPath);
+		}
+
+		// SaveGame 저장
+		UGameplayStatics::SaveGameToSlot(SaveGameInstance , TEXT("CharacterMeshSaveSlot") , 0);
+		UE_LOG(LogTemp , Warning , TEXT("Mesh states have been saved."));
+	}
+}
+
+// void UCustomWidget::OnButtonUndo()
+// {
+//     UE_LOG(LogTemp , Warning , TEXT("Undo Button Click"));
+// 
+//     ACustomCharacter* Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld() , 0));
+//     if ( !Character )
+//     {
+//         UE_LOG(LogTemp , Error , TEXT("Failed to get player character"));
+//         return;
+//     }
+// 
+//     // SaveGame 로드
+//     UCustomSaveGame* SaveGameInstance = CastChecked<UCustomSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("CharacterMeshSaveSlot"), 0));
+//     if ( SaveGameInstance )
+//     {
+//         // Mesh들 복원
+//         FString* MeshPath_h = SaveGameInstance->SavedMeshes.Find("Hair");
+//         if ( MeshPath_h )
+//         {
+//             USkeletalMesh* PreviousMesh = LoadObject<USkeletalMesh>(nullptr, 
+//             **MeshPath_h);
+//             if ( PreviousMesh )
+//             {
+//                 Character->HairMesh->SetSkeletalMesh(PreviousMesh);
+//                 UE_LOG(LogTemp , Warning , TEXT("Hair mesh has been restored."));
+//             }
+//         }
+//         FString* MeshPath_u = SaveGameInstance->SavedMeshes.Find("Upper");
+//         if ( MeshPath_u )
+//         {
+//             USkeletalMesh* PreviousMesh = LoadObject<USkeletalMesh>(nullptr ,
+//             **MeshPath_u);
+//             if ( PreviousMesh )
+//             {
+//                 Character->UpperBodyMesh->SetSkeletalMesh(PreviousMesh);
+//                 UE_LOG(LogTemp , Warning , TEXT("Upper mesh has been restored."));
+//             }
+//         }
+//         FString* MeshPath_l = SaveGameInstance->SavedMeshes.Find("Lower");
+//         if ( MeshPath_l )
+//         {
+//             USkeletalMesh* PreviousMesh = LoadObject<USkeletalMesh>(nullptr ,
+//             **MeshPath_l);
+//             if ( PreviousMesh )
+//             {
+//                 Character->LowerBodyMesh->SetSkeletalMesh(PreviousMesh);
+//                 UE_LOG(LogTemp , Warning , TEXT("Lower mesh has been restored."));
+//             }
+//         }
+//         FString* MeshPath_f = SaveGameInstance->SavedMeshes.Find("Feet");
+//         if ( MeshPath_f )
+//         {
+//             USkeletalMesh* PreviousMesh = LoadObject<USkeletalMesh>(nullptr ,
+//             **MeshPath_f);
+//             if ( PreviousMesh )
+//             {
+//                 Character->FeetMesh->SetSkeletalMesh(PreviousMesh);
+//                 UE_LOG(LogTemp , Warning , TEXT("Feet mesh has been restored."));
+//             }
+//         }
+//     }
+//     else
+//     {
+//         UE_LOG(LogTemp , Error , TEXT("Failed to load save game"));
+//     }
+// }
