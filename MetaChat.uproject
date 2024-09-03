@@ -39,8 +39,8 @@
 			"Enabled": true
 		},
 		{
-			"Name": "WebSocketNetworking",
-			"Enabled": true
+            			"Name": "WebSocketNetworking",
+            			"Enabled": true
 		}
 	]
 }
