@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PixelStreamingActor.h"
+#include "LSJ/PixelStreamingActor.h"
 //#include "IPixelStreamingModule.h"
 //#include "Modules/ModuleManager.h"
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Private/PixelStreamingModule.h"

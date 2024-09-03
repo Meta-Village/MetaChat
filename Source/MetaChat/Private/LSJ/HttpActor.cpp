@@ -1,10 +1,10 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HttpActor.h"
-#include "UserWidgetTEST.h"
+#include "LSJ/HttpActor.h"
+#include "LSJ/UserWidgetTEST.h"
 #include <HttpModule.h>
-#include "JsonParseLib.h"
+#include "LSJ/JsonParseLib.h"
 
 #include "Engine/Texture2D.h"
 #include "Engine/Texture2DDynamic.h"
