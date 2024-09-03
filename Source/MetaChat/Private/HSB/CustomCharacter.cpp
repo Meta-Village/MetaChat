@@ -51,6 +51,8 @@ void ACustomCharacter::Load()
     {
         // HairMesh 로드 및 적용
         FString* MeshPath_h = LoadedGameInstance->SavedMeshes.Find("Hair");
+        UE_LOG(LogTemp, Warning, TEXT("%s"), **MeshPath_h);
+
         if (MeshPath_h)
         {
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_h);
