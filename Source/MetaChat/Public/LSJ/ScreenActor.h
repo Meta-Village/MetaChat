@@ -37,5 +37,6 @@ public:
 
 	//블루프린트 함수 호출
 	void StopLookSharingScreen();
+	void BeginStreaming();
 	void BeginLookSharingScreen();
 };

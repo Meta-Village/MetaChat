@@ -138,6 +138,24 @@ void AScreenActor::StopLookSharingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
 	}
 }
+void AScreenActor::BeginStreaming()
+{
+	// 블루프린트 함수 이름
+	FName FunctionName(TEXT("NewFunction")); // 블루프린트에서 정의한 함수명
+
+	// 블루프린트 함수 가져오기
+	UFunction* Function = FindFunction(FunctionName);
+
+	if (Function)
+	{
+		// 블루프린트 함수 호출 (매개변수가 없는 경우)
+		ProcessEvent(Function, nullptr);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
+	}
+}
 void AScreenActor::BeginLookSharingScreen()
 {
 	// 블루프린트 함수 이름
