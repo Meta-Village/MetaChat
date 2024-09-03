@@ -1,7 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MetaChatGameInstance.h"
+#include "LSJ/MetaChatGameInstance.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "Online/OnlineSessionNames.h"
@@ -35,20 +35,20 @@ void UMetaChatGameInstance::CreateGameSession()
 		{
 			TSharedPtr<FOnlineSessionSettings> SessionSettings = MakeShareable(new FOnlineSessionSettings());
 			SessionSettings->bIsLANMatch= false;
-			// °ÔÀÓ ÇÃ·¹ÀÌ¾î ÃÑ¿ø
+			// ê²Œìž„ í”Œë ˆì´ì–´ ì´ì›
 			SessionSettings->NumPublicConnections = 100;
-			// °ÔÀÓ ¼¼¼Ç ½ÇÇàÁßÀÌ¸é ´Ù¸¥À¯Àúµµ °¡ÀÔ °¡´ÉÇÑÁö
+			// ê²Œìž„ ì„¸ì…˜ ì‹¤í–‰ì¤‘ì´ë©´ ë‹¤ë¥¸ìœ ì €ë„ ê°€ìž… ê°€ëŠ¥í•œì§€
 			SessionSettings->bAllowJoinInProgress = true;
-			// ½ºÆÀÀÌ °ÔÀÓ ¼¼¼ÇÀ» ¼³Á¤ÇÒ ¶§ Á¸ÀçÇÑ´Ù´Â °Í?
-			// Àü ¼¼°è ¸ðµç ÇÃ·¹ÀÌ¾î¿ÍÀÇ ¿¬°áÀÌ ¾Æ´Ñ Áö¿ªÀÌ ÀÖ°í Áö¿ª¿¡¼­ ¹ß»ýÇÏ´Â ¼¼¼Ç °Ë»öÇÏµµ·Ï
+			// ìŠ¤íŒ€ì´ ê²Œìž„ ì„¸ì…˜ì„ ì„¤ì •í•  ë•Œ ì¡´ìž¬í•œë‹¤ëŠ” ê²ƒ?
+			// ì „ ì„¸ê³„ ëª¨ë“  í”Œë ˆì´ì–´ì™€ì˜ ì—°ê²°ì´ ì•„ë‹Œ ì§€ì—­ì´ ìžˆê³  ì§€ì—­ì—ì„œ ë°œìƒí•˜ëŠ” ì„¸ì…˜ ê²€ìƒ‰í•˜ë„ë¡
 			SessionSettings->bAllowJoinViaPresence = true;
-			// ½ºÆÀÀÌ ¼¼¼ÇÀ» ±¤°íÇØ¼­ ´Ù¸¥ À¯ÀúµéÀÌ Âü¿©ÇÒ ¼ö ÀÖ´Ù.
+			// ìŠ¤íŒ€ì´ ì„¸ì…˜ì„ ê´‘ê³ í•´ì„œ ë‹¤ë¥¸ ìœ ì €ë“¤ì´ ì°¸ì—¬í•  ìˆ˜ ìžˆë‹¤.
 			SessionSettings->bShouldAdvertise = true;
-			// ÇöÀç Áö¿ª¿¡¼­ ÁøÇàÁßÀÎ ¼¼¼ÇÀ» Ã£´Â´Ù
+			// í˜„ìž¬ ì§€ì—­ì—ì„œ ì§„í–‰ì¤‘ì¸ ì„¸ì…˜ì„ ì°¾ëŠ”ë‹¤
 			SessionSettings->bUsesPresence = true;
 			const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 			OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *SessionSettings);
-			// ¼¼¼Ç »ý¼º ÄÝ¹éÀ» À§ÇÑ Delegate ¹ÙÀÎµù
+			// ì„¸ì…˜ ìƒì„± ì½œë°±ì„ ìœ„í•œ Delegate ë°”ì¸ë”©
 			OnlineSessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UMetaChatGameInstance::OnCreateSessionComplete);
 	
 		}
@@ -76,11 +76,11 @@ void UMetaChatGameInstance::JoinGameSession()
 		if (OnlineSessionInterface.IsValid())
 		{
 			SessionSearch = MakeShareable(new FOnlineSessionSearch());
-			SessionSearch->MaxSearchResults = 10;	// °Ë»ö °á°ú·Î ³ª¿À´Â ¼¼¼Ç ¼ö ÃÖ´ë°ª
-			SessionSearch->bIsLanQuery = false;			// LAN »ç¿ë ¿©ºÎ
-			//SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals); // Ã£À» ¼¼¼Ç Äõ¸®¸¦ ÇöÀç·Î ¼³Á¤ÇÑ´Ù
+			SessionSearch->MaxSearchResults = 10;	// ê²€ìƒ‰ ê²°ê³¼ë¡œ ë‚˜ì˜¤ëŠ” ì„¸ì…˜ ìˆ˜ ìµœëŒ€ê°’
+			SessionSearch->bIsLanQuery = false;			// LAN ì‚¬ìš© ì—¬ë¶€
+			//SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals); // ì°¾ì„ ì„¸ì…˜ ì¿¼ë¦¬ë¥¼ í˜„ìž¬ë¡œ ì„¤ì •í•œë‹¤
 		
-			// ¼¼¼Ç °Ë»ö ÄÝ¹éÀ» À§ÇÑ Delegate ¹ÙÀÎµù
+			// ì„¸ì…˜ ê²€ìƒ‰ ì½œë°±ì„ ìœ„í•œ Delegate ë°”ì¸ë”©
 			const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 				OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
 	
@@ -146,11 +146,11 @@ void UMetaChatGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSess
 void UMetaChatGameInstance::Init()
 {
 	Super::Init();
-	// OnlineSubsystem¿¡ Access
+	// OnlineSubsystemì— Access
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	if (OnlineSubsystem)
 	{
-		// ¿Â¶óÀÎ ¼¼¼Ç ¹Þ¾Æ¿À±â
+		// ì˜¨ë¼ì¸ ì„¸ì…˜ ë°›ì•„ì˜¤ê¸°
 		OnlineSessionInterface = OnlineSubsystem->GetSessionInterface();
 		OnlineSessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMetaChatGameInstance::OnFindSessionsComplete);
 
@@ -180,17 +180,17 @@ void UMetaChatGameInstance::OnFindSessionComplete(bool bWasSuccessful)
 		FString Id = Result.GetSessionIdStr();
 		FString User = Result.Session.OwningUserName;
 
-		// ¸ÅÄ¡ Å¸ÀÔ È®ÀÎÇÏ±â
+		// ë§¤ì¹˜ íƒ€ìž… í™•ì¸í•˜ê¸°
 		FString MatchType;
 		Result.Session.SessionSettings.Get(FName("MatchType"), MatchType);
 
-		// Ã£Àº ¼¼¼ÇÀÇ Á¤º¸ Ãâ·ÂÇÏ±â
+		// ì°¾ì€ ì„¸ì…˜ì˜ ì •ë³´ ì¶œë ¥í•˜ê¸°
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Session ID : %s / Owner : %s"), *Id, *User));
 		}
 
-		// ¼¼¼ÇÀÇ ¸ÅÄ¡ Å¸ÀÔÀÌ "FreeForAll"ÀÏ °æ¿ì ¼¼¼Ç Âü°¡
+		// ì„¸ì…˜ì˜ ë§¤ì¹˜ íƒ€ìž…ì´ "FreeForAll"ì¼ ê²½ìš° ì„¸ì…˜ ì°¸ê°€
 		if (MatchType == FString("FreeForAll"))
 		{
 			if (GEngine)
@@ -198,7 +198,7 @@ void UMetaChatGameInstance::OnFindSessionComplete(bool bWasSuccessful)
 				GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Joining Match Type : %s"), *MatchType));
 			}
 
-			// Join Session Complete Delegate µî·Ï 
+			// Join Session Complete Delegate ë“±ë¡ 
 			OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
 
 
@@ -221,7 +221,7 @@ void UMetaChatGameInstance::CreateGameSession()
 		return;
 	}
 
-	// ÀÌ¹Ì ¼¼¼ÇÀÌ Á¸ÀçÇÑ´Ù¸é ±âÁ¸ ¼¼¼ÇÀ» »èÁ¦ÇÑ´Ù
+	// ì´ë¯¸ ì„¸ì…˜ì´ ì¡´ìž¬í•œë‹¤ë©´ ê¸°ì¡´ ì„¸ì…˜ì„ ì‚­ì œí•œë‹¤
 	auto ExistingSession = OnlineSessionInterface->GetNamedSession(NAME_GameSession);
 	if (ExistingSession != nullptr)
 	{
@@ -234,21 +234,21 @@ void UMetaChatGameInstance::CreateGameSession()
 		}
 	}
 
-	// ¼¼¼Ç »ý¼º ¿Ï·á ÈÄ È£ÃâµÉ delegate ¸®½ºÆ®¿¡ CreateSessionCompleteDelegate Ãß°¡
+	// ì„¸ì…˜ ìƒì„± ì™„ë£Œ í›„ í˜¸ì¶œë  delegate ë¦¬ìŠ¤íŠ¸ì— CreateSessionCompleteDelegate ì¶”ê°€
 	OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
 
-	// ¼¼¼Ç ¼¼ÆÃÇÏ±â
+	// ì„¸ì…˜ ì„¸íŒ…í•˜ê¸°
 	TSharedPtr<FOnlineSessionSettings> SessionSettings = MakeShareable(new FOnlineSessionSettings());
 
-	SessionSettings->bIsLANMatch = true;			// LAN ¿¬°á
-	SessionSettings->NumPublicConnections = 4;		// ÃÖ´ë Á¢¼Ó °¡´É ¼ö
-	SessionSettings->bAllowJoinInProgress = true;//Session ÁøÇàÁß¿¡ Á¢¼Ó Çã¿ë
-	SessionSettings->bAllowJoinViaPresence = true;//¼¼¼Ç Âü°¡ Áö¿ªÀ» ÇöÀç Áö¿ªÀ¸·Î Á¦ÇÑ (½ºÆÀÀÇ presence »ç¿ë)
-	SessionSettings->bShouldAdvertise = true;		// ÇöÀç ¼¼¼ÇÀ» ±¤°íÇÒÁö (½ºÆÀÀÇ ´Ù¸¥ ÇÃ·¹ÀÌ¾î¿¡°Ô ¼¼¼Ç È«º¸ ¿©ºÎ)
-	SessionSettings->bUsesPresence = true;			// ÇöÀç Áö¿ª¿¡ ¼¼¼Ç Ç¥½Ã
-	SessionSettings->bUseLobbiesIfAvailable = true; // ÇÃ·§ÆûÀÌ Áö¿øÇÏ´Â °æ¿ì ·Îºñ API »ç¿ë
-	//SessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ? true : false; // NULLÀÏ °æ¿ì LAN ¿¬°á
-	SessionSettings->Set(FName("MatchType"), FString("FreeForAll"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing); // ¼¼¼ÇÀÇ MatchTypeÀ» ¸ðµÎ¿¡°Ô ¿­¸², ¿Â¶óÀÎ¼­ºñ½º¿Í ÇÎÀ» ÅëÇØ ¼¼¼Ç È«º¸ ¿É¼ÇÀ¸·Î ¼³Á¤
+	SessionSettings->bIsLANMatch = true;			// LAN ì—°ê²°
+	SessionSettings->NumPublicConnections = 4;		// ìµœëŒ€ ì ‘ì† ê°€ëŠ¥ ìˆ˜
+	SessionSettings->bAllowJoinInProgress = true;//Session ì§„í–‰ì¤‘ì— ì ‘ì† í—ˆìš©
+	SessionSettings->bAllowJoinViaPresence = true;//ì„¸ì…˜ ì°¸ê°€ ì§€ì—­ì„ í˜„ìž¬ ì§€ì—­ìœ¼ë¡œ ì œí•œ (ìŠ¤íŒ€ì˜ presence ì‚¬ìš©)
+	SessionSettings->bShouldAdvertise = true;		// í˜„ìž¬ ì„¸ì…˜ì„ ê´‘ê³ í• ì§€ (ìŠ¤íŒ€ì˜ ë‹¤ë¥¸ í”Œë ˆì´ì–´ì—ê²Œ ì„¸ì…˜ í™ë³´ ì—¬ë¶€)
+	SessionSettings->bUsesPresence = true;			// í˜„ìž¬ ì§€ì—­ì— ì„¸ì…˜ í‘œì‹œ
+	SessionSettings->bUseLobbiesIfAvailable = true; // í”Œëž«í¼ì´ ì§€ì›í•˜ëŠ” ê²½ìš° ë¡œë¹„ API ì‚¬ìš©
+	//SessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ? true : false; // NULLì¼ ê²½ìš° LAN ì—°ê²°
+	SessionSettings->Set(FName("MatchType"), FString("FreeForAll"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing); // ì„¸ì…˜ì˜ MatchTypeì„ ëª¨ë‘ì—ê²Œ ì—´ë¦¼, ì˜¨ë¼ì¸ì„œë¹„ìŠ¤ì™€ í•‘ì„ í†µí•´ ì„¸ì…˜ í™ë³´ ì˜µì…˜ìœ¼ë¡œ ì„¤ì •
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	//OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *SessionSettings);
@@ -256,7 +256,7 @@ void UMetaChatGameInstance::CreateGameSession()
 }
 void UMetaChatGameInstance::JoinGameSession()
 {
-	// ¼¼¼Ç ÀÎÅÍÆäÀÌ½º À¯È¿¼º °Ë»ç
+	// ì„¸ì…˜ ì¸í„°íŽ˜ì´ìŠ¤ ìœ íš¨ì„± ê²€ì‚¬
 	if (!OnlineSessionInterface.IsValid())
 	{
 		// log
@@ -267,15 +267,15 @@ void UMetaChatGameInstance::JoinGameSession()
 		return;
 	}
 
-	// Find Session Complete Delegate µî·Ï
+	// Find Session Complete Delegate ë“±ë¡
 	OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegate);
 
 	// Find Game Session
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
-	SessionSearch->MaxSearchResults = 10000;	// °Ë»ö °á°ú·Î ³ª¿À´Â ¼¼¼Ç ¼ö ÃÖ´ë°ª
-	SessionSearch->bIsLanQuery = true;			// LAN »ç¿ë ¿©ºÎ
+	SessionSearch->MaxSearchResults = 10000;	// ê²€ìƒ‰ ê²°ê³¼ë¡œ ë‚˜ì˜¤ëŠ” ì„¸ì…˜ ìˆ˜ ìµœëŒ€ê°’
+	SessionSearch->bIsLanQuery = true;			// LAN ì‚¬ìš© ì—¬ë¶€
 	SessionSearch->PingBucketSize = 50;
-	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals); // Ã£À» ¼¼¼Ç Äõ¸®¸¦ ÇöÀç·Î ¼³Á¤ÇÑ´Ù
+	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals); // ì°¾ì„ ì„¸ì…˜ ì¿¼ë¦¬ë¥¼ í˜„ìž¬ë¡œ ì„¤ì •í•œë‹¤
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	//OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
@@ -286,7 +286,7 @@ void UMetaChatGameInstance::OnJoinSessionComplate(FName SessionName, EOnJoinSess
 	if (!OnlineSessionInterface.IsValid())
 		return;
 
-	// ¼¼¼Ç¿¡ Á¶ÀÎÇß´Ù¸é IP Address¾ò¾î¿Í¼­ ÇØ´ç ¼­¹ö¿¡ Á¢¼Ó
+	// ì„¸ì…˜ì— ì¡°ì¸í–ˆë‹¤ë©´ IP Addressì–»ì–´ì™€ì„œ í•´ë‹¹ ì„œë²„ì— ì ‘ì†
 	FString Address;
 	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, Address))
 	{
@@ -304,7 +304,7 @@ void UMetaChatGameInstance::OnJoinSessionComplate(FName SessionName, EOnJoinSess
 }
 void UMetaChatGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccssful)
 {
-	// ¼¼¼Ç »ý¼º ¼º°ø!
+	// ì„¸ì…˜ ìƒì„± ì„±ê³µ!
 	if (bWasSuccssful)
 	{
 		if (GEngine)
@@ -313,7 +313,7 @@ void UMetaChatGameInstance::OnCreateSessionComplete(FName SessionName, bool bWas
 		}
 	}
 
-	// ¼¼¼± »ý¼º ½ÇÆÐ
+	// ì„¸ì„  ìƒì„± ì‹¤íŒ¨
 	else
 	{
 		if (GEngine)
@@ -337,7 +337,7 @@ UMetaChatGameInstance::UMetaChatGameInstance()
 
 		if (GEngine)
 		{
-			// OnlineSubsystem ÀÌ¸§ Ãâ·ÂÇÏ±â
+			// OnlineSubsystem ì´ë¦„ ì¶œë ¥í•˜ê¸°
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Found subsystem %s"), *OnlineSubsystem->GetSubsystemName().ToString()));
 		}
 	}
@@ -381,7 +381,7 @@ void UMetaChatGameInstance::CreateSession(int32 NumPublicConnections, FString Ma
 
 	// Setting options for a new session
 	LastSessionSettings = MakeShareable(new FOnlineSessionSettings());
-	LastSessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ? true : false; // NULLÀÏ °æ¿ì LAN ¿¬°á
+	LastSessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ? true : false; // NULLì¼ ê²½ìš° LAN ì—°ê²°
 	LastSessionSettings->NumPublicConnections = NumPublicConnections;
 	LastSessionSettings->bAllowJoinInProgress = true;
 	LastSessionSettings->bAllowJoinViaPresence = true;
