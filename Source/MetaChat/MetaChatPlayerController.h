@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -55,6 +55,7 @@ protected:
 	void OnInputStarted();
 	void OnSetDestinationTriggered();
 	void OnSetDestinationReleased();
+
 	void OnTouchTriggered();
 	void OnTouchReleased();
 
@@ -63,6 +64,16 @@ private:
 
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
+
+	void MoveToLocation(const FVector& Location);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerMoveToLocation(const FVector& Location);
+	void ServerMoveToLocation_Implementation(const FVector& Location);
+	bool ServerMoveToLocation_Validate(const FVector& Location);
+
+	void MoveToLocationTick();
+	FTimerHandle MoveTimerHandle;
 };
 
 

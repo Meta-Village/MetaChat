@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MetaChatPlayerController.h"
 #include "GameFramework/Pawn.h"
@@ -11,6 +11,7 @@
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "TimerManager.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -63,6 +64,7 @@ void AMetaChatPlayerController::SetupInputComponent()
 void AMetaChatPlayerController::OnInputStarted()
 {
 	StopMovement();
+	OnSetDestinationTriggered();  // 입력이 시작될 때 바로 이동을 시도
 }
 
 // Triggered every frame when the input is held down
@@ -100,16 +102,66 @@ void AMetaChatPlayerController::OnSetDestinationTriggered()
 
 void AMetaChatPlayerController::OnSetDestinationReleased()
 {
-	// If it was a short press
-	if (FollowTime <= ShortPressThreshold)
+// 	// If it was a short press
+// 	if (FollowTime <= ShortPressThreshold)
+// 	{
+// 		// We move there and spawn some particles
+// 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+// 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+// 	}
+
+	// 서버에서 이동 처리
+	if (HasAuthority())
 	{
-		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+		MoveToLocation(CachedDestination);
+
 	}
+	else
+	{
+		ServerMoveToLocation_Implementation(CachedDestination);
+	}
+
+	// 이동클릭 이펙트
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 
 	FollowTime = 0.f;
 }
+
+void AMetaChatPlayerController::MoveToLocation(const FVector& Location)
+{
+	CachedDestination = Location;
+	// 서버에서 지속적으로 이동 처리
+	GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &AMetaChatPlayerController::MoveToLocationTick, GetWorld()->GetDeltaSeconds(), true);
+}
+
+void AMetaChatPlayerController::MoveToLocationTick()
+{
+	APawn* ControlledPawn = GetPawn();
+	if (ControlledPawn)
+	{
+		FVector Direction = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+		ControlledPawn->AddMovementInput(Direction, 1.0f, false);
+
+		if (FVector::DistSquared(ControlledPawn->GetActorLocation(), CachedDestination) < FMath::Square(10.0f))
+		{
+			// 도착 지점 근처에 도달한 경우 타이머를 멈추고 이동 종료
+			GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
+		}
+	}
+}
+
+void AMetaChatPlayerController::ServerMoveToLocation_Implementation(const FVector& Location)
+{
+	// 서버에서 이동 처리
+	MoveToLocation(Location);
+}
+
+bool AMetaChatPlayerController::ServerMoveToLocation_Validate(const FVector& Location)
+{
+	return true;
+}
+
+
 
 // Triggered every frame when the input is held down
 void AMetaChatPlayerController::OnTouchTriggered()
