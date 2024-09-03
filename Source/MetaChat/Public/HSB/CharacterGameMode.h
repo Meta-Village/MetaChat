@@ -10,9 +10,5 @@ UCLASS()
 class METACHAT_API ACharacterGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory")
-	TArray<FInventoryItem> InventoryItems;
 
 };
