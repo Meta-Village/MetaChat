@@ -11,6 +11,16 @@
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputBackBuffer.h"
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingModule.h"
 #include "Modules/ModuleManager.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingEditor/Public/PixelStreamingVideoInputViewport.h"
+#include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/OnlineSubsystem.h"
+#include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/Interfaces/OnlineSessionInterface.h"
+#include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/OnlineSessionSettings.h"
+
+#include "LevelEditorViewport.h"
+#include "Slate/SceneViewport.h"
+#include "EditorViewportClient.h"
+
+
 void ULSJMainWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -34,27 +44,45 @@ void ULSJMainWidget::NativeConstruct()
 void ULSJMainWidget::OnButtonWindowScreen()
 {
 	bStreaming = !bStreaming;
-
+	FString streamID = "Editor";
 	if (bStreaming)
 	{
 		ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
 		//ScreenActor->BeginStreaming();
 		// 1. PixelStreaming 모듈을 가져옵니다.
 		IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>("PixelStreaming");
-
+		
 		if (PixelStreamingModule)
 		{
-			// 2. 스트리머를 가져옵니다.
-			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer("Editor");
-
+			// 현재 세션의 아이디를 가져와서 Streamer를 생성한다.
+			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);//GetCurrentSessionID());
+			//TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->CreateStreamer("Test01");
 			if (Streamer.IsValid())
 			{
-				// 3. Back Buffer를 비디오 입력으로 설정합니다.
-				TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
-				Streamer->SetVideoInput(VideoInput);
+				/*FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>("LevelEditor");
+				TSharedPtr<SLevelViewport> ActiveLevelViewport = LevelEditorModule.GetFirstActiveLevelViewport();
+				if (!ActiveLevelViewport.IsValid())
+				{
+					return;
+				}
 
-				// 4. 스트리밍을 시작합니다.
-				Streamer->StartStreaming();
+				FLevelEditorViewportClient& LevelViewportClient = ActiveLevelViewport->GetLevelViewportClient();
+				FSceneViewport* SceneViewport = static_cast<FSceneViewport*>(LevelViewportClient.Viewport);
+				Streamer->SetTargetViewport(SceneViewport->GetViewportWidget());
+				Streamer->SetTargetWindow(SceneViewport->FindWindow());
+				Streamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWindow);
+				Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));*/
+				{
+					TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
+					//Back Buffer를 비디오 입력으로 설정합니다.
+					Streamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
+					Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
+					Streamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
+					
+					//스트리밍을 시작합니다.
+					Streamer->StartStreaming();
+				}
+				
 			}
 			else
 			{
@@ -76,14 +104,10 @@ void ULSJMainWidget::OnButtonWindowScreen()
 		if (PixelStreamingModule)
 		{
 			// 2. 스트리머를 가져옵니다.
-			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer("Editor");
+			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);
 
 			if (Streamer.IsValid())
 			{
-				// 3. Back Buffer를 비디오 입력으로 설정합니다.
-				TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
-				Streamer->SetVideoInput(VideoInput);
-
 				// 4. 스트리밍을 시작합니다.
 				Streamer->StopStreaming();
 			}
@@ -119,4 +143,26 @@ void ULSJMainWidget::OnButtonLookSharingScreen()
 void ULSJMainWidget::SetScreenActor(AScreenActor* Actor)
 {
 	ScreenActor = Actor;
+}
+
+FString ULSJMainWidget::GetCurrentSessionID()
+{
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	if (OnlineSubsystem)
+	{
+		IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
+		if (SessionInterface.IsValid())
+		{
+			// "GameSession"은 기본 세션 이름이며, 필요에 따라 다른 세션 이름을 사용할 수 있음
+			FNamedOnlineSession* NamedSession = SessionInterface->GetNamedSession(NAME_GameSession);
+			if (NamedSession)
+			{
+				// 세션 ID 가져오기
+				return NamedSession->GetSessionIdStr();
+			}
+		}
+	}
+
+	// 세션이 없거나 가져오지 못했을 때
+	return FString("No Session Found");
 }

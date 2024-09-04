@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "HAL/CriticalSection.h"
 #include "ScreenActor.generated.h"
 
 UCLASS()
 class METACHAT_API AScreenActor : public AActor
 {
 	GENERATED_BODY()
-
+	FCriticalSection CriticalSection;
 public:	
 	// Sets default values for this actor's properties
 	AScreenActor();
