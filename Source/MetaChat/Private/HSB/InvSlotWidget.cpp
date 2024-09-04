@@ -40,38 +40,6 @@ void UInvSlotWidget::SetItemData(const TArray<FSlot>& ItemsData)
             ImageWidget->SetBrushFromTexture(ItemsData[i].ItemIcon);
             // 버튼 클릭 이벤트 바인딩
             ButtonWidget->OnClicked.AddDynamic(this , &UInvSlotWidget::OnItemClicked);
-
-//             // Overlay 위젯을 동적으로 생성하고, 이미지와 버튼 추가
-//             OverlayWidget = NewObject<UOverlay>(this);
-//             if ( OverlayWidget )
-//             {
-//                 // Overlay에 이미지 추가
-//                 UOverlaySlot* ImageSlot = OverlayWidget->AddChildToOverlay(ImageWidget);
-//                 if ( ImageSlot )
-//                 {
-//                     ImageSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
-//                     ImageSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
-//                 }
-// 
-//                 // 아이콘 이미지 업데이트
-//                 ImageWidget->SetBrushFromTexture(ItemsData[i].ItemIcon);
-// 
-//                 // 버튼 위젯 동적 생성
-//                 UButton* ButtonWidget = NewObject<UButton>(this , FName(*FString::Printf(TEXT("Button_ItemIcon_%d") , i + 1)));
-//                 if ( ButtonWidget )
-//                 {
-//                     // 버튼 클릭 이벤트 바인딩
-//                     ButtonWidget->OnClicked.AddDynamic(this , &UInvSlotWidget::OnItemClicked);
-// 
-//                     // Overlay에 버튼 추가
-//                     UOverlaySlot* ButtonSlot = OverlayWidget->AddChildToOverlay(ButtonWidget);
-//                     if ( ButtonSlot )
-//                     {
-//                         ButtonSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
-//                         ButtonSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
-//                     }
-//                 }
-//            }
         }
     }
 
@@ -94,13 +62,30 @@ void UInvSlotWidget::OnItemClicked()
 
         // 버튼 이름 가져오기
         FString ButtonName = GetName();
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *ButtonName);
         ////////////////////////////////////////////////////////////////////////////////////////////
         if ( Category == "Hair" )
         {
             // 해당 그림에 맞는 Skeletal mesh를 찾는다
 
             TargetMeshComponent = Character->HairMesh; // 캐릭터의 Skeletal Mesh 참조
-            if ( ButtonName.Contains("WBP_InvParts_C_0") )
+
+            FString ExpectedButtonName0 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt-3);
+            FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt-2);
+            FString ExpectedButtonName2 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt-1);
+            if ( ButtonName.Contains(ExpectedButtonName0) )
+            {
+                if ( TargetMeshComponent )
+                {
+                    TargetMeshComponent->SetSkeletalMesh(nullptr);
+                    TargetMeshComponent->MarkRenderStateDirty();
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("Failed to delete mesh"));
+                }
+            }
+            else if ( ButtonName.Contains(ExpectedButtonName1) )
             {
                 USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_hat.Player_test_hat'"));
                 if ( NewMesh == nullptr )
@@ -110,30 +95,26 @@ void UInvSlotWidget::OnItemClicked()
                 if ( TargetMeshComponent )
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    TargetMeshComponent->MarkRenderStateDirty();
-
-                    UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 1"));
                 }
                 else
                 {
                     UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 1"));
                 }
             }
-            else if ( ButtonName.Contains("WBP_InvParts_C_1") )
+            else if (ButtonName.Contains(ExpectedButtonName2))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_hat.Player_test_hat'"));
-                if ( NewMesh == nullptr )
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_hat.Player_test_hat'"));
+                if (NewMesh == nullptr)
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to load SkeletalMesh 2"));
+                    UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
-                if ( TargetMeshComponent )
+                if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 2"));
                 }
                 else
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 2"));
+                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
                 }
             }
         }
@@ -143,7 +124,25 @@ void UInvSlotWidget::OnItemClicked()
             // 해당 그림에 맞는 Skeletal mesh를 찾는다
 
             TargetMeshComponent = Character->UpperBodyMesh; // 캐릭터의 Skeletal Mesh 참조
-            if ( ButtonName.Contains("WBP_InvParts_C_0") )
+
+            FString ExpectedButtonName0 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 3);
+            FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 2);
+            FString ExpectedButtonName2 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 1);
+            if (ButtonName.Contains(ExpectedButtonName0))
+            {
+                if ( TargetMeshComponent )
+                {
+                    TargetMeshComponent->SetSkeletalMesh(nullptr);
+                    TargetMeshComponent->MarkRenderStateDirty();
+
+                    UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 1"));
+                }
+                else
+                {
+                    UE_LOG(LogTemp , Error , TEXT("Failed to delete mesh"));
+                }
+            }
+            else if (ButtonName.Contains(ExpectedButtonName1))
             {
                 USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_cloth.Player_test_cloth'"));
                 if ( NewMesh == nullptr )
@@ -153,30 +152,28 @@ void UInvSlotWidget::OnItemClicked()
                 if ( TargetMeshComponent )
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    TargetMeshComponent->MarkRenderStateDirty();
-
                     UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 1"));
                 }
                 else
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 1"));
+                    UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 2"));
                 }
             }
-            else if ( ButtonName.Contains("WBP_InvParts_C_1") )
+            else if (ButtonName.Contains(ExpectedButtonName2))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_cloth.Player_test_cloth'"));
-                if ( NewMesh == nullptr )
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_cloth.Player_test_cloth'"));
+                if (NewMesh == nullptr)
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to load SkeletalMesh 2"));
+                    UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
-                if ( TargetMeshComponent )
+                if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 2"));
+                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
                 }
                 else
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 2"));
+                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
                 }
             }
         }
@@ -186,7 +183,25 @@ void UInvSlotWidget::OnItemClicked()
             // 해당 그림에 맞는 Skeletal mesh를 찾는다
 
             TargetMeshComponent = Character->LowerBodyMesh; // 캐릭터의 Skeletal Mesh 참조
-            if ( ButtonName.Contains("WBP_InvParts_C_0") )
+
+            FString ExpectedButtonName0 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 3);
+            FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 2);
+            FString ExpectedButtonName2 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 1);
+            if (ButtonName.Contains(ExpectedButtonName0))
+            {
+                if ( TargetMeshComponent )
+                {
+                    TargetMeshComponent->SetSkeletalMesh(nullptr);
+                    TargetMeshComponent->MarkRenderStateDirty();
+
+                    UE_LOG(LogTemp , Warning , TEXT("Success to delete mesh"));
+                }
+                else
+                {
+                    UE_LOG(LogTemp , Error , TEXT("Failed to delete mesh"));
+                }
+            }
+            else if (ButtonName.Contains(ExpectedButtonName1))
             {
                 USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_pants.Player_test_pants'"));
                 if ( NewMesh == nullptr )
@@ -196,30 +211,28 @@ void UInvSlotWidget::OnItemClicked()
                 if ( TargetMeshComponent )
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    TargetMeshComponent->MarkRenderStateDirty();
-
                     UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 1"));
                 }
                 else
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 1"));
+                    UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 2"));
                 }
             }
-            else if ( ButtonName.Contains("WBP_InvParts_C_1") )
+            else if (ButtonName.Contains(ExpectedButtonName2))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_pants.Player_test_pants'"));
-                if ( NewMesh == nullptr )
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_pants.Player_test_pants'"));
+                if (NewMesh == nullptr)
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to load SkeletalMesh 2"));
+                    UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
-                if ( TargetMeshComponent )
+                if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 2"));
+                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
                 }
                 else
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 2"));
+                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
                 }
             }
         }
@@ -229,7 +242,25 @@ void UInvSlotWidget::OnItemClicked()
             // 해당 그림에 맞는 Skeletal mesh를 찾는다
 
             TargetMeshComponent = Character->FeetMesh; // 캐릭터의 Skeletal Mesh 참조
-            if ( ButtonName.Contains("WBP_InvParts_C_0") )
+
+            FString ExpectedButtonName0 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt -3);
+            FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt -2);
+            FString ExpectedButtonName2 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt -1);
+            if (ButtonName.Contains(ExpectedButtonName0))
+            {
+                if ( TargetMeshComponent )
+                {
+                    TargetMeshComponent->SetSkeletalMesh(nullptr);
+                    TargetMeshComponent->MarkRenderStateDirty();
+
+                    UE_LOG(LogTemp , Warning , TEXT("Success to delete mesh"));
+                }
+                else
+                {
+                    UE_LOG(LogTemp , Error , TEXT("Failed to Set delete mesh"));
+                }
+            }
+            else if (ButtonName.Contains(ExpectedButtonName1))
             {
                 USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_shoes.Player_test_shoes'"));
                 if ( NewMesh == nullptr )
@@ -239,8 +270,6 @@ void UInvSlotWidget::OnItemClicked()
                 if ( TargetMeshComponent )
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    TargetMeshComponent->MarkRenderStateDirty();
-
                     UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 1"));
                 }
                 else
@@ -248,21 +277,21 @@ void UInvSlotWidget::OnItemClicked()
                     UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 1"));
                 }
             }
-            else if ( ButtonName.Contains("WBP_InvParts_C_1") )
+            else if (ButtonName.Contains(ExpectedButtonName2))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr , TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_shoes.Player_test_shoes'"));
-                if ( NewMesh == nullptr )
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_shoes.Player_test_shoes'"));
+                if (NewMesh == nullptr)
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to load SkeletalMesh 2"));
+                    UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
-                if ( TargetMeshComponent )
+                if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp , Warning , TEXT("Success to load Mesh 2"));
+                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
                 }
                 else
                 {
-                    UE_LOG(LogTemp , Error , TEXT("Failed to Set SkeletalMesh 2"));
+                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
                 }
             }
         }

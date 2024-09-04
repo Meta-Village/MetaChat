@@ -99,7 +99,7 @@ void UCustomWidget::InitSlot()
                 Column++;
 
                 // 2열 그리드를 기준으로 행과 열을 자동으로 업데이트
-                if (Column >= 2) // 예를 들어 2열씩 배치하고 싶다면
+                if (Column >= 4) // 예를 들어 2열씩 배치하고 싶다면
                 {
                     Column = 0;
                     Row++;
@@ -110,14 +110,18 @@ void UCustomWidget::InitSlot()
                     UE_LOG(LogTemp, Error, TEXT("PartsPanel is not valid."));
                     return;
                 }
+
+                InvSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
             }
-			
 		}
 	}
 }
 
 void UCustomWidget::OnHairButtonClicked()
 {
+    P_clickcnt += 3;
+    UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
+
     DesiredCategory = "Hair";
     InitSlot(); // 슬롯 재생성
 
@@ -126,6 +130,9 @@ void UCustomWidget::OnHairButtonClicked()
 
 void UCustomWidget::OnUpperButtonClicked()
 {
+    P_clickcnt += 3;
+    UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
+
     DesiredCategory = "Upper";
     InitSlot(); // 슬롯 재생성
 
@@ -134,6 +141,9 @@ void UCustomWidget::OnUpperButtonClicked()
 
 void UCustomWidget::OnLowerButtonClicked()
 {
+    P_clickcnt += 3;
+    UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
+
     DesiredCategory = "Lower";
     InitSlot(); // 슬롯 재생성
 
@@ -142,6 +152,9 @@ void UCustomWidget::OnLowerButtonClicked()
 
 void UCustomWidget::OnShoesButtonClicked()
 {
+    P_clickcnt += 3;
+    UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
+
     DesiredCategory = "Shoes";
     InitSlot(); // 슬롯 재생성
 

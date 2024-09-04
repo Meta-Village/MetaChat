@@ -12,6 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -27,6 +28,8 @@ void AMetaChatPlayerController::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 }
 
 void AMetaChatPlayerController::SetupInputComponent()

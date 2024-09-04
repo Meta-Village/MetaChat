@@ -59,17 +59,21 @@ void AScreenActor::UpdateTexture()
 	if (TimeAccumulator >= CaptureInterval)
 	{
 		TimeAccumulator = 0.0f;
-
+		FScopeLock Lock(&CriticalSection);
+		if (CapturedTexture)
+		{
+			CapturedTexture->ConditionalBeginDestroy();
+		}
 		CapturedTexture = CaptureScreenToTexture();
 
-		if (nullptr!=DynamicMaterial)
+		if (DynamicMaterial && CapturedTexture&& WindowScreenPlaneMesh)
 		{
 			CapturedTexture->SRGB = true;
 			// BaseTexture 파라미터에 텍스처 설정
 			DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
 
 			// PlaneMesh에 머티리얼 적용
-			WindowScreenPlaneMesh->SetMaterial(0, DynamicMaterial);
+			
 		}
 	}
 }
@@ -174,6 +178,7 @@ void AScreenActor::BeginLookSharingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
 	}
 }
+
 // Called when the game starts or when spawned
 void AScreenActor::BeginPlay()
 {
@@ -187,7 +192,7 @@ void AScreenActor::BeginPlay()
 	// Z 축이 카메라를 향하도록 회전
 	//WindowScreenPlaneMesh->SetRelativeRotation(FRotator(0, LookAtRotation.Yaw, LookAtRotation.Roll));
 	DynamicMaterial = UMaterialInstanceDynamic::Create(WindowScreenPlaneMesh->GetMaterial(0), this);
-
+	WindowScreenPlaneMesh->SetMaterial(0, DynamicMaterial);
 	MainWidget = Cast<ULSJMainWidget>(CreateWidget<UUserWidget>(GetWorld(),MainWidgetFactory));
 	if (MainWidget)
 	{

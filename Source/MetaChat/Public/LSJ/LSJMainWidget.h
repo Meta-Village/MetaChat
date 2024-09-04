@@ -41,4 +41,6 @@ private:
 public:
 	void SetScreenActor(class AScreenActor* Actor);
 
+	
+	FString GetCurrentSessionID();
 };

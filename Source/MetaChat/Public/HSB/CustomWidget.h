@@ -31,6 +31,8 @@ public:
 	UFUNCTION()
 	void InitSlot();
 
+	int32 P_clickcnt = 0;
+
 	// 카테고리 클릭하면 슬롯 필터링
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BtnHair;
