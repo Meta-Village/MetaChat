@@ -46,6 +46,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnItemClicked();
 
+	int32 clickcnt=0;
+
 	UPROPERTY()
 	class ACustomCharacter* Character;
 
