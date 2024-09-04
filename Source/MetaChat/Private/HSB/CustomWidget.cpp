@@ -99,7 +99,7 @@ void UCustomWidget::InitSlot()
                 Column++;
 
                 // 2열 그리드를 기준으로 행과 열을 자동으로 업데이트
-                if (Column >= 4) // 예를 들어 2열씩 배치하고 싶다면
+                if (Column >= 2) // 예를 들어 2열씩 배치하고 싶다면
                 {
                     Column = 0;
                     Row++;
@@ -119,7 +119,7 @@ void UCustomWidget::InitSlot()
 
 void UCustomWidget::OnHairButtonClicked()
 {
-    P_clickcnt += 3;
+    P_clickcnt += 2;
     UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
 
     DesiredCategory = "Hair";
@@ -130,7 +130,7 @@ void UCustomWidget::OnHairButtonClicked()
 
 void UCustomWidget::OnUpperButtonClicked()
 {
-    P_clickcnt += 3;
+    P_clickcnt += 2;
     UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
 
     DesiredCategory = "Upper";
@@ -141,7 +141,7 @@ void UCustomWidget::OnUpperButtonClicked()
 
 void UCustomWidget::OnLowerButtonClicked()
 {
-    P_clickcnt += 3;
+    P_clickcnt += 2;
     UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
 
     DesiredCategory = "Lower";
@@ -152,7 +152,7 @@ void UCustomWidget::OnLowerButtonClicked()
 
 void UCustomWidget::OnShoesButtonClicked()
 {
-    P_clickcnt += 3;
+    P_clickcnt += 2;
     UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
 
     DesiredCategory = "Shoes";
