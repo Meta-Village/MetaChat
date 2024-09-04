@@ -42,6 +42,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* SetDestinationTouchAction;
 
+	// 레벨 전환 처리
+	UFUNCTION(BlueprintCallable)
+	void OnCustomButtonClicked();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRequestTravelToCustomLevel();
+	void ServerRequestTravelToCustomLevel_Implementation();
+	bool ServerRequestTravelToCustomLevel_Validate();
+
+// 	// 커스텀 레벨에서 완료 버튼 눌렀을 때
+// 	void OnCustomizationComplete();
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;

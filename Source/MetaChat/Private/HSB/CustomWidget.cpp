@@ -176,24 +176,24 @@ void UCustomWidget::OnButtonApply()
     UCustomSaveGame* SaveGameInstance = CastChecked<UCustomSaveGame>(UGameplayStatics::CreateSaveGameObject(UCustomSaveGame::StaticClass()));
     if(SaveGameInstance )
 	{
-		if ( Character->HairMesh )
+		if ( Character->HairMeshComp )
 		{
-			FString MeshPath = Character->HairMesh->SkeletalMesh->GetPathName();
+			FString MeshPath = Character->HairMeshComp->SkeletalMesh->GetPathName();
 			SaveGameInstance->SavedMeshes.Add("Hair" , MeshPath);
 		}
-		if ( Character->UpperBodyMesh )
+		if ( Character->UpperBodyMeshComp )
 		{
-			FString MeshPath = Character->UpperBodyMesh->SkeletalMesh->GetPathName();
+			FString MeshPath = Character->UpperBodyMeshComp->SkeletalMesh->GetPathName();
 			SaveGameInstance->SavedMeshes.Add("Upper" , MeshPath);
 		}
-		if ( Character->LowerBodyMesh )
+		if ( Character->LowerBodyMeshComp )
 		{
-			FString MeshPath = Character->LowerBodyMesh->SkeletalMesh->GetPathName();
+			FString MeshPath = Character->LowerBodyMeshComp->SkeletalMesh->GetPathName();
 			SaveGameInstance->SavedMeshes.Add("Lower" , MeshPath);
 		}
-		if ( Character->FeetMesh )
+		if ( Character->FeetMeshComp )
 		{
-			FString MeshPath = Character->FeetMesh->SkeletalMesh->GetPathName();
+			FString MeshPath = Character->FeetMeshComp->SkeletalMesh->GetPathName();
 			SaveGameInstance->SavedMeshes.Add("Feet" , MeshPath);
 		}
 

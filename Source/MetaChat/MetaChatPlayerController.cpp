@@ -32,6 +32,33 @@ void AMetaChatPlayerController::BeginPlay()
 	UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 }
 
+void AMetaChatPlayerController::OnCustomButtonClicked()
+{
+	if (HasAuthority())
+	{
+		// 서버에서 커스텀 레벨로 이동
+		GetWorld()->ServerTravel("/Game/XR_HSB/Map/Customizing");
+	}
+	else
+	{
+		// 클라이언트는 서버에 요청해서 커스텀 레벨로 이동
+		ServerRequestTravelToCustomLevel();
+	}
+}
+
+void AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Implementation()
+{
+	if (HasAuthority())
+	{
+		GetWorld()->ServerTravel("/Game/XR_HSB/Map/Customizing");
+	}
+}
+
+bool AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Validate()
+{
+	return true;
+}
+
 void AMetaChatPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
