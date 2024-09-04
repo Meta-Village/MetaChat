@@ -73,7 +73,7 @@ void AScreenActor::UpdateTexture()
 			DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
 
 			// PlaneMesh에 머티리얼 적용
-			WindowScreenPlaneMesh->SetMaterial(0, DynamicMaterial);
+			
 		}
 	}
 }
@@ -192,7 +192,7 @@ void AScreenActor::BeginPlay()
 	// Z 축이 카메라를 향하도록 회전
 	//WindowScreenPlaneMesh->SetRelativeRotation(FRotator(0, LookAtRotation.Yaw, LookAtRotation.Roll));
 	DynamicMaterial = UMaterialInstanceDynamic::Create(WindowScreenPlaneMesh->GetMaterial(0), this);
-
+	WindowScreenPlaneMesh->SetMaterial(0, DynamicMaterial);
 	MainWidget = Cast<ULSJMainWidget>(CreateWidget<UUserWidget>(GetWorld(),MainWidgetFactory));
 	if (MainWidget)
 	{
