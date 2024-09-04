@@ -59,10 +59,14 @@ void AScreenActor::UpdateTexture()
 	if (TimeAccumulator >= CaptureInterval)
 	{
 		TimeAccumulator = 0.0f;
-
+		FScopeLock Lock(&CriticalSection);
+		if (CapturedTexture)
+		{
+			CapturedTexture->ConditionalBeginDestroy();
+		}
 		CapturedTexture = CaptureScreenToTexture();
 
-		if (nullptr!=DynamicMaterial)
+		if (DynamicMaterial && CapturedTexture&& WindowScreenPlaneMesh)
 		{
 			CapturedTexture->SRGB = true;
 			// BaseTexture 파라미터에 텍스처 설정
@@ -174,6 +178,7 @@ void AScreenActor::BeginLookSharingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
 	}
 }
+
 // Called when the game starts or when spawned
 void AScreenActor::BeginPlay()
 {

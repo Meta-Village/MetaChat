@@ -52,9 +52,10 @@ void ULSJMainWidget::OnButtonWindowScreen()
 				// 3. Back Buffer를 비디오 입력으로 설정합니다.
 				TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
 				Streamer->SetVideoInput(VideoInput);
-
+				Streamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
 				// 4. 스트리밍을 시작합니다.
 				Streamer->StartStreaming();
+				//url 입력해서 해보자
 			}
 			else
 			{
@@ -80,10 +81,6 @@ void ULSJMainWidget::OnButtonWindowScreen()
 
 			if (Streamer.IsValid())
 			{
-				// 3. Back Buffer를 비디오 입력으로 설정합니다.
-				TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
-				Streamer->SetVideoInput(VideoInput);
-
 				// 4. 스트리밍을 시작합니다.
 				Streamer->StopStreaming();
 			}
