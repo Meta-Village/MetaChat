@@ -23,17 +23,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//Audio Component 선언
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Audio")
-	class UAudioCaptureComponent* AudioCaptureComponent;
 
-	// 녹음 시작
-	void StartRecord();
 
-	// 녹음 끝
-	void EndRecord();
-
-	// 녹음파일 저장하기
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Audio")
-	class USoundWave* SoundWave;
 };
