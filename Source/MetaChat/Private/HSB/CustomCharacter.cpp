@@ -113,7 +113,7 @@ void ACustomCharacter::ServerUpdateCustomizationData_Implementation(const FChara
     if (HasAuthority())
     {
         CustomizationData = NewData;
-        MulticastUpdateCustomizationData(NewData);
+//        MulticastUpdateCustomizationData(NewData);
     }
 }
 
@@ -122,14 +122,14 @@ bool ACustomCharacter::ServerUpdateCustomizationData_Validate(const FCharacterCu
     return true;
 }
 
-void ACustomCharacter::MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
-{
-    // 모든 클라이언트에게 적용
-    CustomizationData = NewData;
-    // 캐릭터 외형 갱신
-    UpdateCharacterAppearance();
-}
-
+// void ACustomCharacter::MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
+// {
+//     // 모든 클라이언트에게 적용
+//     CustomizationData = NewData;
+//     // 캐릭터 외형 갱신
+//     UpdateCharacterAppearance();
+// }
+// 
 void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);

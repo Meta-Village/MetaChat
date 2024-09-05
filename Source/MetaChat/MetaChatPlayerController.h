@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
+#include "HSB/CustomCharacter.h"
 #include "MetaChatPlayerController.generated.h"
 
 /** Forward declaration to improve compiling times */
@@ -41,18 +43,21 @@ public:
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* SetDestinationTouchAction;
-
+//---------------------------------------------------------------------
 	// 레벨 전환 처리
-	UFUNCTION(BlueprintCallable)
-	void OnCustomButtonClicked();
+	void RequestTravelToCustomizationLevel();
+// 	UFUNCTION(BlueprintCallable)
+// 	void OnCustomButtonClicked();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRequestTravelToCustomLevel();
 	void ServerRequestTravelToCustomLevel_Implementation();
 	bool ServerRequestTravelToCustomLevel_Validate();
 
-// 	// 커스텀 레벨에서 완료 버튼 눌렀을 때
-// 	void OnCustomizationComplete();
+	// 커스텀 데이터를 캐릭터에 전달하는 중간 역할
+	UFUNCTION(BlueprintCallable, Category="Customization")
+	void SubmitcustomizationData(const FCharacterCustomizationData& NewData);
+//---------------------------------------------------------------------
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
