@@ -5,22 +5,24 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "SB/CustomSaveGame.h"
+#include "Engine/SkeletalMesh.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	LowerBodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LowerBody"));
-	LowerBodyMesh->SetupAttachment(GetMesh());
-	UpperBodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("UpperBody"));
-	UpperBodyMesh->SetupAttachment(GetMesh());
-	HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head"));
-	HeadMesh->SetupAttachment(GetMesh());
-	HairMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hair"));
-	HairMesh->SetupAttachment(GetMesh());
-	FeetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Feet"));
-	FeetMesh->SetupAttachment(GetMesh());
+	LowerBodyMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LowerBody"));
+	LowerBodyMeshComp->SetupAttachment(GetMesh());
+	UpperBodyMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("UpperBody"));
+	UpperBodyMeshComp->SetupAttachment(GetMesh());
+	HeadMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head"));
+	HeadMeshComp->SetupAttachment(GetMesh());
+	HairMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hair"));
+	HairMeshComp->SetupAttachment(GetMesh());
+	FeetMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Feet"));
+	FeetMeshComp->SetupAttachment(GetMesh());
 }
 
 // Called when the game starts or when spawned
@@ -58,7 +60,7 @@ void ACustomCharacter::Load()
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_h);
             if (LoadedMesh)
             {
-                HairMesh->SetSkeletalMesh(LoadedMesh);
+                HairMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Hair mesh has been applied from save."));
             }
         }
@@ -70,7 +72,7 @@ void ACustomCharacter::Load()
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_u);
             if (LoadedMesh)
             {
-                UpperBodyMesh->SetSkeletalMesh(LoadedMesh);
+                UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Upper body mesh has been applied from save."));
             }
         }
@@ -82,7 +84,7 @@ void ACustomCharacter::Load()
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_l);
             if (LoadedMesh)
             {
-                LowerBodyMesh->SetSkeletalMesh(LoadedMesh);
+                LowerBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Lower body mesh has been applied from save."));
             }
         }
@@ -94,7 +96,7 @@ void ACustomCharacter::Load()
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_f);
             if (LoadedMesh)
             {
-                FeetMesh->SetSkeletalMesh(LoadedMesh);
+                FeetMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Feet mesh has been applied from save."));
             }
         }
@@ -102,5 +104,56 @@ void ACustomCharacter::Load()
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to load save game"));
+    }
+}
+
+void ACustomCharacter::ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
+{
+    // 서버 -> 다른 클라이언트 (변경된 데이터 전송)
+    if (HasAuthority())
+    {
+        CustomizationData = NewData;
+//        MulticastUpdateCustomizationData(NewData);
+    }
+}
+
+bool ACustomCharacter::ServerUpdateCustomizationData_Validate(const FCharacterCustomizationData& NewData)
+{
+    return true;
+}
+
+// void ACustomCharacter::MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
+// {
+//     // 모든 클라이언트에게 적용
+//     CustomizationData = NewData;
+//     // 캐릭터 외형 갱신
+//     UpdateCharacterAppearance();
+// }
+// 
+void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    // CustomizationData 구조체를 복제 목록에 추가
+    DOREPLIFETIME(ACustomCharacter, CustomizationData);
+}
+
+void ACustomCharacter::UpdateCharacterAppearance()
+{
+    if (CustomizationData.HairMesh)
+    {
+        HairMeshComp->SetSkeletalMesh(CustomizationData.HairMesh);
+    }
+    if (CustomizationData.UpperBodyMesh)
+    {
+        HairMeshComp->SetSkeletalMesh(CustomizationData.UpperBodyMesh);
+    }
+    if (CustomizationData.LowerBodyMesh)
+    {
+        HairMeshComp->SetSkeletalMesh(CustomizationData.LowerBodyMesh);
+    }
+    if (CustomizationData.FeetMesh)
+    {
+        HairMeshComp->SetSkeletalMesh(CustomizationData.FeetMesh);
     }
 }

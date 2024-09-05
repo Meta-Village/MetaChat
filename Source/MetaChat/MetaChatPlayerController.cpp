@@ -13,6 +13,8 @@
 #include "Engine/LocalPlayer.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "HSB/CustomCharacter.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -31,7 +33,36 @@ void AMetaChatPlayerController::BeginPlay()
 
 	UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 }
+//------------------------------------------------------------------------------------
+void AMetaChatPlayerController::RequestTravelToCustomizationLevel()
+{
+	if (HasAuthority())  // 서버에서 처리
+	{
+		GetWorld()->ServerTravel("/Game/XR_HSB/Map/Customizing");  // 커스터마이제이션 맵으로 이동
+	}
+	else  // 클라이언트에서 요청
+	{
+		ServerRequestTravelToCustomLevel();  // 서버에 레벨 전환 요청
+	}
+}
 
+void AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Implementation()
+{
+	GetWorld()->ServerTravel("/Game/XR_HSB/Map/Customizing");
+}
+
+bool AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Validate()
+{
+	return true;
+}
+
+void AMetaChatPlayerController::SubmitcustomizationData(const FCharacterCustomizationData& NewData)
+{
+	if(ACustomCharacter* ControlledCharacter = Cast<ACustomCharacter>(GetPawn()))
+		ControlledCharacter->ServerUpdateCustomizationData(NewData);
+}
+
+//------------------------------------------------------------------------------------
 void AMetaChatPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
@@ -123,7 +154,7 @@ void AMetaChatPlayerController::OnSetDestinationReleased()
 	{
 		ServerMoveToLocation_Implementation(CachedDestination);
 	}
-
+	
 	// 이동클릭 이펙트
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 

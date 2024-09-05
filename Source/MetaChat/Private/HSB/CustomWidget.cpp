@@ -99,7 +99,7 @@ void UCustomWidget::InitSlot()
                 Column++;
 
                 // 2열 그리드를 기준으로 행과 열을 자동으로 업데이트
-                if (Column >= 4) // 예를 들어 2열씩 배치하고 싶다면
+                if (Column >= 2) // 예를 들어 2열씩 배치하고 싶다면
                 {
                     Column = 0;
                     Row++;
@@ -119,7 +119,7 @@ void UCustomWidget::InitSlot()
 
 void UCustomWidget::OnHairButtonClicked()
 {
-    P_clickcnt += 3;
+    P_clickcnt += 2;
     UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
 
     DesiredCategory = "Hair";
@@ -130,7 +130,7 @@ void UCustomWidget::OnHairButtonClicked()
 
 void UCustomWidget::OnUpperButtonClicked()
 {
-    P_clickcnt += 3;
+    P_clickcnt += 2;
     UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
 
     DesiredCategory = "Upper";
@@ -141,7 +141,7 @@ void UCustomWidget::OnUpperButtonClicked()
 
 void UCustomWidget::OnLowerButtonClicked()
 {
-    P_clickcnt += 3;
+    P_clickcnt += 2;
     UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
 
     DesiredCategory = "Lower";
@@ -152,7 +152,7 @@ void UCustomWidget::OnLowerButtonClicked()
 
 void UCustomWidget::OnShoesButtonClicked()
 {
-    P_clickcnt += 3;
+    P_clickcnt += 2;
     UE_LOG(LogTemp, Log, TEXT("%d"), P_clickcnt);
 
     DesiredCategory = "Shoes";
@@ -176,24 +176,24 @@ void UCustomWidget::OnButtonApply()
     UCustomSaveGame* SaveGameInstance = CastChecked<UCustomSaveGame>(UGameplayStatics::CreateSaveGameObject(UCustomSaveGame::StaticClass()));
     if(SaveGameInstance )
 	{
-		if ( Character->HairMesh )
+		if ( Character->HairMeshComp )
 		{
-			FString MeshPath = Character->HairMesh->SkeletalMesh->GetPathName();
+			FString MeshPath = Character->HairMeshComp->SkeletalMesh->GetPathName();
 			SaveGameInstance->SavedMeshes.Add("Hair" , MeshPath);
 		}
-		if ( Character->UpperBodyMesh )
+		if ( Character->UpperBodyMeshComp )
 		{
-			FString MeshPath = Character->UpperBodyMesh->SkeletalMesh->GetPathName();
+			FString MeshPath = Character->UpperBodyMeshComp->SkeletalMesh->GetPathName();
 			SaveGameInstance->SavedMeshes.Add("Upper" , MeshPath);
 		}
-		if ( Character->LowerBodyMesh )
+		if ( Character->LowerBodyMeshComp )
 		{
-			FString MeshPath = Character->LowerBodyMesh->SkeletalMesh->GetPathName();
+			FString MeshPath = Character->LowerBodyMeshComp->SkeletalMesh->GetPathName();
 			SaveGameInstance->SavedMeshes.Add("Lower" , MeshPath);
 		}
-		if ( Character->FeetMesh )
+		if ( Character->FeetMeshComp )
 		{
-			FString MeshPath = Character->FeetMesh->SkeletalMesh->GetPathName();
+			FString MeshPath = Character->FeetMeshComp->SkeletalMesh->GetPathName();
 			SaveGameInstance->SavedMeshes.Add("Feet" , MeshPath);
 		}
 
