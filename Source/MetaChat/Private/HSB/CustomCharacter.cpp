@@ -154,6 +154,12 @@ void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(ACustomCharacter, CustomizationData);
 }
 
+void ACustomCharacter::OnRep_CustomizationData()
+{
+    // 복제된 커스터마이제이션 데이터를 기반으로 캐릭터 외형을 업데이트
+    UpdateCharacterAppearance();
+}
+
 void ACustomCharacter::UpdateCharacterAppearance()
 {
     if (CustomizationData.HairMesh)

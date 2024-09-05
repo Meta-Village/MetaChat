@@ -84,8 +84,11 @@ public:
 
      virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+     UFUNCTION()
+     void OnRep_CustomizationData();
+
     // 캐릭터 커스터마이징 상태
-    UPROPERTY(Replicated, BlueprintReadWrite, Category = "Customization")
+    UPROPERTY(ReplicatedUsing=OnRep_CustomizationData)
     FCharacterCustomizationData CustomizationData;
 
     // 캐릭터 외형 갱신
