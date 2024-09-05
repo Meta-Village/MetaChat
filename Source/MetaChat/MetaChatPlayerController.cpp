@@ -34,27 +34,27 @@ void AMetaChatPlayerController::BeginPlay()
 	UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 }
 //------------------------------------------------------------------------------------
-void AMetaChatPlayerController::RequestTravelToCustomizationLevel()
-{
-	if (HasAuthority())  // 서버에서 처리
-	{
-		GetWorld()->ServerTravel("/Game/XR_HSB/Map/Customizing");  // 커스터마이제이션 맵으로 이동
-	}
-	else  // 클라이언트에서 요청
-	{
-		ServerRequestTravelToCustomLevel();  // 서버에 레벨 전환 요청
-	}
-}
-
-void AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Implementation()
-{
-	GetWorld()->ServerTravel("/Game/XR_HSB/Map/Customizing");
-}
-
-bool AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Validate()
-{
-	return true;
-}
+// void AMetaChatPlayerController::RequestTravelToCustomizationLevel()
+// {
+// 	if (HasAuthority())  // 서버에서 처리
+// 	{
+// 		GetWorld()->ServerTravel("/Game/TopDown/Maps/TopDownMap.TopDownMap");  // 메인 맵으로 이동
+// 	}
+// 	else  // 클라이언트에서 요청
+// 	{
+// 		ServerRequestTravelToCustomLevel();  // 서버에 레벨 전환 요청
+// 	}
+// }
+// 
+// void AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Implementation()
+// {
+// 	GetWorld()->ServerTravel("/Game/TopDown/Maps/TopDownMap.TopDownMap");
+// }
+// 
+// bool AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Validate()
+// {
+// 	return true;
+// }
 
 void AMetaChatPlayerController::SubmitcustomizationData(const FCharacterCustomizationData& NewData)
 {
