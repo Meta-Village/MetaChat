@@ -73,15 +73,15 @@ public:
     // RPC 내용----------------------------------------
 public:
     // 커스텀 데이터를 Listen server에 전송
-    UFUNCTION(Server, Reliable, WithValidation)
+    UFUNCTION(Server, Reliable, WithValidation) // 클라 -> 리슨서버
     void ServerUpdateCustomizationData(const FCharacterCustomizationData& NewData);
     void ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
     bool ServerUpdateCustomizationData_Validate(const FCharacterCustomizationData& NewData);
 
-//     UFUNCTION(NetMulticast, Reliable)
+//     UFUNCTION(NetMulticast, Reliable) // 서버 -> 여러 클라
 //     void MulticastUpdateCustomizationData(const FCharacterCustomizationData& NewData);
 //     void MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
-// 
+
      virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
     // 캐릭터 커스터마이징 상태

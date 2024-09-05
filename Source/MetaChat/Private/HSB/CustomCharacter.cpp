@@ -7,6 +7,7 @@
 #include "SB/CustomSaveGame.h"
 #include "Engine/SkeletalMesh.h"
 #include "Net/UnrealNetwork.h"
+#include "../MetaChatPlayerController.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -60,6 +61,8 @@ void ACustomCharacter::Load()
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_h);
             if (LoadedMesh)
             {
+                // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
+                CustomizationData.HairMesh = LoadedMesh;
                 HairMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Hair mesh has been applied from save."));
             }
@@ -72,6 +75,8 @@ void ACustomCharacter::Load()
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_u);
             if (LoadedMesh)
             {
+                // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
+                CustomizationData.UpperBodyMesh = LoadedMesh;
                 UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Upper body mesh has been applied from save."));
             }
@@ -84,6 +89,8 @@ void ACustomCharacter::Load()
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_l);
             if (LoadedMesh)
             {
+                // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
+                CustomizationData.LowerBodyMesh = LoadedMesh;
                 LowerBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Lower body mesh has been applied from save."));
             }
@@ -96,20 +103,29 @@ void ACustomCharacter::Load()
             USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_f);
             if (LoadedMesh)
             {
+                // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
+                CustomizationData.FeetMesh = LoadedMesh;
                 FeetMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Feet mesh has been applied from save."));
             }
         }
+
+        // SubmitCustomizationData 함수 호출
+        auto* pc = Cast<AMetaChatPlayerController>(GetWorld()->GetFirstPlayerController());
+
+        pc->SubmitcustomizationData(CustomizationData);
     }
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to load save game"));
     }
+
+    UpdateCharacterAppearance();
 }
 
+// 클라 -> 리슨서버
 void ACustomCharacter::ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
 {
-    // 서버 -> 다른 클라이언트 (변경된 데이터 전송)
     if (HasAuthority())
     {
         CustomizationData = NewData;
@@ -129,7 +145,7 @@ bool ACustomCharacter::ServerUpdateCustomizationData_Validate(const FCharacterCu
 //     // 캐릭터 외형 갱신
 //     UpdateCharacterAppearance();
 // }
-// 
+
 void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
