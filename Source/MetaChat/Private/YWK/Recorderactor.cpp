@@ -25,13 +25,3 @@ void ARecorderactor::Tick(float DeltaTime)
 
 }
 
-void ARecorderactor::StartRecord()
-{
-
-}
-
-void ARecorderactor::EndRecord()
-{
-
-}
-
