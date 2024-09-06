@@ -2,6 +2,7 @@
 
 
 #include "HSB/CustomCharacter.h"
+#include "../MetaChat.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "SB/CustomSaveGame.h"
@@ -31,12 +32,14 @@ void ACustomCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    bReplicates = true;
 }
 
 // Called every frame
 void ACustomCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 // Called to bind functionality to input
@@ -63,7 +66,7 @@ void ACustomCharacter::Load()
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
                 CustomizationData.HairMesh = LoadedMesh;
-                HairMeshComp->SetSkeletalMesh(LoadedMesh);
+                 HairMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Hair mesh has been applied from save."));
             }
         }
@@ -77,7 +80,7 @@ void ACustomCharacter::Load()
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
                 CustomizationData.UpperBodyMesh = LoadedMesh;
-                UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
+                 UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Upper body mesh has been applied from save."));
             }
         }
@@ -91,7 +94,7 @@ void ACustomCharacter::Load()
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
                 CustomizationData.LowerBodyMesh = LoadedMesh;
-                LowerBodyMeshComp->SetSkeletalMesh(LoadedMesh);
+                 LowerBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Lower body mesh has been applied from save."));
             }
         }
@@ -105,31 +108,36 @@ void ACustomCharacter::Load()
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
                 CustomizationData.FeetMesh = LoadedMesh;
-                FeetMeshComp->SetSkeletalMesh(LoadedMesh);
+                 FeetMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Feet mesh has been applied from save."));
             }
         }
 
-        // SubmitCustomizationData 함수 호출
-        auto* pc = Cast<AMetaChatPlayerController>(GetWorld()->GetFirstPlayerController());
-
-        pc->SubmitcustomizationData(CustomizationData);
+        
     }
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to load save game"));
     }
 
+    // SubmitCustomizationData 함수 호출
+    
+    if (IsLocallyControlled())
+    {
+//         auto* pc = Cast<AMetaChatPlayerController>(GetController());
+//         pc->SubmitcustomizationData(CustomizationData);
+        ServerUpdateCustomizationData(CustomizationData);
+    }
     UpdateCharacterAppearance();
 }
 
 // 클라 -> 리슨서버
 void ACustomCharacter::ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
 {
-    if (HasAuthority())
+/*    if (IsLocallyControlled())*/
     {
         CustomizationData = NewData;
-//        MulticastUpdateCustomizationData(NewData);
+        //MulticastUpdateCustomizationData(NewData);
     }
 }
 
@@ -138,13 +146,13 @@ bool ACustomCharacter::ServerUpdateCustomizationData_Validate(const FCharacterCu
     return true;
 }
 
-// void ACustomCharacter::MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
-// {
-//     // 모든 클라이언트에게 적용
-//     CustomizationData = NewData;
-//     // 캐릭터 외형 갱신
-//     UpdateCharacterAppearance();
-// }
+void ACustomCharacter::MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
+{
+    // 모든 클라이언트에게 적용
+    CustomizationData = NewData;
+    // 캐릭터 외형 갱신
+    UpdateCharacterAppearance();
+}
 
 void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -178,4 +186,22 @@ void ACustomCharacter::UpdateCharacterAppearance()
     {
         HairMeshComp->SetSkeletalMesh(CustomizationData.FeetMesh);
     }
+}
+
+void ACustomCharacter::PrintNetLog()
+{
+    const FString conStr = GetNetConnection() != nullptr ? TEXT("Valid Connection") : TEXT("InValid Connection");
+
+    const FString ownerName = GetOwner() != nullptr ? GetOwner()->GetName() : TEXT("No Owner");
+
+    const FString logStr = FString::Printf(TEXT("Connection : %s\nOwner Name : %s\nLocalRole : %s\nRemoteRole : %s"), *conStr, *ownerName, *LOCALROLE, *REMOTEROLE);
+
+/*    DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100, logStr, nullptr, FColor::Red, 0, true, 1);*/
+}
+
+void ACustomCharacter::OnRep_ChangeMatColor()
+{
+/*    MatColor = FMath::RandRange(0, 100);*/
+    const FString logStr = FString::Printf(TEXT("Connection: %d"), MatColor);
+    DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100, logStr, nullptr, FColor::Red, 0, true, 1);
 }
