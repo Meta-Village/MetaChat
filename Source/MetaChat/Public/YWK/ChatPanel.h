@@ -29,12 +29,13 @@ public:
 	UFUNCTION()
 	void UpdateChat(const FString& PlayerName, const FString& ChatMessage);
 
-	
+	// 채팅내역 다시 받기
+	void RequestChatHistory();
 
 private:
 	void SendChatToServer(const FString& PlayerName, const FString& ChatMessage);
 
 	void SendChatToServerHttp(const FString& PlayerName, const FString& ChatMessage);
 
-	void RequestChatHistory();
+	
 };
