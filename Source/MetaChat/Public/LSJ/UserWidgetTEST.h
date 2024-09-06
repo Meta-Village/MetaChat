@@ -77,6 +77,8 @@ public:
 	//월드제목과 월드 비밀번호 보내기
 	UFUNCTION(BlueprintCallable)
 	virtual void SendCreatingWorldInfo();
+	UFUNCTION(BlueprintCallable)
+	virtual void SendCreatingIDInfo();
 	virtual void RecvCreatingWorldInfo(FString result);
 	UPROPERTY(BlueprintReadWrite)
 	FString WorldName;

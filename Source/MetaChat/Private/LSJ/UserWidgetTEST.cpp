@@ -383,9 +383,21 @@ void UUserWidgetTEST::SendCreatingWorldInfo()
 	studentData.Add("worldPassword", WorldPassworld);
 	FString json = UJsonParseLib::MakeJson(studentData);
 
-	//HttpActor->RsqPostCreateWorld(createWorldURL, json);
-	FString createWorldURL2 = "http://125.132.216.190:8126/api/v1/worlds";
-	HttpActor->RsqGetTest(createWorldURL2);
+	HttpActor->RsqPostCreateWorld(createWorldURL, json);
+	//FString createWorldURL2 = "http://125.132.216.190:8126/api/v1/worlds";
+	//HttpActor->RsqGetTest(createWorldURL);
+}
+void UUserWidgetTEST::SendCreatingIDInfo()
+{
+	//서버에 월드제목과 월드비밀번호 보내고 결과 받기
+	FString createIDURL = "http://125.132.216.190:8126/signup";
+
+   	TMap<FString, FString> studentData;
+	studentData.Add("worldName", WorldName);
+	studentData.Add("worldPassword", WorldPassworld);
+	FString json = UJsonParseLib::MakeJson(studentData);
+
+	HttpActor->RsqPostCreateID(createIDURL, json);
 }
 
 void UUserWidgetTEST::RecvCreatingWorldInfo(FString result)
