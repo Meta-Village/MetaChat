@@ -69,36 +69,36 @@ public:
     // level 넘어갈 때 로드될 정보
 	UFUNCTION(BlueprintCallable)
 	void Load();
-
-    // RPC 내용----------------------------------------
-public:
-    // 커스텀 데이터를 Listen server에 전송
-    UFUNCTION(Server, Reliable, WithValidation) // 클라 -> 리슨서버
-    void ServerUpdateCustomizationData(const FCharacterCustomizationData& NewData);
-    void ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
-    bool ServerUpdateCustomizationData_Validate(const FCharacterCustomizationData& NewData);
-
-    UFUNCTION(NetMulticast, Reliable) // 서버 -> 여러 클라
-    void MulticastUpdateCustomizationData(const FCharacterCustomizationData& NewData);
-    void MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
-
-     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-     UFUNCTION()
-     void OnRep_CustomizationData();
-
-    // 캐릭터 커스터마이징 상태
-    UPROPERTY(ReplicatedUsing=OnRep_CustomizationData)
-    FCharacterCustomizationData CustomizationData;
-
-    // 캐릭터 외형 갱신
-    void UpdateCharacterAppearance();
-
-    // 네트워크 상태로그 출력 할 함수
-    void PrintNetLog();
-
-    UPROPERTY(BlueprintReadWrite,ReplicatedUsing=OnRep_ChangeMatColor)
-    int MatColor;
-    UFUNCTION(BlueprintCallable)
-    void OnRep_ChangeMatColor();
+// 
+//     // RPC 내용----------------------------------------
+// public:
+//     // 커스텀 데이터를 Listen server에 전송
+//     UFUNCTION(Server, Reliable, WithValidation) // 클라 -> 리슨서버
+//     void ServerUpdateCustomizationData(const FCharacterCustomizationData& NewData);
+//     void ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
+//     bool ServerUpdateCustomizationData_Validate(const FCharacterCustomizationData& NewData);
+// 
+//     UFUNCTION(NetMulticast, Reliable) // 서버 -> 여러 클라
+//     void MulticastUpdateCustomizationData(const FCharacterCustomizationData& NewData);
+//     void MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
+// 
+//      virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+// 
+//      UFUNCTION()
+//      void OnRep_CustomizationData();
+// 
+//     // 캐릭터 커스터마이징 상태
+//     UPROPERTY(ReplicatedUsing=OnRep_CustomizationData)
+//     FCharacterCustomizationData CustomizationData;
+// 
+//     // 캐릭터 외형 갱신
+//     void UpdateCharacterAppearance();
+// 
+//     // 네트워크 상태로그 출력 할 함수
+//     void PrintNetLog();
+// 
+//     UPROPERTY(BlueprintReadWrite,ReplicatedUsing=OnRep_ChangeMatColor)
+//     int MatColor;
+//     UFUNCTION(BlueprintCallable)
+//     void OnRep_ChangeMatColor();
 };

@@ -54,9 +54,9 @@ public:
 // 	void ServerRequestTravelToCustomLevel_Implementation();
 // 	bool ServerRequestTravelToCustomLevel_Validate();
 
-	// 커스텀 데이터를 캐릭터에 전달하는 중간 역할
-	UFUNCTION(BlueprintCallable, Category="Customization")
-	void SubmitcustomizationData(const FCharacterCustomizationData& NewData);
+// 	// 커스텀 데이터를 캐릭터에 전달하는 중간 역할
+// 	UFUNCTION(BlueprintCallable, Category="Customization")
+// 	void SubmitcustomizationData(const FCharacterCustomizationData& NewData);
 //---------------------------------------------------------------------
 
 protected:
