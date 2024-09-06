@@ -43,4 +43,5 @@ public:
 
 	
 	FString GetCurrentSessionID();
+
 };

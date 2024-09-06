@@ -33,12 +33,15 @@ public:
 	// Send 버튼을 눌렀을때 요청할 함수
 	void RsqGetTest(FString url);
 	//응답받을 함수
-
 	void OnRsqGetTest(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 
 	void RsqPostTest(FString url, FString json);
 	void OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 
+	void RsqPostCreateWorld(FString url, FString json);
+	void OnResPostCreateWorld(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
+	void RsqPostCreateID(FString url, FString json);
+	void OnRsqPostCreateID(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 	//window api viewer
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	TSubclassOf<AActor> windowViewer;
