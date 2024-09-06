@@ -78,9 +78,9 @@ public:
     void ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
     bool ServerUpdateCustomizationData_Validate(const FCharacterCustomizationData& NewData);
 
-//     UFUNCTION(NetMulticast, Reliable) // 서버 -> 여러 클라
-//     void MulticastUpdateCustomizationData(const FCharacterCustomizationData& NewData);
-//     void MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
+    UFUNCTION(NetMulticast, Reliable) // 서버 -> 여러 클라
+    void MulticastUpdateCustomizationData(const FCharacterCustomizationData& NewData);
+    void MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
 
      virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -94,5 +94,11 @@ public:
     // 캐릭터 외형 갱신
     void UpdateCharacterAppearance();
 
-    // 레벨 전환 버튼바인딩 -> PlayerController 에서 처리
+    // 네트워크 상태로그 출력 할 함수
+    void PrintNetLog();
+
+    UPROPERTY(BlueprintReadWrite,ReplicatedUsing=OnRep_ChangeMatColor)
+    int MatColor;
+    UFUNCTION(BlueprintCallable)
+    void OnRep_ChangeMatColor();
 };
