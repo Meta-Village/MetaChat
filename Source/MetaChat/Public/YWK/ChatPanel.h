@@ -17,10 +17,10 @@ class METACHAT_API UChatPanel : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
 	class UScrollBox* Chat_ScrollBox;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
 	class UEditableTextBox* ChatInputBox;
 
 	UFUNCTION()
@@ -29,6 +29,12 @@ public:
 	UFUNCTION()
 	void UpdateChat(const FString& PlayerName, const FString& ChatMessage);
 
+	
+
 private:
 	void SendChatToServer(const FString& PlayerName, const FString& ChatMessage);
+
+	void SendChatToServerHttp(const FString& PlayerName, const FString& ChatMessage);
+
+	void RequestChatHistory();
 };
