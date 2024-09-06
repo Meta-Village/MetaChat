@@ -57,11 +57,11 @@ void AMetaChatPlayerController::BeginPlay()
 // }
 
 // 커스텀 데이터를 캐릭터에 전달하는 중간 역할
-void AMetaChatPlayerController::SubmitcustomizationData(const FCharacterCustomizationData& NewData)
-{
-	if(ACustomCharacter* ControlledCharacter = Cast<ACustomCharacter>(GetPawn()))
-		ControlledCharacter->ServerUpdateCustomizationData(NewData);
-}
+// void AMetaChatPlayerController::SubmitcustomizationData(const FCharacterCustomizationData& NewData)
+// {
+// 	if(ACustomCharacter* ControlledCharacter = Cast<ACustomCharacter>(GetPawn()))
+// 		ControlledCharacter->ServerUpdateCustomizationData(NewData);
+// }
 
 //------------------------------------------------------------------------------------
 void AMetaChatPlayerController::SetupInputComponent()

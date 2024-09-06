@@ -65,7 +65,7 @@ void ACustomCharacter::Load()
             if (LoadedMesh)
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                CustomizationData.HairMesh = LoadedMesh;
+//                 CustomizationData.HairMesh = LoadedMesh;
                  HairMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Hair mesh has been applied from save."));
             }
@@ -79,7 +79,7 @@ void ACustomCharacter::Load()
             if (LoadedMesh)
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                CustomizationData.UpperBodyMesh = LoadedMesh;
+//                 CustomizationData.UpperBodyMesh = LoadedMesh;
                  UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Upper body mesh has been applied from save."));
             }
@@ -93,7 +93,7 @@ void ACustomCharacter::Load()
             if (LoadedMesh)
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                CustomizationData.LowerBodyMesh = LoadedMesh;
+//                 CustomizationData.LowerBodyMesh = LoadedMesh;
                  LowerBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Lower body mesh has been applied from save."));
             }
@@ -107,7 +107,7 @@ void ACustomCharacter::Load()
             if (LoadedMesh)
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                CustomizationData.FeetMesh = LoadedMesh;
+//                 CustomizationData.FeetMesh = LoadedMesh;
                  FeetMeshComp->SetSkeletalMesh(LoadedMesh);
                 UE_LOG(LogTemp, Warning, TEXT("Feet mesh has been applied from save."));
             }
@@ -120,88 +120,88 @@ void ACustomCharacter::Load()
         UE_LOG(LogTemp, Error, TEXT("Failed to load save game"));
     }
 
-    // SubmitCustomizationData 함수 호출
-    
-    if (IsLocallyControlled())
-    {
-//         auto* pc = Cast<AMetaChatPlayerController>(GetController());
-//         pc->SubmitcustomizationData(CustomizationData);
-        ServerUpdateCustomizationData(CustomizationData);
-    }
-    UpdateCharacterAppearance();
+//     // SubmitCustomizationData 함수 호출
+//     
+//     if (IsLocallyControlled())
+//     {
+// //         auto* pc = Cast<AMetaChatPlayerController>(GetController());
+// //         pc->SubmitcustomizationData(CustomizationData);
+//         ServerUpdateCustomizationData(CustomizationData);
+//     }
+//     UpdateCharacterAppearance();
 }
 
 // 클라 -> 리슨서버
-void ACustomCharacter::ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
-{
-/*    if (IsLocallyControlled())*/
-    {
-        CustomizationData = NewData;
-        //MulticastUpdateCustomizationData(NewData);
-    }
-}
-
-bool ACustomCharacter::ServerUpdateCustomizationData_Validate(const FCharacterCustomizationData& NewData)
-{
-    return true;
-}
-
-void ACustomCharacter::MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
-{
-    // 모든 클라이언트에게 적용
-    CustomizationData = NewData;
-    // 캐릭터 외형 갱신
-    UpdateCharacterAppearance();
-}
-
-void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-    // CustomizationData 구조체를 복제 목록에 추가
-    DOREPLIFETIME(ACustomCharacter, CustomizationData);
-}
-
-void ACustomCharacter::OnRep_CustomizationData()
-{
-    // 복제된 커스터마이제이션 데이터를 기반으로 캐릭터 외형을 업데이트
-    UpdateCharacterAppearance();
-}
-
-void ACustomCharacter::UpdateCharacterAppearance()
-{
-    if (CustomizationData.HairMesh)
-    {
-        HairMeshComp->SetSkeletalMesh(CustomizationData.HairMesh);
-    }
-    if (CustomizationData.UpperBodyMesh)
-    {
-        HairMeshComp->SetSkeletalMesh(CustomizationData.UpperBodyMesh);
-    }
-    if (CustomizationData.LowerBodyMesh)
-    {
-        HairMeshComp->SetSkeletalMesh(CustomizationData.LowerBodyMesh);
-    }
-    if (CustomizationData.FeetMesh)
-    {
-        HairMeshComp->SetSkeletalMesh(CustomizationData.FeetMesh);
-    }
-}
-
-void ACustomCharacter::PrintNetLog()
-{
-    const FString conStr = GetNetConnection() != nullptr ? TEXT("Valid Connection") : TEXT("InValid Connection");
-
-    const FString ownerName = GetOwner() != nullptr ? GetOwner()->GetName() : TEXT("No Owner");
-
-    const FString logStr = FString::Printf(TEXT("Connection : %s\nOwner Name : %s\nLocalRole : %s\nRemoteRole : %s"), *conStr, *ownerName, *LOCALROLE, *REMOTEROLE);
-
-/*    DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100, logStr, nullptr, FColor::Red, 0, true, 1);*/
-}
-
-void ACustomCharacter::OnRep_ChangeMatColor()
-{
-/*    MatColor = FMath::RandRange(0, 100);*/
-    const FString logStr = FString::Printf(TEXT("Connection: %d"), MatColor);
-    DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100, logStr, nullptr, FColor::Red, 0, true, 1);
-}
+// void ACustomCharacter::ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
+// {
+// /*    if (IsLocallyControlled())*/
+//     {
+//         CustomizationData = NewData;
+//         //MulticastUpdateCustomizationData(NewData);
+//     }
+// }
+// 
+// bool ACustomCharacter::ServerUpdateCustomizationData_Validate(const FCharacterCustomizationData& NewData)
+// {
+//     return true;
+// }
+// 
+// void ACustomCharacter::MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData)
+// {
+//     // 모든 클라이언트에게 적용
+//     CustomizationData = NewData;
+//     // 캐릭터 외형 갱신
+//     UpdateCharacterAppearance();
+// }
+// 
+// void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+// {
+//     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+// 
+//     // CustomizationData 구조체를 복제 목록에 추가
+//     DOREPLIFETIME(ACustomCharacter, CustomizationData);
+// }
+// 
+// void ACustomCharacter::OnRep_CustomizationData()
+// {
+//     // 복제된 커스터마이제이션 데이터를 기반으로 캐릭터 외형을 업데이트
+//     UpdateCharacterAppearance();
+// }
+// 
+// void ACustomCharacter::UpdateCharacterAppearance()
+// {
+//     if (CustomizationData.HairMesh)
+//     {
+//         HairMeshComp->SetSkeletalMesh(CustomizationData.HairMesh);
+//     }
+//     if (CustomizationData.UpperBodyMesh)
+//     {
+//         HairMeshComp->SetSkeletalMesh(CustomizationData.UpperBodyMesh);
+//     }
+//     if (CustomizationData.LowerBodyMesh)
+//     {
+//         HairMeshComp->SetSkeletalMesh(CustomizationData.LowerBodyMesh);
+//     }
+//     if (CustomizationData.FeetMesh)
+//     {
+//         HairMeshComp->SetSkeletalMesh(CustomizationData.FeetMesh);
+//     }
+// }
+// 
+// void ACustomCharacter::PrintNetLog()
+// {
+//     const FString conStr = GetNetConnection() != nullptr ? TEXT("Valid Connection") : TEXT("InValid Connection");
+// 
+//     const FString ownerName = GetOwner() != nullptr ? GetOwner()->GetName() : TEXT("No Owner");
+// 
+//     const FString logStr = FString::Printf(TEXT("Connection : %s\nOwner Name : %s\nLocalRole : %s\nRemoteRole : %s"), *conStr, *ownerName, *LOCALROLE, *REMOTEROLE);
+// 
+// /*    DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100, logStr, nullptr, FColor::Red, 0, true, 1);*/
+// }
+// 
+// void ACustomCharacter::OnRep_ChangeMatColor()
+// {
+// /*    MatColor = FMath::RandRange(0, 100);*/
+//     const FString logStr = FString::Printf(TEXT("Connection: %d"), MatColor);
+//     DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100, logStr, nullptr, FColor::Red, 0, true, 1);
+// }
