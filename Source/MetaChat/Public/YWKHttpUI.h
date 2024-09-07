@@ -29,5 +29,14 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SendButton;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* SummaryTextBlock;
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* ScrollBox;
+
+	// 요약본 불러올 텍스트창
+	void UpdateSummaryText(const FString& SummaryText);
+
 	void UpdateWidgetTexture();
 };
