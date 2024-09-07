@@ -213,7 +213,7 @@ void AScreenActor::BeginPlay()
 	MainWidget = Cast<ULSJMainWidget>(CreateWidget<UUserWidget>(GetWorld(),MainWidgetFactory));
 	if (MainWidget)
 	{
-		MainWidget->AddToViewport();
+		MainWidget->AddToViewport(2);
 		MainWidget->SetScreenActor(this);
 	}
 }
