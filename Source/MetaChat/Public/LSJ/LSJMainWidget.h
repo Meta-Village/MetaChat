@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "LSJMainWidget.generated.h"
 
+
+
 /**
  * 
  */
@@ -13,6 +15,15 @@ UCLASS()
 class METACHAT_API ULSJMainWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+	//SharingUser 버튼 패널
+	UPROPERTY(meta=(BindWidget))
+	class UUniformGridPanel* SharingUserPanel;
+		// TSubClass
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> SharingUserSlotFactory;
+	UPROPERTY()
+	class USharingUserSlot* SharingUserSlot;
 
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	class UButton* ButtonWindowScreen;
@@ -25,9 +36,12 @@ class METACHAT_API ULSJMainWidget : public UUserWidget
 	 UPROPERTY(meta = (BindWidget))
     class UImage* ImageSharingScreen;
 	class AScreenActor* ScreenActor;
-
+	UPROPERTY(meta = (BindWidget))
+	class UImage* ImageCoveringScreen;
 	bool bStreaming;
 	bool bLookStreaming;
+	UFUNCTION()
+	void SetUserID(FString ID);
 protected:
 	virtual void NativeOnInitialized();
 	virtual void NativeConstruct() override;
@@ -40,8 +54,9 @@ private:
 	void OnButtonLookSharingScreen();
 public:
 	void SetScreenActor(class AScreenActor* Actor);
-
-	
 	FString GetCurrentSessionID();
+	//SharingUser 버튼 초기화
+
+	void InitSlot(TArray<FString> Items);
 
 };

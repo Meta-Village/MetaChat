@@ -400,8 +400,30 @@ void UUserWidgetTEST::SendCreatingIDInfo()
 	HttpActor->RsqPostCreateID(createIDURL, json);
 }
 
-void UUserWidgetTEST::RecvCreatingWorldInfo(FString result)
+void UUserWidgetTEST::RecvCreatingWorldInfo(FString result, int32 resultCode)
 {
-	//if(result == TEXT(""))
+	if (resultCode == 200 || resultCode == 201)
+	{
+		int32 RecvWorldID;
+		UJsonParseLib::JsonParsePassword(result, RecvWorldID, WorldName);
+		CreateSession(RecvWorldID);
+		RemoveFromParent();
+	}
+	
+}
+void UUserWidgetTEST::SendFindSessionInfo(FString SendWorldID)
+{
+	FString createWorldURL = "http://125.132.216.190:8126/api/v1/worlds/";
+	FString fullURL = FString::Printf(TEXT("%s%s"), *createWorldURL, *SendWorldID);
 
+    HttpActor->RsqGetFindSession(fullURL);
+}
+void UUserWidgetTEST::RecvFindSessionInfo(FString result, int32 resultCode)
+{
+	if (resultCode == 200 || resultCode == 201)
+	{
+		int32 RecvWorldID;
+		UJsonParseLib::JsonParsePassword(result, RecvWorldID, WorldName);
+		JoinSession(RecvWorldID);
+	}
 }

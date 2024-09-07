@@ -178,7 +178,24 @@ void AScreenActor::BeginLookSharingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
 	}
 }
+void AScreenActor::ChangeLookSharingScreen()
+{
+	// 블루프린트 함수 이름
+	FName FunctionName(TEXT("ChangeLookPixelStreaming")); // 블루프린트에서 정의한 함수명
 
+	// 블루프린트 함수 가져오기
+	UFunction* Function = FindFunction(FunctionName);
+
+	if (Function)
+	{
+		// 블루프린트 함수 호출 (매개변수가 없는 경우)
+		ProcessEvent(Function, nullptr);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
+	}
+}
 // Called when the game starts or when spawned
 void AScreenActor::BeginPlay()
 {
@@ -207,3 +224,17 @@ void AScreenActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+FString AScreenActor::GetSharingUsers(TArray<FString> Users)
+{
+	if(MainWidget)
+		MainWidget->InitSlot(Users);
+	if(Users.Num()>0)
+		return Users[0];
+	else
+		return "";
+}
+void AScreenActor::SetViewSharingUserID(FString ID)
+{
+	UserID = ID;
+	ChangeLookSharingScreen();
+}

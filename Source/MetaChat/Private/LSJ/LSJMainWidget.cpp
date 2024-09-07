@@ -3,6 +3,7 @@
 
 
 #include "LSJ/LSJMainWidget.h"
+#include "Components/UniformGridPanel.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
@@ -19,7 +20,13 @@
 #include "LevelEditorViewport.h"
 #include "Slate/SceneViewport.h"
 #include "EditorViewportClient.h"
+#include "LSJ/SharingUserSlot.h"
 
+
+void ULSJMainWidget::SetUserID(FString ID)
+{
+	ScreenActor->SetViewSharingUserID(ID);
+}
 
 void ULSJMainWidget::NativeOnInitialized()
 {
@@ -39,6 +46,7 @@ void ULSJMainWidget::NativeConstruct()
 	ButtonLookSharingScreen->OnClicked.AddDynamic(this,&ULSJMainWidget::OnButtonLookSharingScreen);
 	ButtonWindowScreen->OnClicked.AddDynamic(this, &ULSJMainWidget::OnButtonWindowScreen);
 	ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
+	ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void ULSJMainWidget::OnButtonWindowScreen()
@@ -131,12 +139,15 @@ void ULSJMainWidget::OnButtonLookSharingScreen()
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
 		//블루프린트 subs
 		ScreenActor->BeginLookSharingScreen();
+		ImageCoveringScreen->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
 	{
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 		//블루프린트 subs
 		ScreenActor->StopLookSharingScreen();
+		SharingUserPanel->ClearChildren();
+		ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -165,4 +176,39 @@ FString ULSJMainWidget::GetCurrentSessionID()
 
 	// 세션이 없거나 가져오지 못했을 때
 	return FString("No Session Found");
+}
+
+void ULSJMainWidget::InitSlot(TArray<FString> Items)
+{
+    // 기존 슬롯 제거
+    SharingUserPanel->ClearChildren();
+    int32 Row = 0;
+    int32 Column = 0;
+
+
+    // 아이템 데이터 바탕으로 슬롯 생성 및 추가
+    for(FString UserID : Items)
+	{
+        SharingUserSlot = CastChecked<USharingUserSlot>(CreateWidget(GetWorld(), SharingUserSlotFactory));
+        if (SharingUserSlot)
+        {
+            // 슬롯 가시성 및 레이아웃 확인
+            SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
+            SharingUserSlot->SetUserID(UserID);
+			SharingUserSlot->FUserIDButtonDelegate_OneParam.BindUFunction(this,FName("SetUserID"));
+            // Grid에 슬롯 추가
+            SharingUserPanel->AddChildToUniformGrid(SharingUserSlot, Row, Column);
+
+            // Row 값 증가
+            Row++;
+
+            if (!SharingUserPanel)
+            {
+                UE_LOG(LogTemp, Error, TEXT("PartsPanel is not valid."));
+                return;
+            }
+
+            //SharingUserSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
+        }
+	}
 }

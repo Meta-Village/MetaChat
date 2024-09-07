@@ -17,5 +17,6 @@ class METACHAT_API UJsonParseLib : public UBlueprintFunctionLibrary
 public:
 	static FString JsonParse(const FString& json);
 	static FString JsonParsePassword(const FString& json);
+	static void JsonParsePassword(const FString& json, int32& WorldID, FString WorldName);
 	static FString MakeJson(const TMap<FString, FString> source);
 };
