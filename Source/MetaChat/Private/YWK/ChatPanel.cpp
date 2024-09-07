@@ -98,11 +98,11 @@ void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& 
     TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
 
     // 서버가 필요로 하는 데이터 Json으로 채우기
-    JsonObject->SetNumberField(TEXT("WorldId"), 0);
-    JsonObject->SetStringField(TEXT("userId"), "example_user_id"); // 나중에 변경
-    JsonObject->SetNumberField(TEXT("meetingId"), 0);
+    JsonObject->SetNumberField(TEXT("worldId"), 1); // 월드 아이디도 나중에 변경예정
+    JsonObject->SetStringField(TEXT("userId"), "example_user_id"); // 나중에 변경예정
+    JsonObject->SetNumberField(TEXT("meetingId"), 0); // 나중에 추가 예정
     JsonObject->SetStringField(("userName"), PlayerName);
-    JsonObject->SetStringField(("zoneName"), "ROOM1"); //나중에 변경
+    JsonObject->SetStringField(("zoneName"), "ROOM1"); //나중에 변경 예정
     JsonObject->SetStringField(TEXT("chatTime"), FDateTime::Now().ToIso8601()); // 현재 시간을 ISO8601 형식으로
     JsonObject->SetStringField(TEXT("chatContent"), ChatMessage);
 

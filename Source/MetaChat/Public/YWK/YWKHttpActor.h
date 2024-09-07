@@ -44,6 +44,7 @@ public:
 	void RsqPostwavfile(FString url, FString FilePath);
 
 
+
 	//window api viewer
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	TSubclassOf<AActor> windowViewer;

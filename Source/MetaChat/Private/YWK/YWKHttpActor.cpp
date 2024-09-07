@@ -39,6 +39,17 @@ void AYWKHttpActor::BeginPlay()
 			UE_LOG(LogTemp, Error, TEXT("Failed to create HttpUI widget."));
 		}
 	}
+	// 채팅 내역을 요청하기 전에 조건을 확인(플레이어가 존재하는지, worldId가 유효한지)
+	APlayerController* PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PlayerController)
+	{
+		// 예: 플레이어가 준비되었을 때 채팅 내역 요청
+		UChatPanel* ChatPanel = FindObject<UChatPanel>(GetWorld(), TEXT("ChatPanel"));
+		if (ChatPanel)
+		{
+			ChatPanel->RequestChatHistory();
+		}
+	}
 }
 
 // Called every frame
@@ -111,7 +122,6 @@ void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Resp
 	if (bConnectedSuccessfully && Response.IsValid())
 	{
 		FString ResponseString = Response->GetContentAsString(); // 서버로부터 받은 응답
-
 		UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *ResponseString);
 
 		// JSON 파싱
@@ -119,22 +129,36 @@ void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Resp
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
-			// 응답 데이터에서 'chatMessages' 배열을 가져옴
-			TArray<TSharedPtr<FJsonValue>> ChatArray = JsonObject->GetArrayField("chatMessages");
-
-			// 배열을 순회하면서 각 메시지를 ChatPanel에 추가
-			for (TSharedPtr<FJsonValue> Value : ChatArray)
+			// 서버 응답에서 'chatMessages' 배열을 가져옴
+			if (JsonObject->HasField("chatMessages"))
 			{
-				TSharedPtr<FJsonObject> ChatObject = Value->AsObject();
-				FString PlayerName = ChatObject->GetStringField("userName");
-				FString ChatMessage = ChatObject->GetStringField("chatContent");
+				TArray<TSharedPtr<FJsonValue>> ChatArray = JsonObject->GetArrayField("chatMessages");
 
-				// ChatPanel에 채팅 메시지를 업데이트
-				UChatPanel* ChatPanel = FindObject<UChatPanel>(GetWorld(), TEXT("ChatPanel")); // ChatPanel을 찾아서
-				if (ChatPanel)
+				// 채팅 메시지가 없을 경우 처리
+				if (ChatArray.Num() == 0)
 				{
-					ChatPanel->UpdateChat(PlayerName, ChatMessage); // 채팅창에 메시지 업데이트
+					UE_LOG(LogTemp, Warning, TEXT("No chat messages found."));
+					return; // 채팅 메시지가 없으면 리턴
 				}
+
+				// 배열을 순회하면서 각 메시지를 ChatPanel에 추가
+				for (TSharedPtr<FJsonValue> Value : ChatArray)
+				{
+					TSharedPtr<FJsonObject> ChatObject = Value->AsObject();
+					FString PlayerName = ChatObject->GetStringField("userName");
+					FString ChatMessage = ChatObject->GetStringField("chatContent");
+
+					// ChatPanel에 채팅 메시지를 업데이트
+					UChatPanel* ChatPanel = FindObject<UChatPanel>(GetWorld(), TEXT("ChatPanel")); // ChatPanel을 찾아서
+					if (ChatPanel)
+					{
+						ChatPanel->UpdateChat(PlayerName, ChatMessage); // 채팅창에 메시지 업데이트
+					}
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("chatMessages field not found."));
 			}
 		}
 		else
