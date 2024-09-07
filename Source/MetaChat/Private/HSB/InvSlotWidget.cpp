@@ -74,7 +74,7 @@ void UInvSlotWidget::OnItemClicked()
             FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt-1);
             if ( ButtonName.Contains(ExpectedButtonName0) )
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_hat.Player_test_hat'"));
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Hair_Long_v1.Hair_Long_v1'"));
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
@@ -90,7 +90,7 @@ void UInvSlotWidget::OnItemClicked()
             }
             else if ( ButtonName.Contains(ExpectedButtonName1) )
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_hat1.Player_test_hat1'"));
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Hair_Short_.Hair_Short_'"));
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
@@ -116,7 +116,7 @@ void UInvSlotWidget::OnItemClicked()
             FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 1);
             if (ButtonName.Contains(ExpectedButtonName0))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_cloth.Player_test_cloth'"));
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_Top_Long.Player_Top_Long'"));
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
@@ -133,7 +133,7 @@ void UInvSlotWidget::OnItemClicked()
             }
             else if (ButtonName.Contains(ExpectedButtonName1))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_cloth1.Player_test_cloth1'"));
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_Top_Short.Player_Top_Short'"));
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
@@ -160,7 +160,7 @@ void UInvSlotWidget::OnItemClicked()
             FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 1);
             if (ButtonName.Contains(ExpectedButtonName0))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_pants.Player_test_pants'"));
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_Pants_Short.Player_Pants_Short'"));
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
@@ -177,7 +177,7 @@ void UInvSlotWidget::OnItemClicked()
             }
             else if (ButtonName.Contains(ExpectedButtonName1))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_pants1.Player_test_pants1'"));
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.Material'/Game/XR_HSB/Character/Cloth_Pants1.Cloth_Pants1'"));
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
@@ -204,7 +204,7 @@ void UInvSlotWidget::OnItemClicked()
             FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt - 1);
             if (ButtonName.Contains(ExpectedButtonName0))
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_test_shoes.Player_test_shoes'"));
+                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Player_Shoes_v1.Player_Shoes_v1'"));
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
