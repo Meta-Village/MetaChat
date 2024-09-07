@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "HttpFwd.h"
 #include "CustomCharacter.generated.h"
 
 USTRUCT(BlueprintType)
@@ -45,10 +46,19 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+//     UFUNCTION()
+//     void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+//     UFUNCTION()
+//     void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+    UPROPERTY(EditDefaultsOnly)
+    class USpringArmComponent* SpringArm;
+    UPROPERTY(EditDefaultsOnly)
+    class UCameraComponent* Camera;
+
 	// Lower Body
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Parts", meta = (AllowPrivateAccess = "true"))
     USkeletalMeshComponent* LowerBodyMeshComp;
-
 
     // Upper Body
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Character Parts")
@@ -65,6 +75,9 @@ public:
     // Feet
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Character Parts")
     USkeletalMeshComponent* FeetMeshComp;
+
+
+
 
     // level 넘어갈 때 로드될 정보
 	UFUNCTION(BlueprintCallable)
@@ -101,4 +114,12 @@ public:
 //     int MatColor;
 //     UFUNCTION(BlueprintCallable)
 //     void OnRep_ChangeMatColor();
+
+// 
+// private:
+//     // 서버에 CurrentLocationInfo 보내기
+//     void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInfo);
+// 
+//     // 서버 응답 처리
+//     void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 };
