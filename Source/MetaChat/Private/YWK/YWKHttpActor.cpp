@@ -187,65 +187,57 @@ bool AYWKHttpActor::LoadWavFileToBinary(const FString& FilePath, TArray<uint8>& 
 	}
 }
 
-void AYWKHttpActor::RsqPostwavfile(FString url, FString FilePath, FString MeetingId)
+void AYWKHttpActor::RsqPostwavfile(FString url, FString FilePath)
 {
-    // WAV 파일을 바이너리로 읽기
-    TArray<uint8> wavFileData;
-    if (!LoadWavFileToBinary(FilePath, wavFileData))
-    {
-        UE_LOG(LogTemp, Error, TEXT("Failed to load WAV file: %s"), *FilePath);
-        return;
-    }
 
-    // Http 모듈 생성
-    FHttpModule& httpModule = FHttpModule::Get();
-    TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
+	// WAV 파일을 바이너리로 읽기
+	TArray<uint8> wavFileData;
+	if (!LoadWavFileToBinary(FilePath, wavFileData))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to load WAV file: %s"), *FilePath);
+		return;
+	}
 
-    // 요청할 정보를 설정
-    req->SetURL(url);
-    req->SetVerb(TEXT("POST"));
+	//Http 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get();
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
 
-    // multipart/form-data 포맷으로 전송
-    req->SetHeader(TEXT("Content-Type"), TEXT("multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"));
+	// 요청할 정보를 설정
+	req->SetURL(url);
+	req->SetVerb(TEXT("POST"));
+	//req->SetHeader(TEXT("Content-Type"), TEXT("audio/wav")); // Content-Type을 audio/wav로 설정
+	// multipart/form data으로 전송
+	req->SetHeader(TEXT("Content-Type"), TEXT("multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"));
 
-    // Boundary와 파일 이름 설정
-    FString Boundary = TEXT("----WebKitFormBoundary7MA4YWxkTrZu0gW");
-    FString FileName = FPaths::GetCleanFilename(FilePath);
+	// 바이너리 데이터를 요청 본문에 설정
+	//req->SetContent(wavFileData);
+	// multipart/form-data 포맷으로 파일 내용 구성
+	FString Boundary = TEXT("----WebKitFormBoundary7MA4YWxkTrZu0gW");
+	FString FileName = TEXT("test.wav");
 
-    // FormData에 추가할 각 파트를 작성
-    // 1. meetingId 파트 (텍스트)
-    FString MeetingIdPart = FString::Printf(TEXT("--%s\r\nContent-Disposition: form-data; name=\"meetingId\"\r\n\r\n%s\r\n"), *Boundary, *MeetingId);
+	FString Payload = FString::Printf(TEXT("--%s\r\nContent-Disposition: form-data; name=\"file\"; filename=\"%s\"\r\nContent-Type: audio/wav\r\n\r\n"),
+	*Boundary, *FileName);
 
-    // 2. voice 파트 (파일)
-    FString FilePartHeader = FString::Printf(
-        TEXT("--%s\r\nContent-Disposition: form-data; name=\"voice\"; filename=\"%s\"\r\nContent-Type: audio/wav\r\n\r\n"), 
-        *Boundary, *FileName);
+	TArray<uint8> FormData;
+	// 텍스트 데이터를 UTF-8로 변환
+	FTCHARToUTF8 Converter(*Payload);
+	FormData.Append(reinterpret_cast<const uint8*>(Converter.Get()), (Converter.Length()));
 
-    // 3. FormData를 구성
-    TArray<uint8> FormData;
+	// 파일 바이너리 데이터 추가
+	FormData.Append(wavFileData);
 
-    // 텍스트 파트 (meetingId)를 UTF-8로 변환하고 추가
-    FTCHARToUTF8 MeetingIdConverter(*MeetingIdPart);
-    FormData.Append(reinterpret_cast<const uint8*>(MeetingIdConverter.Get()), MeetingIdConverter.Length());
+	//폼 데이터 끝에 boundary 추가
+	FString EndBoundary = FString::Printf(TEXT("\r\n--%s--\r\n"), *Boundary);
+	FTCHARToUTF8 EndConverter(*EndBoundary);
+	FormData.Append(reinterpret_cast<const uint8*>(EndConverter.Get()), (EndConverter.Length()));
 
-    // 파일 헤더 파트를 UTF-8로 변환하고 추가
-    FTCHARToUTF8 FileHeaderConverter(*FilePartHeader);
-    FormData.Append(reinterpret_cast<const uint8*>(FileHeaderConverter.Get()), FileHeaderConverter.Length());
+	//최종 FormData를 본문에 설정
+	req->SetContent(FormData);
 
-    // 파일 바이너리 데이터를 추가
-    FormData.Append(wavFileData);
+	//응답받을 함수를 연결
+	req->OnProcessRequestComplete().BindUObject(this, &AYWKHttpActor::OnResPostTest);
 
-    // 폼 데이터 끝에 boundary 추가
-    FString EndBoundary = FString::Printf(TEXT("\r\n--%s--\r\n"), *Boundary);
-    FTCHARToUTF8 EndBoundaryConverter(*EndBoundary);
-    FormData.Append(reinterpret_cast<const uint8*>(EndBoundaryConverter.Get()), EndBoundaryConverter.Length());
+	// 서버에 요청
+	req->ProcessRequest();
 
-    // 최종 FormData를 본문에 설정
-    req->SetContent(FormData);
-
-    // 응답 받을 함수를 연결
-    req->OnProcessRequestComplete().BindUObject(this, &AYWKHttpActor::OnResPostTest);
-
-    // 서버에 요청 전송
-    req->ProcessRequest();
 }
