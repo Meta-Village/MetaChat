@@ -41,7 +41,7 @@ public:
 
 	// WAV 파일 전송
 	bool LoadWavFileToBinary(const FString& FilePath, TArray<uint8>& OutBinaryData);
-	void RsqPostwavfile(FString url, FString FilePath);
+	void RsqPostwavfile(FString url, FString FilePath, FString MeetingId);
 
 
 

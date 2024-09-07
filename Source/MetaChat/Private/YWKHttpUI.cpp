@@ -37,8 +37,11 @@ void UYWKHttpUI::OnSendButtonClicked()
             return;
         }
 
+        // meetingId 설정 (예시: 사용자가 입력한 값을 가져온다거나, 특정 로직에 의해 할당됨)
+        FString MeetingId = "22"; // 실제 MeetingId 값 설정
+
         // 파일을 서버로 전송
-        YWKHttpActor->RsqPostwavfile(TEXT("http://125.132.216.190:8126/api/v1/files/upload"), FilePath);
+        YWKHttpActor->RsqPostwavfile(TEXT("http://125.132.216.190:8126/voice"), FilePath, MeetingId);
     }
     else
     {
