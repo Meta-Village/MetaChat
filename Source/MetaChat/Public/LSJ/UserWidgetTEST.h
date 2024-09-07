@@ -30,6 +30,9 @@ protected:
 	 UPROPERTY(meta = (BindWidget))
     class UImage* ImageWidget; 
 
+	//방 세션 UI
+
+
 protected:
 	virtual void NativeOnInitialized();
 
@@ -73,4 +76,30 @@ public:
 	void StartLevelOnlyPixelStreaming();
 	//FCriticalSection CriticalSection;
 	//	TFuture<void> AsyncTaskHandle;
+
+	//월드제목과 월드 비밀번호 보내기
+	UFUNCTION(BlueprintCallable)
+	virtual void SendCreatingWorldInfo();
+	virtual void RecvCreatingWorldInfo(FString result,int32 resultCode);
+	UPROPERTY(BlueprintReadWrite)
+	FString WorldName;
+	UPROPERTY(BlueprintReadWrite)
+	FString WorldPassworld;
+
+	//회원가입정보 http 통신
+	UFUNCTION(BlueprintCallable)
+	virtual void SendCreatingIDInfo();
+
+	//서버에서 월드번호,비밀번호로 조회결과 가져오기 http 통신
+
+	UFUNCTION(BlueprintCallable)
+	void SendFindSessionInfo(FString SendWorldID);
+	void RecvFindSessionInfo(FString result, int32 resultCode);
+
+	//세션 생성하는 블루프린트 함수
+	UFUNCTION(BlueprintImplementableEvent, Category = "MyCategory")
+    void CreateSession(int WorldID);
+	//세션 참가하는 블루프린트 함수
+	UFUNCTION(BlueprintImplementableEvent, Category = "MyCategory")
+    void JoinSession(int WorldID);
 };

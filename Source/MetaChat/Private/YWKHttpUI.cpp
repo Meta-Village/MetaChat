@@ -5,6 +5,8 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "YWK/YWKHttpActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/ScrollBox.h"
 
 void UYWKHttpUI::NativeConstruct()
 {
@@ -16,23 +18,36 @@ void UYWKHttpUI::NativeConstruct()
 	}
 }
 
+// 파일 전송 버튼 클릭
 void UYWKHttpUI::OnSendButtonClicked()
 {
-	// 여기서 파일을 서버로 전송하는 로직을 호출
-	UE_LOG(LogTemp, Log, TEXT("Send Button Clicked"));
+    UE_LOG(LogTemp, Log, TEXT("Send Button Clicked"));
 
-	// Http 요청을 처리할 액터를 가져와서 요청 보내기
-	if(AYWKHttpActor* YWKHttpActor = Cast<AYWKHttpActor>(GetWorld()->GetFirstPlayerController()->GetPawn()))
-	{
-		// 파일 경로 설정
-		FString FilePath = FPaths::ProjectDir() + TEXT("savewave/test.wav");
-		YWKHttpActor->RsqPostwavfile(TEXT("http://125.132.216.190:8126/api/v1/files/upload"), FilePath);
-	}
-}
+    // 월드에서 AYWKHttpActor 액터 찾기
+    AYWKHttpActor* YWKHttpActor = Cast<AYWKHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AYWKHttpActor::StaticClass()));
 
-void UYWKHttpUI::UpdateWidgetTexture()
-{
+    if (YWKHttpActor)
+    {
+        // 파일 경로 설정
+        FString FilePath = FPaths::ProjectDir() + TEXT("savewave/test.wav");
 
+        // 파일 존재여부 확인
+        if (!FPaths::FileExists(FilePath))
+        {
+            UE_LOG(LogTemp, Error, TEXT("File Not Found: %s"), *FilePath);
+            return;
+        }
+
+        // meetingId 설정 (예시: 사용자가 입력한 값을 가져온다거나, 특정 로직에 의해 할당됨)
+        FString MeetingId = "22"; // 실제 MeetingId 값 설정
+
+        // 파일을 서버로 전송
+        YWKHttpActor->RsqPostwavfile(TEXT("http://125.132.216.190:8126/voice"), FilePath, MeetingId);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("HttpActor not found in the world"));
+    }
 }
 
 void UYWKHttpUI::SetTextLog(const FString& NewLog)
@@ -42,5 +57,23 @@ void UYWKHttpUI::SetTextLog(const FString& NewLog)
 		// TextBlock에 텍스트를 설정
 		LogCheckBox->SetText(FText::FromString(NewLog));
 	}
+}
+
+// 요약본 관련
+void UYWKHttpUI::UpdateSummaryText(const FString& SummaryText)
+{
+    if (SummaryTextBlock) // 텍스트 블럭이 UMG에서 바인딩된 변수
+    {
+        SummaryTextBlock->SetText(FText::FromString(SummaryText));
+        if (ScrollBox)
+        {
+            ScrollBox->ScrollToEnd(); // 텍스트 길어지면 자동으로 스크롤
+        }
+    }
+}
+
+void UYWKHttpUI::UpdateWidgetTexture()
+{
+
 }
 

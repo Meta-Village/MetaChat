@@ -23,6 +23,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable)
+	FString GetSharingUsers(TArray<FString> Users);
+	void SetViewSharingUserID(FString ID);
 	void UpdateTexture();
 	UTexture2D* CaptureScreenToTexture();
 	UTexture2D* CapturedTexture;
@@ -40,4 +43,9 @@ public:
 	void StopLookSharingScreen();
 	void BeginStreaming();
 	void BeginLookSharingScreen();
+
+	void ChangeLookSharingScreen();
+	//ViewSharingUserID
+	UPROPERTY(BlueprintReadWrite)
+	FString UserID;
 };
