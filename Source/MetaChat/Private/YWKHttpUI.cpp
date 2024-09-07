@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "YWK/YWKHttpActor.h"
+#include "Kismet/GameplayStatics.h"
 
 void UYWKHttpUI::NativeConstruct()
 {
@@ -16,18 +17,33 @@ void UYWKHttpUI::NativeConstruct()
 	}
 }
 
+// 파일 전송 버튼 클릭
 void UYWKHttpUI::OnSendButtonClicked()
 {
-	// 여기서 파일을 서버로 전송하는 로직을 호출
-	UE_LOG(LogTemp, Log, TEXT("Send Button Clicked"));
+    UE_LOG(LogTemp, Log, TEXT("Send Button Clicked"));
 
-	// Http 요청을 처리할 액터를 가져와서 요청 보내기
-	if(AYWKHttpActor* YWKHttpActor = Cast<AYWKHttpActor>(GetWorld()->GetFirstPlayerController()->GetPawn()))
-	{
-		// 파일 경로 설정
-		FString FilePath = FPaths::ProjectDir() + TEXT("savewave/test.wav");
-		YWKHttpActor->RsqPostwavfile(TEXT("http://125.132.216.190:8126/api/v1/files/upload"), FilePath);
-	}
+    // 월드에서 AYWKHttpActor 액터 찾기
+    AYWKHttpActor* YWKHttpActor = Cast<AYWKHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AYWKHttpActor::StaticClass()));
+
+    if (YWKHttpActor)
+    {
+        // 파일 경로 설정
+        FString FilePath = FPaths::ProjectDir() + TEXT("savewave/test.wav");
+
+        // 파일 존재여부 확인
+        if (!FPaths::FileExists(FilePath))
+        {
+            UE_LOG(LogTemp, Error, TEXT("File Not Found: %s"), *FilePath);
+            return;
+        }
+
+        // 파일을 서버로 전송
+        YWKHttpActor->RsqPostwavfile(TEXT("http://125.132.216.190:8126/api/v1/files/upload"), FilePath);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("HttpActor not found in the world"));
+    }
 }
 
 void UYWKHttpUI::UpdateWidgetTexture()
