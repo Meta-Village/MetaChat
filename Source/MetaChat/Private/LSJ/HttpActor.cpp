@@ -28,7 +28,7 @@ void AHttpActor::BeginPlay()
 	HttpUI = Cast<UUserWidgetTEST>(CreateWidget(GetWorld(), HttpUIFactory));
 	if (HttpUI)
 	{
-		HttpUI->AddToViewport();
+		HttpUI->AddToViewport(2);
 		HttpUI->SetHttpActor(this);
 		//FVector position = GetActorLocation() + GetActorUpVector() * 100;
 		//AActor* spawnViewer = GetWorld()->SpawnActor<AActor>(windowViewer, position, GetActorRotation());
