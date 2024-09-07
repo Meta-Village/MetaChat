@@ -41,11 +41,11 @@ APixelStreamingActor::APixelStreamingActor()
     }
 
     // 기본 머티리얼 설정
-    static ConstructorHelpers::FObjectFinder<UMaterial> DefaultMaterial(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/XR_LSJ/WindowViewer/MMMMM.MMMMM'"));
-    if ( DefaultMaterial.Succeeded() )
-    {
-        PlaneMesh->SetMaterial(0 , DefaultMaterial.Object);
-    }
+ /*   static ConstructorHelpers::FObjectFinder<UMaterial> DefaultMaterial(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/XR_LSJ/WindowViewer/MMMMM.MMMMM'"));
+	if ( DefaultMaterial.Succeeded() )
+	{
+		PlaneMesh->SetMaterial(0 , DefaultMaterial.Object);
+	}*/
 }
 
 void APixelStreamingActor::BeginPlay()
