@@ -53,6 +53,34 @@ FString UJsonParseLib::JsonParsePassword(const FString& json)
 	return returnValue;
 }
 
+void UJsonParseLib::JsonParsePassword(const FString& json,int32& WorldID,FString WorldName)
+{
+	// JSON 파싱을 위한 Reader 생성
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(json);
+
+    // JSON 객체를 저장할 포인터 선언
+    TSharedPtr<FJsonObject> JsonObject;
+
+    // JSON 문자열을 파싱하여 JsonObject에 저장
+    if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+    {
+        // "월드 ID" 필드를 int32 타입으로 추출
+         WorldID = JsonObject->GetIntegerField(TEXT("worldId"));
+
+        // "월드 이름" 필드를 FString 타입으로 추출
+         WorldName = JsonObject->GetStringField(TEXT("worldName"));
+
+        // 출력 로그
+        UE_LOG(LogTemp, Log, TEXT("월드 ID: %d"), WorldID);
+        UE_LOG(LogTemp, Log, TEXT("월드 이름: %s"), *WorldName);
+    }
+    else
+    {
+        // 파싱 실패 시 로그 출력
+        UE_LOG(LogTemp, Error, TEXT("JSON 파싱 실패"));
+    }
+}
+
 FString UJsonParseLib::MakeJson(const TMap<FString, FString> source)
 {
 	//source를 jsonObject형식으로 만든다.
