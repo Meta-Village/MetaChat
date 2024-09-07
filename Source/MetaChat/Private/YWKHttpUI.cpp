@@ -6,6 +6,7 @@
 #include "Components/TextBlock.h"
 #include "YWK/YWKHttpActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/ScrollBox.h"
 
 void UYWKHttpUI::NativeConstruct()
 {
@@ -46,11 +47,6 @@ void UYWKHttpUI::OnSendButtonClicked()
     }
 }
 
-void UYWKHttpUI::UpdateWidgetTexture()
-{
-
-}
-
 void UYWKHttpUI::SetTextLog(const FString& NewLog)
 {
 	if (LogCheckBox)
@@ -58,5 +54,23 @@ void UYWKHttpUI::SetTextLog(const FString& NewLog)
 		// TextBlock에 텍스트를 설정
 		LogCheckBox->SetText(FText::FromString(NewLog));
 	}
+}
+
+// 요약본 관련
+void UYWKHttpUI::UpdateSummaryText(const FString& SummaryText)
+{
+    if (SummaryTextBlock) // 텍스트 블럭이 UMG에서 바인딩된 변수
+    {
+        SummaryTextBlock->SetText(FText::FromString(SummaryText));
+        if (ScrollBox)
+        {
+            ScrollBox->ScrollToEnd(); // 텍스트 길어지면 자동으로 스크롤
+        }
+    }
+}
+
+void UYWKHttpUI::UpdateWidgetTexture()
+{
+
 }
 

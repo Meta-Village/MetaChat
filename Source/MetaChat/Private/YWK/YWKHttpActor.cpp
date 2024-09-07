@@ -129,7 +129,7 @@ void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Resp
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
-			// 서버 응답에서 'chatMessages' 배열을 가져옴
+			// 1. 여기는 서버 응답에서 'chatMessages' 배열을 가져옴(방 나갔다 들어올 때 채팅내역 받는 부분)
 			if (JsonObject->HasField("chatMessages"))
 			{
 				TArray<TSharedPtr<FJsonValue>> ChatArray = JsonObject->GetArrayField("chatMessages");
@@ -159,6 +159,22 @@ void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Resp
 			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT("chatMessages field not found."));
+			}
+			// 2. 회의 요약 가져오기
+			if (JsonObject->HasField("messages") && !JsonObject->GetField<EJson::None>("messages")->IsNull())
+			{
+				FString MeetingSummary = JsonObject->GetStringField("messages");
+				UE_LOG(LogTemp, Log, TEXT("Meeting summary: %s"), *MeetingSummary);
+
+				//UI 업데이트 - YWKHttpUI에서 SetTextLog를 호출하여 텍스트 설정
+				if (YWKHttpUI)
+				{
+					YWKHttpUI->SetTextLog(MeetingSummary); // 회의 요약을 UI의 TextBlock에서 처리
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("messages field not found or null"));
 			}
 		}
 		else
