@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include <Components/Overlay.h>
 #include "Components/OverlaySlot.h"
+#include "UObject/SoftObjectPtr.h"
 
 void UInvSlotWidget::NativeConstruct()
 {
@@ -72,9 +73,14 @@ void UInvSlotWidget::OnItemClicked()
 
             FString ExpectedButtonName0 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt-2);
             FString ExpectedButtonName1 = FString::Printf(TEXT("WBP_InvParts_C_%d"), clickcnt-1);
+
+            TSoftObjectPtr<USkeletalMesh> MeshAsset;
+
             if ( ButtonName.Contains(ExpectedButtonName0) )
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Hair_Long_v1.Hair_Long_v1'"));
+                MeshAsset = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath(TEXT("/Game/XR_HSB/Character/Hair_Long_v1.Hair_Long_v1")));
+                USkeletalMesh* NewMesh = MeshAsset.LoadSynchronous();
+                
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
@@ -90,7 +96,9 @@ void UInvSlotWidget::OnItemClicked()
             }
             else if ( ButtonName.Contains(ExpectedButtonName1) )
             {
-                USkeletalMesh* NewMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Script/Engine.SkeletalMesh'/Game/XR_HSB/Character/Hair_Short_.Hair_Short_'"));
+                MeshAsset = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath(TEXT("/Game/XR_HSB/Character/Hair_Short_.Hair_Short_")));
+                USkeletalMesh* NewMesh = MeshAsset.LoadSynchronous();
+
                 if (NewMesh == nullptr)
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
