@@ -12,18 +12,19 @@ struct FCharacterCustomizationData
 {
     GENERATED_BODY()
 public:
+    // TSoftObjectPtr로 선언하면 객체가 사용될 때 로드될 수 있음
     // Hair
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
-    USkeletalMesh* HairMesh;
+    TSoftObjectPtr<USkeletalMesh> HairMesh;
      // Upper Body
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
-    USkeletalMesh* UpperBodyMesh;
+    TSoftObjectPtr<USkeletalMesh> UpperBodyMesh;
     // Lower Body
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Customization")
-    USkeletalMesh* LowerBodyMesh;
+    TSoftObjectPtr<USkeletalMesh> LowerBodyMesh;
      // Feet
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
-    USkeletalMesh* FeetMesh;
+    TSoftObjectPtr<USkeletalMesh> FeetMesh;
 };
 
 UENUM(BlueprintType)

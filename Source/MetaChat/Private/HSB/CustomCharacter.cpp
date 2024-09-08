@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "SB/CustomSaveGame.h"
 #include "Engine/SkeletalMesh.h"
+#include "UObject/SoftObjectPtr.h"
 #include "../MetaChatPlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
