@@ -171,6 +171,12 @@ void AMetaChatPlayerController::MoveToLocation(const FVector& Location)
 
 void AMetaChatPlayerController::MoveToLocationTick()
 {
+	ACustomCharacter* Customcharacter = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
+	if (Customcharacter)
+	{
+		Customcharacter->CurrentState = ELocationState::MOVE;
+	}
+
 	APawn* ControlledPawn = GetPawn();
 	if (ControlledPawn)
 	{
@@ -181,6 +187,7 @@ void AMetaChatPlayerController::MoveToLocationTick()
 		{
 			// 도착 지점 근처에 도달한 경우 타이머를 멈추고 이동 종료
 			GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
+			Customcharacter->CurrentState = ELocationState::IDLE;
 		}
 	}
 }

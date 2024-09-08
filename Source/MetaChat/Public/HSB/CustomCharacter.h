@@ -26,6 +26,13 @@ public:
     USkeletalMesh* FeetMesh;
 };
 
+UENUM(BlueprintType)
+enum class ELocationState : uint8 
+{
+	IDLE,
+	MOVE
+};
+
 UCLASS()
 class METACHAT_API ACustomCharacter : public ACharacter
 {
@@ -34,7 +41,16 @@ class METACHAT_API ACustomCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ACustomCharacter();
+    void SetUpLocation(ELocationState State);
+    void UpdateState();
+    void Idle();
+    void Move();
 
+    UPROPERTY()
+	class UCustomAnimInstance* CustomAnimInstance;
+
+    UPROPERTY(EditDefaultsOnly)
+	ELocationState CurrentState;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

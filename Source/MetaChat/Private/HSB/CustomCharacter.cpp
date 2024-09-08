@@ -20,6 +20,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Json.h"
 #include "JsonUtilities.h"
+#include "HSB/CustomAnimInstance.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -74,6 +75,12 @@ void ACustomCharacter::BeginPlay()
     // 캐릭터의 충돌 설정, BeginOverlap과 EndOverlap 바인딩
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACustomCharacter::OnOverlapBegin);
     GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &ACustomCharacter::OnOverlapEnd);
+	
+    if(this->GetMesh())
+    {
+		CustomAnimInstance = Cast<UCustomAnimInstance>(GetMesh()->GetAnimInstance());
+	}
+    CurrentState = ELocationState::IDLE;
 
     CurrentLocationInfo = 0;
     bReplicates = true;
@@ -83,6 +90,8 @@ void ACustomCharacter::BeginPlay()
 void ACustomCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+    UpdateState();
 }
 
 // Called to bind functionality to input
@@ -90,6 +99,55 @@ void ACustomCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ACustomCharacter::SetUpLocation(ELocationState State)
+{
+    if (CurrentState != State)
+    {
+        CurrentState = State;
+
+        switch (State)
+        {
+        case ELocationState::IDLE:	Idle();
+            break;
+        case ELocationState::MOVE:	Move();
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void ACustomCharacter::UpdateState()
+{
+    switch (CurrentState)
+    {
+    case ELocationState::IDLE:	Idle();
+        break;
+    case ELocationState::MOVE:	Move();
+        break;
+    default:
+        break;
+    }
+}
+
+void ACustomCharacter::Idle()
+{
+    if (CustomAnimInstance)
+    {
+        CustomAnimInstance->IsWalking = false;
+        CustomAnimInstance->PlayIdleMontage();
+    }
+}
+
+void ACustomCharacter::Move()
+{
+    if (CustomAnimInstance)
+    {
+        CustomAnimInstance->IsWalking = true;
+        CustomAnimInstance->PlayWalkMontage();
+    }
 }
 
 void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
