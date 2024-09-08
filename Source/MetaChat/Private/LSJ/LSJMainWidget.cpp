@@ -67,8 +67,9 @@ void ULSJMainWidget::OnButtonWindowScreen()
 		ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
 		//ScreenActor->BeginStreaming();
 		// 1. PixelStreaming 모듈을 가져옵니다.
-		IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>("PixelStreaming");
-		
+		IPixelStreamingModule* PixelStreamingModule = FModuleManager::Get().LoadModulePtr<IPixelStreamingModule>("PixelStreaming");
+		//FModuleManager::GetModulePtr<IPixelStreamingModule>("PixelStreaming");
+	
 		if (PixelStreamingModule)
 		{
 			// 현재 세션의 아이디를 가져와서 Streamer를 생성한다.
@@ -163,7 +164,7 @@ void ULSJMainWidget::OnButtonLookSharingScreen()
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
 		//블루프린트 subs
 		ScreenActor->BeginLookSharingScreen();
-		ImageCoveringScreen->SetVisibility(ESlateVisibility::Visible);
+		//ImageCoveringScreen->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
 	{
