@@ -91,7 +91,7 @@ void ACustomCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    UpdateState();
+//     UpdateState();
 }
 
 // Called to bind functionality to input

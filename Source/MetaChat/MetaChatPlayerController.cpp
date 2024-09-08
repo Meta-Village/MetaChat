@@ -178,18 +178,38 @@ void AMetaChatPlayerController::MoveToLocationTick()
 	APawn* ControlledPawn = GetPawn();
 	if (ControlledPawn)
 	{
-		FVector Direction = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-		ControlledPawn->AddMovementInput(Direction, 1.0f, false);
+		// 캐릭터의 속도 확인
+		FVector Velocity = ControlledPawn->GetVelocity();
+		float Speed = Velocity.Size();  // 속도의 크기를 계산
 
-		if (FVector::DistSquared(ControlledPawn->GetActorLocation(), CachedDestination) < FMath::Square(10.0f))
+		// 목표 지점까지의 거리 계산
+		float DistanceSquared = FVector::DistSquared(ControlledPawn->GetActorLocation(), CachedDestination);
+		const float StopDistanceSquared = FMath::Square(50.0f);  // 허용 오차 범위
+
+		// 속도가 0이 되면 IDLE 상태로 전환
+		if (Speed <= 1.0f)
+		{
+			Customcharacter->SetUpLocation(ELocationState::IDLE);
+			UE_LOG(LogTemp, Warning, TEXT("Character set to IDLE state"));
+		}
+		// 아래 도달 부분은 실행이 안 됨.
+		if (DistanceSquared <= StopDistanceSquared)
 		{
 			// 도착 지점 근처에 도달한 경우 타이머를 멈추고 이동 종료
 			GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
-			Customcharacter->SetUpLocation(ELocationState::IDLE);
+
+			UE_LOG(LogTemp, Warning, TEXT("Arrived at Destination"));
 		}
 		else
 		{
- 			Customcharacter->SetUpLocation(ELocationState::MOVE);
+			// 목표 지점에 도달하지 않았을 때만 이동 입력을 추가
+			FVector Direction = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(Direction, 1.0f, false);
+			if(Speed > 1.0f)
+			{
+				// MOVE 상태로 전환
+				Customcharacter->SetUpLocation(ELocationState::MOVE);
+			}
 		}
 	}
 }
