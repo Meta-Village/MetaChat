@@ -70,12 +70,12 @@ ACustomCharacter::ACustomCharacter()
 void ACustomCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-// 
-//     // 캐릭터의 충돌 설정, BeginOverlap과 EndOverlap 바인딩
-//     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACustomCharacter::OnOverlapBegin);
-//     GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &ACustomCharacter::OnOverlapEnd);
-// 
 
+    // 캐릭터의 충돌 설정, BeginOverlap과 EndOverlap 바인딩
+    GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACustomCharacter::OnOverlapBegin);
+    GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &ACustomCharacter::OnOverlapEnd);
+
+    CurrentLocationInfo = 0;
     bReplicates = true;
 }
 
@@ -91,50 +91,133 @@ void ACustomCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-// 
-// void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-// {
-//     // 다른 액터에 "Section1" 태그가 있는지 확인
-//     if (OtherActor && OtherActor->ActorHasTag(FName("Section1")))
-//     {
-//         // 현재 위치 정보를 1로 설정
-//         // 캐릭터가 Section1에 들어갔을 때 서버로 정보 전송
+
+void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+       // 의자 액터에 overlap 되었는지
+    if (OtherActor && OtherActor->ActorHasTag(FName("Chair")))
+    {
+        // 의자에 앉는 애니메이션 작동
+
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Sit on a chair"));
+        }
+        UE_LOG(LogTemp, Warning, TEXT("Sit"));
+
+    }
+
+    // 다른 액터에 "Room1" 태그가 있는지 확인
+    if (OtherActor && OtherActor->ActorHasTag(FName("Room1")))
+    {
+         // 현재 위치 정보를 1로 설정
+//         // 캐릭터가 1에 들어갔을 때 서버로 정보 전송
 //         FDateTime EntryTime = FDateTime::Now();
 //         FDateTime ExitTime;  // 빈 값으로 처리
 //         FName ZoneName = "ROOM1";  // 가정된 존 이름
 //         FString UserId = "User123";  // 가정된 유저 아이디
-//         int32 CurrentLocationInfo = 1;  // 예시로 1
+         CurrentLocationInfo = 1;  // 예시로 1
 // 
 //         // 서버에 정보 전송
 //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
 // 
-//         UE_LOG(LogTemp, Warning, TEXT("Entered Section1, Location Info: %d"), CurrentLocationInfo);
-//     }
-//     // 다른 액터에 "Section2" 태그가 있는지 확인
-//     if (OtherActor && OtherActor->ActorHasTag(FName("Section2")))
-//     {
-//         // 현재 위치 정보를 1로 설정
-//         // 캐릭터가 Section1에 들어갔을 때 서버로 정보 전송
+
+         if (GEngine)
+         {
+             FString Message = FString::Printf(TEXT("Entered Location Info: %d"), CurrentLocationInfo);
+             GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, Message);
+         }
+         UE_LOG(LogTemp, Warning, TEXT("Room1"));
+    }
+    // 다른 액터에 "Room2" 태그가 있는지 확인
+    if (OtherActor && OtherActor->ActorHasTag(FName("Room2")))
+    {
+        // 현재 위치 정보를 2로 설정
+//         // 캐릭터가 2에 들어갔을 때 서버로 정보 전송
 //         FDateTime EntryTime = FDateTime::Now();
 //         FDateTime ExitTime;  // 빈 값으로 처리
 //         FName ZoneName = "ROOM2";  // 가정된 존 이름
 //         FString UserId = "User123";  // 가정된 유저 아이디
-//         int32 CurrentLocationInfo = 2;  // 예시로 1
-// 
+        CurrentLocationInfo = 2;  // 예시로 2
+
 //         // 서버에 정보 전송
 //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
 // 
-//         UE_LOG(LogTemp, Warning, TEXT("Entered Section1, Location Info: %d"), CurrentLocationInfo);
-//     }
-// }
-// 
-// void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-// {
-//     // 다른 액터에 "Section1" 태그가 있는지 확인
-//     if (OtherActor && OtherActor->ActorHasTag(FName("Section1")))
-//     {
-//         UE_LOG(LogTemp, Warning, TEXT("Left Section1"));
-// 
+
+        if (GEngine)
+        {
+            FString Message = FString::Printf(TEXT("Entered Location Info: %d"), CurrentLocationInfo);
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, Message);
+        }
+
+    }
+    // 다른 액터에 "Room3" 태그가 있는지 확인
+    if (OtherActor && OtherActor->ActorHasTag(FName("Room3")))
+    {
+        // 현재 위치 정보를 3로 설정
+//         // 캐릭터가 3에 들어갔을 때 서버로 정보 전송
+//         FDateTime EntryTime = FDateTime::Now();
+//         FDateTime ExitTime;  // 빈 값으로 처리
+//         FName ZoneName = "ROOM3";  // 가정된 존 이름
+//         FString UserId = "User123";  // 가정된 유저 아이디
+        CurrentLocationInfo = 3;  
+
+        //         // 서버에 정보 전송
+        //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+        // 
+
+        if (GEngine)
+        {
+            FString Message = FString::Printf(TEXT("Entered Location Info: %d"), CurrentLocationInfo);
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, Message);
+        }
+
+    }
+    // 다른 액터에 "Room4" 태그가 있는지 확인
+    if (OtherActor && OtherActor->ActorHasTag(FName("Room4")))
+    {
+        // 현재 위치 정보를 4로 설정
+//         // 캐릭터가 4에 들어갔을 때 서버로 정보 전송
+//         FDateTime EntryTime = FDateTime::Now();
+//         FDateTime ExitTime;  // 빈 값으로 처리
+//         FName ZoneName = "ROOM4";  // 가정된 존 이름
+//         FString UserId = "User123";  // 가정된 유저 아이디
+        CurrentLocationInfo = 4; 
+
+        //         // 서버에 정보 전송
+        //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+        // 
+
+        if (GEngine)
+        {
+            FString Message = FString::Printf(TEXT("Entered Location Info: %d"), CurrentLocationInfo);
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, Message);
+        }
+
+    }
+ }
+
+void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+    // 의자 액터에서 벗어났을 때
+    if (OtherActor && OtherActor->ActorHasTag(FName("Chair")))
+    {
+        // 다시 기본 애니메이션으로 전환
+
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Stand Up from a chair"));
+        }
+    }
+
+    // 다른 액터에 "Room1" 태그가 있는지 확인
+    if (OtherActor && OtherActor->ActorHasTag(FName("Room1")))
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Left Room1"));
+        }
+
 //         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
 //         FDateTime EntryTime;  // 빈 값으로 처리
 //         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
@@ -145,26 +228,60 @@ void ACustomCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 //         // 서버에 정보 전송
 //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
 // 
-//         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
-//     }
-//     // 다른 액터에 "Section2" 태그가 있는지 확인
-//     if (OtherActor && OtherActor->ActorHasTag(FName("Section2")))
-//     {
-//         UE_LOG(LogTemp, Warning, TEXT("Left Section2"));
-// 
+//         UE_LOG(LogTemp, Warning, TEXT("Left Room1, Location Info: %d"), CurrentLocationInfo);
+    }
+    // 다른 액터에 "Room2" 태그가 있는지 확인
+    if (OtherActor && OtherActor->ActorHasTag(FName("Room2")))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Left Room2"));
+
 //         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
 //         FDateTime EntryTime;  // 빈 값으로 처리
 //         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
 //         FName ZoneName = "ROOM2";  // 가정된 존 이름
 //         FString UserId = "User123";  // 가정된 유저 아이디
-//         int32 CurrentLocationInfo = 0;  // 예시로 0
-// 
+        CurrentLocationInfo = 0;  // 예시로 0
+
 //         // 서버에 정보 전송
 //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-// 
+//
 //         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
-//     }
-// }
+    }
+    // 다른 액터에 "Room3" 태그가 있는지 확인
+    if (OtherActor && OtherActor->ActorHasTag(FName("Room3")))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Left Room3"));
+
+        //         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        //         FDateTime EntryTime;  // 빈 값으로 처리
+        //         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        //         FName ZoneName = "ROOM2";  // 가정된 존 이름
+        //         FString UserId = "User123";  // 가정된 유저 아이디
+        CurrentLocationInfo = 0;  // 예시로 0
+
+        //         // 서버에 정보 전송
+        //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+        //
+        //         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
+    }
+    // 다른 액터에 "Room4" 태그가 있는지 확인
+    if (OtherActor && OtherActor->ActorHasTag(FName("Room4")))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Left Room4"));
+
+        //         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        //         FDateTime EntryTime;  // 빈 값으로 처리
+        //         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        //         FName ZoneName = "ROOM2";  // 가정된 존 이름
+        //         FString UserId = "User123";  // 가정된 유저 아이디
+        CurrentLocationInfo = 0;  // 예시로 0
+
+        //         // 서버에 정보 전송
+        //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+        //
+        //         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
+    }
+ }
 
 void ACustomCharacter::Load()
 {
