@@ -62,17 +62,18 @@ AScreenActor::AScreenActor()
   		RenderTarget->bAutoGenerateMips = false;
 		RenderTarget->bForceLinearGamma = true;
 		RenderTarget->TargetGamma = 2.2f;
-  		RenderTarget->AddressX = TextureAddress::TA_Clamp;
-  		RenderTarget->AddressY = TextureAddress::TA_Clamp;
-		RenderTarget->InitAutoFormat(1920, 1080);
-
+		RenderTarget->AddressX = TextureAddress::TA_Clamp;
+		RenderTarget->AddressY = TextureAddress::TA_Clamp;
+		RenderTarget->InitAutoFormat(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 		SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 		SceneCapture->SetupAttachment(RootComponent);
 		SceneCapture->CaptureSource = SCS_FinalColorLDR;
-  		//SceneCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_RenderScenePrimitives;
+  		//SceneCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_LegacySceneCapture;
+       //SceneCapture->CaptureSource=ESceneCaptureSource::SCS_BaseColor;
 		SceneCapture->TextureTarget = RenderTarget;
 		//SceneCapture->bConsiderUnrenderedOpaquePixelAsFullyTranslucent = true;
 }
+
 void AScreenActor::UpdateTexture()
 {
 	// 일정 시간 간격으로 화면 캡처 수행
@@ -89,23 +90,23 @@ void AScreenActor::UpdateTexture()
 			CapturedTexture->ConditionalBeginDestroy();
 		}
 		CapturedTexture = CaptureScreenToTexture();
-
+        
 		if (DynamicMaterial && CapturedTexture&& WindowScreenPlaneMesh)
 		{
 			//CapturedTexture->SRGB = true;
 			// BaseTexture 파라미터에 텍스처 설정
 			DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
-
+			RenderTarget->UpdateResourceImmediate();
 			// PlaneMesh에 머티리얼 적용
 			
 		}
 	}
 }
-
 UTexture2D* AScreenActor::CaptureScreenToTexture()
 {
 	int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
 	int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+
 	HDC hScreenDC = GetDC(NULL);
 	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, ScreenWidth, ScreenHeight);
@@ -146,9 +147,9 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
 	ReleaseDC(NULL, hScreenDC);
 
 
-					FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
+					/*FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
 					FTextureResource* TextureResource = Texture->GetResource();
-					
+					*/
 									//if (RenderTargetResource && TextureResource)
 									//{
 									//	ENQUEUE_RENDER_COMMAND(DrawTextureToRenderTarget)(
@@ -182,6 +183,120 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
 									
 
 	return Texture;
+    //int32 ScreenWidth =  GetSystemMetrics(SM_CXSCREEN);
+    //int32 ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+    //// 화면의 HDC를 얻기
+    //HDC hScreenDC = GetDC(NULL);
+    //HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
+    //HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, ScreenWidth, ScreenHeight);
+    //HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC, hBitmap);
+
+    //// 화면 캡처
+    //BitBlt(hMemoryDC, 0, 0, ScreenWidth, ScreenHeight, hScreenDC, 0, 0, SRCCOPY);
+    //SelectObject(hMemoryDC, hOldBitmap);
+
+    //// BITMAPINFOHEADER 설정
+    //BITMAPINFOHEADER bi;
+    //bi.biSize = sizeof(BITMAPINFOHEADER);
+    //bi.biWidth = ScreenWidth;
+    //bi.biHeight = -ScreenHeight;  // 이미지를 뒤집기 위해 음수로 설정
+    //bi.biPlanes = 1;
+    //bi.biBitCount = 32;  // 32비트 비트맵 (RGBA)
+    //bi.biCompression = BI_RGB;
+    //bi.biSizeImage = 0;
+    //bi.biXPelsPerMeter = 0;
+    //bi.biYPelsPerMeter = 0;
+    //bi.biClrUsed = 0;
+    //bi.biClrImportant = 0;
+
+    //// 비트맵 데이터를 저장할 버퍼 생성
+    //std::vector<BYTE> Buffer(ScreenWidth * ScreenHeight * 4);
+    //GetDIBits(hMemoryDC, hBitmap, 0, ScreenHeight, Buffer.data(), (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+
+    //// UTexture2D 동적 생성
+    //UTexture2D* Texture = UTexture2D::CreateTransient(ScreenWidth, ScreenHeight, PF_B8G8R8A8);
+    //if (!Texture)
+    //{
+    //    DeleteObject(hBitmap);
+    //    DeleteDC(hMemoryDC);
+    //    ReleaseDC(NULL, hScreenDC);
+    //    return nullptr;
+    //}
+
+    //// 텍스처 데이터를 업데이트
+    //void* TextureData = Texture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+    //FMemory::Memcpy(TextureData, Buffer.data(), Buffer.size());
+    //Texture->GetPlatformData()->Mips[0].BulkData.Unlock();
+    //Texture->UpdateResource();
+
+    //// 리소스 해제
+    //DeleteObject(hBitmap);
+    //DeleteDC(hMemoryDC);
+    //ReleaseDC(NULL, hScreenDC);
+
+    //return Texture;  // 캡처된 모니터 화면을 텍스처로 반환
+}
+
+// 텍스처 해상도를 PlaneMesh에 맞게 조정하는 함수
+UTexture2D* AScreenActor::ResizeTextureToFitPlane(UTexture2D* OriginalTexture, UStaticMeshComponent* PlaneMesh)
+{
+    if (!OriginalTexture || !PlaneMesh)
+    {
+        return nullptr;
+    }
+
+    // 1. PlaneMesh의 크기 가져오기
+    FVector PlaneMeshSize = PlaneMesh->Bounds.GetBox().GetSize();
+    float PlaneMeshWidth = PlaneMeshSize.X;
+    float PlaneMeshHeight = PlaneMeshSize.Y;
+
+    // 2. 원본 텍스처의 크기 가져오기
+    int32 TextureWidth = OriginalTexture->GetSizeX();
+    int32 TextureHeight = OriginalTexture->GetSizeY();
+
+    // 3. 텍스처와 PlaneMesh의 비율 계산
+    float TextureAspectRatio = static_cast<float>(TextureWidth) / static_cast<float>(TextureHeight);
+    float PlaneAspectRatio = PlaneMeshWidth / PlaneMeshHeight;
+
+    int32 NewWidth = TextureWidth;
+    int32 NewHeight = TextureHeight;
+
+    // 4. PlaneMesh의 크기에 맞게 텍스처의 해상도 조정
+    if (TextureAspectRatio > PlaneAspectRatio)
+    {
+        // 텍스처가 가로로 더 길면 가로를 PlaneMesh에 맞추고, 세로 비율을 유지
+        NewWidth = PlaneMeshWidth;
+        NewHeight = FMath::RoundToInt(NewWidth / TextureAspectRatio);
+    }
+    else
+    {
+        // 텍스처가 세로로 더 길면 세로를 PlaneMesh에 맞추고, 가로 비율을 유지
+        NewHeight = PlaneMeshHeight;
+        NewWidth = FMath::RoundToInt(NewHeight * TextureAspectRatio);
+    }
+
+    // 5. 새로운 크기의 텍스처 생성
+    UTexture2D* ResizedTexture = UTexture2D::CreateTransient(NewWidth, NewHeight, PF_B8G8R8A8);
+    if (!ResizedTexture)
+    {
+        return nullptr;
+    }
+
+    // 6. 원본 텍스처의 데이터 가져오기
+    FTexture2DMipMap& OriginalMip = OriginalTexture->GetPlatformData()->Mips[0];
+    void* OriginalData = OriginalMip.BulkData.Lock(LOCK_READ_ONLY);
+    int32 OriginalPitch = OriginalMip.SizeX * 4;  // 32비트(RGBA) 기준
+
+    // 7. 리사이즈된 텍스처에 데이터 복사
+    void* ResizedTextureData = ResizedTexture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+    FMemory::Memcpy(ResizedTextureData, OriginalData, FMath::Min(OriginalPitch, NewWidth * 4));  // 데이터 복사
+    OriginalMip.BulkData.Unlock();
+    ResizedTexture->GetPlatformData()->Mips[0].BulkData.Unlock();
+    ResizedTexture->UpdateResource();
+
+    // 8. 리사이즈된 텍스처 반환
+    return ResizedTexture;
 }
 
 void AScreenActor::StopLookSharingScreen()
@@ -262,7 +377,7 @@ void AScreenActor::BeginPlay()
 	Super::BeginPlay();
 	APawn* playerPawn =UGameplayStatics::GetPlayerPawn(GetWorld(),0);
 	UCameraComponent* playerCamera = playerPawn->GetComponentByClass<UCameraComponent>();
-	WindowScreenPlaneMesh->SetRelativeScale3D(FVector(1,1,1));
+	WindowScreenPlaneMesh->SetRelativeScale3D(FVector(3,2,1));
 	sceneComp->AttachToComponent(playerCamera,FAttachmentTransformRules::SnapToTargetIncludingScale);
 
 	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(sceneComp->GetComponentLocation(), playerCamera->GetComponentLocation());
