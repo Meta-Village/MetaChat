@@ -21,6 +21,20 @@
 #include "Slate/SceneViewport.h"
 #include "EditorViewportClient.h"
 #include "LSJ/SharingUserSlot.h"
+#include "Engine/TextureRenderTarget2D.h"
+//#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
+//#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingBlueprint/Internal/PixelStreamingStreamerVideoInputRenderTarget.h"
+//#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingBlueprint/Internal/PixelStreamingStreamerVideoInput.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Internal/PixelStreamingVideoInputMediaCapture.h"
+#include "../../../../Plugins/Media/MediaIOFramework/Source/MediaIOCore/Public/MediaOutput.h"
+#include "../../../../Plugins/Media/MediaIOFramework/Source/MediaIOCore/Public/MediaCapture.h"
+#include "SLevelViewport.h"
+#include "LevelEditor.h"
+#include "ILevelEditor.h"
+#include "Engine/GameViewportClient.h"
+#include "Widgets/SViewport.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
+#include "Components/SceneCaptureComponent2D.h"
 
 
 void ULSJMainWidget::SetUserID(FString ID)
@@ -55,6 +69,8 @@ void ULSJMainWidget::OnButtonWindowScreen()
 	FString streamID = "Editor";
 	if (bStreaming)
 	{
+		TextWindowScreen->SetText(FText::FromString(TEXT("공유중")));
+
 		ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
 		//ScreenActor->BeginStreaming();
 		// 1. PixelStreaming 모듈을 가져옵니다.
@@ -63,9 +79,9 @@ void ULSJMainWidget::OnButtonWindowScreen()
 		if (PixelStreamingModule)
 		{
 			// 현재 세션의 아이디를 가져와서 Streamer를 생성한다.
-			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);//GetCurrentSessionID());
+			CurrentStreamer = PixelStreamingModule->FindStreamer(streamID);//GetCurrentSessionID());
 			//TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->CreateStreamer("Test01");
-			if (Streamer.IsValid())
+			if (CurrentStreamer.IsValid())
 			{
 				/*FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>("LevelEditor");
 				TSharedPtr<SLevelViewport> ActiveLevelViewport = LevelEditorModule.GetFirstActiveLevelViewport();
@@ -81,14 +97,27 @@ void ULSJMainWidget::OnButtonWindowScreen()
 				Streamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWindow);
 				Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));*/
 				{
-					TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
+					ScreenActor->UpdateTexture();
+				
+					//TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
 					//Back Buffer를 비디오 입력으로 설정합니다.
-					Streamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
-					Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
-					Streamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
+					CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
+
+					
+					UGameViewportClient* GameViewport = GEngine->GameViewport;
+					ScreenActor->SceneCapture->Activate();
+	
+
+// 2. Pixel Streaming 비디오 입력으로 설정
+					VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
+
+					CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
+	
+					//Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
+					CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
 					
 					//스트리밍을 시작합니다.
-					Streamer->StartStreaming();
+					CurrentStreamer->StartStreaming();
 				}
 				
 			}
@@ -104,6 +133,7 @@ void ULSJMainWidget::OnButtonWindowScreen()
 	}
 	else
 	{
+		TextWindowScreen->SetText(FText::FromString(TEXT("화면공유")));
 		ScreenActor->WindowScreenPlaneMesh->SetVisibility(false);
 
 		// 1. PixelStreaming 모듈을 가져옵니다.
@@ -136,6 +166,7 @@ void ULSJMainWidget::OnButtonLookSharingScreen()
 	bLookStreaming = !bLookStreaming;
 	if (bLookStreaming)
 	{
+		TextLookSharingScreen->SetText(FText::FromString(TEXT("보는중")));
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
 		//블루프린트 subs
 		ScreenActor->BeginLookSharingScreen();
@@ -143,6 +174,7 @@ void ULSJMainWidget::OnButtonLookSharingScreen()
 	}
 	else
 	{
+		TextLookSharingScreen->SetText(FText::FromString(TEXT("화면보기")));
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 		//블루프린트 subs
 		ScreenActor->StopLookSharingScreen();

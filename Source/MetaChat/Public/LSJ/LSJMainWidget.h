@@ -59,4 +59,13 @@ public:
 
 	void InitSlot(TArray<FString> Items);
 
+
+
+	TSharedPtr<class IPixelStreamingStreamer> CurrentStreamer;
+	    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture", meta = (AllowPrivateAccess = "true"))
+    class USceneCaptureComponent2D* SceneCapture;
+    // Render target to store captured scene
+
+    // Pixel Streaming video input from render target
+    TSharedPtr<class FPixelStreamingVideoInputRenderTarget> VideoInput;
 };

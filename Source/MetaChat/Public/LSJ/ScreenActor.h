@@ -49,4 +49,9 @@ public:
 	//ViewSharingUserID
 	UPROPERTY(BlueprintReadWrite)
 	FString UserID;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture")
+    class UTextureRenderTarget2D* RenderTarget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture")
+	class USceneCaptureComponent2D* SceneCapture;
 };
