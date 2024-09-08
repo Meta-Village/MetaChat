@@ -4,6 +4,7 @@
 #include "YWKHttpUI.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "TimerManager.h"
 #include "YWK/YWKHttpActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/ScrollBox.h"
@@ -16,12 +17,21 @@ void UYWKHttpUI::NativeConstruct()
 	{
 		SendButton->OnClicked.AddDynamic(this, &UYWKHttpUI::OnSendButtonClicked);
 	}
+
 }
 
 // 파일 전송 버튼 클릭
 void UYWKHttpUI::OnSendButtonClicked()
 {
     UE_LOG(LogTemp, Log, TEXT("Send Button Clicked"));
+
+    // 텍스트를 "회의 요약 중..." 으로 설정
+    if (LogCheckBox)
+    {
+        LogCheckBox->SetText(FText::FromString(TEXT("회의 내용 요약중.....")));
+        // 타이머 0.5초 간격으로 깜빡이게
+        GetWorld()->GetTimerManager().SetTimer(BlinkTimerHandle, this, &UYWKHttpUI::ToggleBlinkingText, 0.5f, true);
+    }
 
     // 월드에서 AYWKHttpActor 액터 찾기
     AYWKHttpActor* YWKHttpActor = Cast<AYWKHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AYWKHttpActor::StaticClass()));
@@ -52,11 +62,32 @@ void UYWKHttpUI::OnSendButtonClicked()
 
 void UYWKHttpUI::SetTextLog(const FString& NewLog)
 {
+    // 타이머 정지 (깜빡임 멈추기)
+    GetWorld()->GetTimerManager().ClearTimer(BlinkTimerHandle);
+
 	if (LogCheckBox)
 	{
 		// TextBlock에 텍스트를 설정
 		LogCheckBox->SetText(FText::FromString(NewLog));
 	}
+}
+
+void UYWKHttpUI::ToggleBlinkingText()
+{
+    if (LogCheckBox) //유효성 확인
+    {
+        if (bIsTextVisible) // 현재 텍스트 보이는지 확인
+        {
+            LogCheckBox->SetVisibility(ESlateVisibility::Hidden); //텍스트 숨김
+        }
+        else
+        {
+            LogCheckBox->SetVisibility(ESlateVisibility::Visible); // 보이기
+        }
+        // 토글
+        bIsTextVisible = !bIsTextVisible; // 다음 호출 때는 상태 반전
+    }
+
 }
 
 // 요약본 관련
