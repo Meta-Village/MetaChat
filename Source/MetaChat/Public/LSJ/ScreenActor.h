@@ -31,12 +31,13 @@ public:
 	UTexture2D* CapturedTexture;
 	class UMaterialInstanceDynamic* DynamicMaterial;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	class USceneComponent* sceneComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "Components")
     class UStaticMeshComponent* WindowScreenPlaneMesh;
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainWidgetFactory;
+	UPROPERTY(BlueprintReadWrite)
 	class ULSJMainWidget* MainWidget;
 
 	//블루프린트 함수 호출
@@ -48,4 +49,9 @@ public:
 	//ViewSharingUserID
 	UPROPERTY(BlueprintReadWrite)
 	FString UserID;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture")
+    class UTextureRenderTarget2D* RenderTarget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture")
+	class USceneCaptureComponent2D* SceneCapture;
 };

@@ -27,7 +27,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UUserWidget> HttpUIFactory;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	class UUserWidgetTEST* HttpUI;
 
 	// Send 버튼을 눌렀을때 요청할 함수
@@ -44,7 +44,5 @@ public:
 	void OnRsqPostCreateID(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 	void RsqGetFindSession(FString url);
 	void OnRsqGetFindSession(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
-	//window api viewer
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
-	TSubclassOf<AActor> windowViewer;
+
 };

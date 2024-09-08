@@ -39,8 +39,12 @@
 			"Enabled": true
 		},
 		{
-            			"Name": "WebSocketNetworking",
-            			"Enabled": true
+			"Name": "AVCodecsCore",
+			"Enabled": true
+		},
+		{
+			"Name": "WebSocketNetworking",
+			"Enabled": true
 		}
 	]
 }

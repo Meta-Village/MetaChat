@@ -21,6 +21,12 @@
 #include "Rendering/Texture2DResource.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LSJ/LSJMainWidget.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "CanvasItem.h"
+#include "CanvasTypes.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingStreamer.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 // Sets default values
 AScreenActor::AScreenActor()
 {
@@ -34,7 +40,7 @@ AScreenActor::AScreenActor()
     //PlaneMesh->SetupAttachment(RootComponent);
     WindowScreenPlaneMesh->SetupAttachment(sceneComp);
 	WindowScreenPlaneMesh->SetRelativeLocation(FVector(0,0,0));
-
+	WindowScreenPlaneMesh->SetRelativeScale3D(FVector(3.00000, 10000, 1.000000));
     // 기본 Plane Mesh 설정
     static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneMeshAsset(TEXT("/Engine/BasicShapes/Plane.Plane"));
     if (PlaneMeshAsset.Succeeded())
@@ -48,6 +54,24 @@ AScreenActor::AScreenActor()
         WindowScreenPlaneMesh->SetMaterial(0, DefaultMaterial.Object);
     }
 	WindowScreenPlaneMesh->SetVisibility(false);
+
+
+		RenderTarget = CreateDefaultSubobject<UTextureRenderTarget2D>(TEXT("RenderTarget"));
+  		RenderTarget->CompressionSettings = TextureCompressionSettings::TC_Default;
+  		RenderTarget->SRGB = false;
+  		RenderTarget->bAutoGenerateMips = false;
+		RenderTarget->bForceLinearGamma = true;
+		RenderTarget->TargetGamma = 2.2f;
+  		RenderTarget->AddressX = TextureAddress::TA_Clamp;
+  		RenderTarget->AddressY = TextureAddress::TA_Clamp;
+		RenderTarget->InitAutoFormat(1920, 1080);
+
+		SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
+		SceneCapture->SetupAttachment(RootComponent);
+		SceneCapture->CaptureSource = SCS_FinalColorLDR;
+  		//SceneCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_RenderScenePrimitives;
+		SceneCapture->TextureTarget = RenderTarget;
+		//SceneCapture->bConsiderUnrenderedOpaquePixelAsFullyTranslucent = true;
 }
 void AScreenActor::UpdateTexture()
 {
@@ -68,7 +92,7 @@ void AScreenActor::UpdateTexture()
 
 		if (DynamicMaterial && CapturedTexture&& WindowScreenPlaneMesh)
 		{
-			CapturedTexture->SRGB = true;
+			//CapturedTexture->SRGB = true;
 			// BaseTexture 파라미터에 텍스처 설정
 			DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
 
@@ -120,6 +144,42 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
 	DeleteObject(hBitmap);
 	DeleteDC(hMemoryDC);
 	ReleaseDC(NULL, hScreenDC);
+
+
+					FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
+					FTextureResource* TextureResource = Texture->GetResource();
+					
+									//if (RenderTargetResource && TextureResource)
+									//{
+									//	ENQUEUE_RENDER_COMMAND(DrawTextureToRenderTarget)(
+									//		[RenderTargetResource, TextureResource](FRHICommandListImmediate& RHICmdList)
+									//		{
+									//			// FCanvas를 사용하여 RenderTarget에 그리기
+									//			FCanvas Canvas(RenderTargetResource, nullptr, 0, 0, 0, ERHIFeatureLevel::SM5);
+         //   
+									//			// GGlobalShaderMap을 사용하여 셰이더가 제대로 로드되었는지 확인
+									//			if (!GGlobalShaderMap[ERHIFeatureLevel::SM5])
+									//			{
+									//				UE_LOG(LogTemp, Error, TEXT("Shader map not loaded properly."));
+									//				return;
+									//			}
+
+									//			Canvas.Clear(FLinearColor::Black);  // RenderTarget 초기화
+
+									//			// 텍스처를 그리기 위한 FCanvasTileItem 생성
+									//			FCanvasTileItem TileItem(FVector2D(0, 0), TextureResource, FLinearColor::White);
+									//			TileItem.BlendMode = SE_BLEND_Opaque;
+
+									//			// 텍스처를 RenderTarget에 그리기
+									//			Canvas.DrawItem(TileItem);
+									//			Canvas.Flush_GameThread();  // 모든 그리기 명령을 처리
+									//		}
+									//	);
+									//}
+									//RenderTarget->UpdateResource();
+									//RenderTarget->UpdateResourceImmediate();
+									//SceneCapture->UpdateContent();
+									
 
 	return Texture;
 }
@@ -202,6 +262,7 @@ void AScreenActor::BeginPlay()
 	Super::BeginPlay();
 	APawn* playerPawn =UGameplayStatics::GetPlayerPawn(GetWorld(),0);
 	UCameraComponent* playerCamera = playerPawn->GetComponentByClass<UCameraComponent>();
+	WindowScreenPlaneMesh->SetRelativeScale3D(FVector(1,1,1));
 	sceneComp->AttachToComponent(playerCamera,FAttachmentTransformRules::SnapToTargetIncludingScale);
 
 	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(sceneComp->GetComponentLocation(), playerCamera->GetComponentLocation());
