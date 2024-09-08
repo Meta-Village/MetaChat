@@ -31,9 +31,9 @@ public:
 	UTexture2D* CapturedTexture;
 	class UMaterialInstanceDynamic* DynamicMaterial;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	class USceneComponent* sceneComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "Components")
     class UStaticMeshComponent* WindowScreenPlaneMesh;
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainWidgetFactory;

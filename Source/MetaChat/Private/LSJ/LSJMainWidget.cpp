@@ -12,14 +12,11 @@
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputBackBuffer.h"
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingModule.h"
 #include "Modules/ModuleManager.h"
-#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingEditor/Public/PixelStreamingVideoInputViewport.h"
+
 #include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/OnlineSubsystem.h"
 #include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/Interfaces/OnlineSessionInterface.h"
 #include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/OnlineSessionSettings.h"
 
-#include "LevelEditorViewport.h"
-#include "Slate/SceneViewport.h"
-#include "EditorViewportClient.h"
 #include "LSJ/SharingUserSlot.h"
 #include "Engine/TextureRenderTarget2D.h"
 //#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
@@ -28,11 +25,7 @@
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Internal/PixelStreamingVideoInputMediaCapture.h"
 #include "../../../../Plugins/Media/MediaIOFramework/Source/MediaIOCore/Public/MediaOutput.h"
 #include "../../../../Plugins/Media/MediaIOFramework/Source/MediaIOCore/Public/MediaCapture.h"
-#include "SLevelViewport.h"
-#include "LevelEditor.h"
-#include "ILevelEditor.h"
-#include "Engine/GameViewportClient.h"
-#include "Widgets/SViewport.h"
+
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 #include "Components/SceneCaptureComponent2D.h"
 

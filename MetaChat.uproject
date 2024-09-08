@@ -10,10 +10,7 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"UMG",
-				"PixelStreamingEditor",
-				"PixelCapture",
-				"AVCodecsCore"
+				"UMG"
 			]
 		}
 	],
@@ -42,15 +39,11 @@
 			"Enabled": true
 		},
 		{
-			"Name": "WebSocketNetworking",
-			"Enabled": true
-		},
-		{
-			"Name": "PixelCapture",
-			"Enabled": true
-		},
-		{
 			"Name": "AVCodecsCore",
+			"Enabled": true
+		},
+		{
+			"Name": "WebSocketNetworking",
 			"Enabled": true
 		}
 	]

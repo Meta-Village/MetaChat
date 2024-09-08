@@ -44,7 +44,5 @@ public:
 	void OnRsqPostCreateID(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 	void RsqGetFindSession(FString url);
 	void OnRsqGetFindSession(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
-	//window api viewer
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
-	TSubclassOf<AActor> windowViewer;
+
 };
