@@ -37,6 +37,7 @@ public:
     class UStaticMeshComponent* WindowScreenPlaneMesh;
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainWidgetFactory;
+	UPROPERTY(BlueprintReadWrite)
 	class ULSJMainWidget* MainWidget;
 
 	//블루프린트 함수 호출
