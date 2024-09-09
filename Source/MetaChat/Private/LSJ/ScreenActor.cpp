@@ -130,6 +130,19 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
 	std::vector<BYTE> Buffer(ScreenWidth * ScreenHeight * 4);
 	GetDIBits(hMemoryDC, hBitmap, 0, ScreenHeight, Buffer.data(), (BITMAPINFO*)&bi, DIB_RGB_COLORS);
 
+	 // 명도 감소 비율 (예: 0.8로 명도를 20% 감소)
+    float BrightnessFactor = 0.8f;
+
+    // 각 픽셀의 RGB 값을 명도 감소 비율로 조정
+    for (int32 i = 0; i < ScreenWidth * ScreenHeight * 4; i += 4)
+    {
+        // R, G, B 값을 감소
+        Buffer[i] = static_cast<BYTE>(Buffer[i] * BrightnessFactor);     // Red
+        Buffer[i + 1] = static_cast<BYTE>(Buffer[i + 1] * BrightnessFactor); // Green
+        Buffer[i + 2] = static_cast<BYTE>(Buffer[i + 2] * BrightnessFactor); // Blue
+        // 알파 값(Buffer[i+3])은 변경하지 않음 (투명도 유지)
+    }
+
 	// UTexture2D 동적 생성
 	UTexture2D* Texture = UTexture2D::CreateTransient(ScreenWidth, ScreenHeight, PF_B8G8R8A8);
 	if (!Texture)
@@ -236,67 +249,6 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
     //ReleaseDC(NULL, hScreenDC);
 
     //return Texture;  // 캡처된 모니터 화면을 텍스처로 반환
-}
-
-// 텍스처 해상도를 PlaneMesh에 맞게 조정하는 함수
-UTexture2D* AScreenActor::ResizeTextureToFitPlane(UTexture2D* OriginalTexture, UStaticMeshComponent* PlaneMesh)
-{
-    if (!OriginalTexture || !PlaneMesh)
-    {
-        return nullptr;
-    }
-
-    // 1. PlaneMesh의 크기 가져오기
-    FVector PlaneMeshSize = PlaneMesh->Bounds.GetBox().GetSize();
-    float PlaneMeshWidth = PlaneMeshSize.X;
-    float PlaneMeshHeight = PlaneMeshSize.Y;
-
-    // 2. 원본 텍스처의 크기 가져오기
-    int32 TextureWidth = OriginalTexture->GetSizeX();
-    int32 TextureHeight = OriginalTexture->GetSizeY();
-
-    // 3. 텍스처와 PlaneMesh의 비율 계산
-    float TextureAspectRatio = static_cast<float>(TextureWidth) / static_cast<float>(TextureHeight);
-    float PlaneAspectRatio = PlaneMeshWidth / PlaneMeshHeight;
-
-    int32 NewWidth = TextureWidth;
-    int32 NewHeight = TextureHeight;
-
-    // 4. PlaneMesh의 크기에 맞게 텍스처의 해상도 조정
-    if (TextureAspectRatio > PlaneAspectRatio)
-    {
-        // 텍스처가 가로로 더 길면 가로를 PlaneMesh에 맞추고, 세로 비율을 유지
-        NewWidth = PlaneMeshWidth;
-        NewHeight = FMath::RoundToInt(NewWidth / TextureAspectRatio);
-    }
-    else
-    {
-        // 텍스처가 세로로 더 길면 세로를 PlaneMesh에 맞추고, 가로 비율을 유지
-        NewHeight = PlaneMeshHeight;
-        NewWidth = FMath::RoundToInt(NewHeight * TextureAspectRatio);
-    }
-
-    // 5. 새로운 크기의 텍스처 생성
-    UTexture2D* ResizedTexture = UTexture2D::CreateTransient(NewWidth, NewHeight, PF_B8G8R8A8);
-    if (!ResizedTexture)
-    {
-        return nullptr;
-    }
-
-    // 6. 원본 텍스처의 데이터 가져오기
-    FTexture2DMipMap& OriginalMip = OriginalTexture->GetPlatformData()->Mips[0];
-    void* OriginalData = OriginalMip.BulkData.Lock(LOCK_READ_ONLY);
-    int32 OriginalPitch = OriginalMip.SizeX * 4;  // 32비트(RGBA) 기준
-
-    // 7. 리사이즈된 텍스처에 데이터 복사
-    void* ResizedTextureData = ResizedTexture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-    FMemory::Memcpy(ResizedTextureData, OriginalData, FMath::Min(OriginalPitch, NewWidth * 4));  // 데이터 복사
-    OriginalMip.BulkData.Unlock();
-    ResizedTexture->GetPlatformData()->Mips[0].BulkData.Unlock();
-    ResizedTexture->UpdateResource();
-
-    // 8. 리사이즈된 텍스처 반환
-    return ResizedTexture;
 }
 
 void AScreenActor::StopLookSharingScreen()

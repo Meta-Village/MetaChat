@@ -28,6 +28,7 @@
 
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingEditor/Public/PixelStreamingVideoInputViewport.h"
 
 
 void ULSJMainWidget::SetUserID(FString ID)
@@ -101,7 +102,7 @@ void ULSJMainWidget::OnButtonWindowScreen()
 					UGameViewportClient* GameViewport = GEngine->GameViewport;
 					ScreenActor->SceneCapture->Activate();
 	
-
+					
 // 2. Pixel Streaming 비디오 입력으로 설정
 					VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
 
@@ -112,6 +113,15 @@ void ULSJMainWidget::OnButtonWindowScreen()
 					
 					//스트리밍을 시작합니다.
 					CurrentStreamer->StartStreaming();
+
+					
+					////Back Buffer를 비디오 입력으로 설정합니다.
+					//CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
+					//CurrentStreamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(CurrentStreamer));
+					//CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
+					//
+					////스트리밍을 시작합니다.
+					//CurrentStreamer->StartStreaming();
 				}
 				
 			}

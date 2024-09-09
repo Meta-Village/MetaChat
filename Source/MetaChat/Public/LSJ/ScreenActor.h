@@ -28,7 +28,6 @@ public:
 	void SetViewSharingUserID(FString ID);
 	void UpdateTexture();
 	UTexture2D* CaptureScreenToTexture();
-	UTexture2D* ResizeTextureToFitPlane(UTexture2D* OriginalTexture, UStaticMeshComponent* PlaneMesh);
 	UTexture2D* CapturedTexture;
 	class UMaterialInstanceDynamic* DynamicMaterial;
 
