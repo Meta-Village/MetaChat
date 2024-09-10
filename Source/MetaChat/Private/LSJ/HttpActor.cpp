@@ -12,6 +12,9 @@
 #include <Windows.h>
 #include "Windows/HideWindowsPlatformTypes.h"
 #include <vector> 
+
+#include "Kismet/GameplayStatics.h"
+#include "LSJ/LoginScreenWidget.h"
 // Sets default values
 AHttpActor::AHttpActor()
 {
@@ -24,15 +27,31 @@ AHttpActor::AHttpActor()
 void AHttpActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	HttpUI = Cast<UUserWidgetTEST>(CreateWidget(GetWorld(), HttpUIFactory));
-	if (HttpUI)
+	
+	FString CurrentWorldName =UGameplayStatics::GetCurrentLevelName(GetWorld(),true);
+	if (CurrentWorldName == CustomCharacterMap)
 	{
-		HttpUI->AddToViewport(2);
-		HttpUI->SetHttpActor(this);
-		//FVector position = GetActorLocation() + GetActorUpVector() * 100;
-		//AActor* spawnViewer = GetWorld()->SpawnActor<AActor>(windowViewer, position, GetActorRotation());
-		//HttpUI->SetViewer(spawnViewer);
+		HttpUI = Cast<UUserWidgetTEST>(CreateWidget(GetWorld(), CustomCharacterHttpUIFactory));
+		if (HttpUI)
+		{
+			HttpUI->AddToViewport(2);
+			HttpUI->SetHttpActor(this);
+			//FVector position = GetActorLocation() + GetActorUpVector() * 100;
+			//AActor* spawnViewer = GetWorld()->SpawnActor<AActor>(windowViewer, position, GetActorRotation());
+			//HttpUI->SetViewer(spawnViewer);
+		}
+	}
+	else if (CurrentWorldName == RogoMap)
+	{
+		LoginScreenHttpUI = Cast<ULoginScreenWidget>(CreateWidget(GetWorld(), LoginHttpUIFactory));
+		if (LoginScreenHttpUI)
+		{
+			LoginScreenHttpUI->AddToViewport();
+			LoginScreenHttpUI->SetHttpActor(this);
+		}
+	}else if (CurrentWorldName == "PrototypeMain")
+	{
+
 	}
 
 }
@@ -179,8 +198,7 @@ void AHttpActor::OnRsqPostCreateID(FHttpRequestPtr Request, FHttpResponsePtr Res
 		//통신성공
 		FString result = Response->GetContentAsString(); //어떤 타입으로 받을 것인지
 		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
-		HttpUI->SetTextLog(result);
-
+		int code = Response->GetResponseCode();
 	}
 	else
 	{
@@ -226,3 +244,4 @@ void AHttpActor::OnRsqGetFindSession(FHttpRequestPtr Request, FHttpResponsePtr R
 		UE_LOG(LogTemp, Error, TEXT("bConnectedSuccessfully Fail.."));
 	}
 }
+
