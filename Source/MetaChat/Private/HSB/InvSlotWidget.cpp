@@ -56,7 +56,7 @@ void UInvSlotWidget::OnItemClicked()
     Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld() , 0));
     // Mesh 설정할 캐릭터의 SkeletalMeshComponent
     USkeletalMeshComponent* TargetMeshComponent = nullptr;
-    if(Character)
+    if(Character && Character->HasAuthority())
 	{
         if(Category == "" )
             UE_LOG(LogTemp , Warning , TEXT("Problem in Loading Category."));
@@ -85,6 +85,7 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
                 }
+                
                 if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
@@ -103,6 +104,7 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
+
                 if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
@@ -129,6 +131,7 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
                 }
+                
                 if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
@@ -146,6 +149,7 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
+                
                 if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
@@ -173,6 +177,7 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
                 }
+                
                 if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
@@ -190,6 +195,7 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
+                
                 if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
@@ -217,6 +223,7 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
                 }
+                
                 if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
@@ -234,6 +241,7 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
+                
                 if (TargetMeshComponent)
                 {
                     TargetMeshComponent->SetSkeletalMesh(NewMesh);

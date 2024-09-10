@@ -190,7 +190,7 @@ void AMetaChatPlayerController::MoveToLocationTick()
 		if (Speed <= 1.0f)
 		{
 			Customcharacter->SetUpLocation(ELocationState::IDLE);
-			UE_LOG(LogTemp, Warning, TEXT("Character set to IDLE state"));
+// 			UE_LOG(LogTemp, Warning, TEXT("Character set to IDLE state"));
 		}
 		// 아래 도달 부분은 실행이 안 됨.
 		if (DistanceSquared <= StopDistanceSquared)

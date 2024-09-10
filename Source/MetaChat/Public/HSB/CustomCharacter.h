@@ -15,16 +15,16 @@ public:
     // TSoftObjectPtr로 선언하면 객체가 사용될 때 로드될 수 있음
     // Hair
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
-    TSoftObjectPtr<USkeletalMesh> HairMesh;
+    USkeletalMesh* HairMesh;
      // Upper Body
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
-    TSoftObjectPtr<USkeletalMesh> UpperBodyMesh;
+    USkeletalMesh* UpperBodyMesh;
     // Lower Body
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Customization")
-    TSoftObjectPtr<USkeletalMesh> LowerBodyMesh;
+    USkeletalMesh* LowerBodyMesh;
      // Feet
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
-    TSoftObjectPtr<USkeletalMesh> FeetMesh;
+    USkeletalMesh* FeetMesh;
 };
 
 UENUM(BlueprintType)
@@ -94,50 +94,35 @@ public:
     USkeletalMeshComponent* FeetMeshComp;
 
 
-
-
     // level 넘어갈 때 로드될 정보
 	UFUNCTION(BlueprintCallable)
 	void Load();
-// 
-//     // RPC 내용----------------------------------------
-// public:
-//     // 커스텀 데이터를 Listen server에 전송
-//     UFUNCTION(Server, Reliable, WithValidation) // 클라 -> 리슨서버
-//     void ServerUpdateCustomizationData(const FCharacterCustomizationData& NewData);
-//     void ServerUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
-//     bool ServerUpdateCustomizationData_Validate(const FCharacterCustomizationData& NewData);
-// 
-//     UFUNCTION(NetMulticast, Reliable) // 서버 -> 여러 클라
-//     void MulticastUpdateCustomizationData(const FCharacterCustomizationData& NewData);
-//     void MulticastUpdateCustomizationData_Implementation(const FCharacterCustomizationData& NewData);
-// 
-//      virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-// 
-//      UFUNCTION()
-//      void OnRep_CustomizationData();
-// 
-//     // 캐릭터 커스터마이징 상태
-//     UPROPERTY(ReplicatedUsing=OnRep_CustomizationData)
-//     FCharacterCustomizationData CustomizationData;
-// 
-//     // 캐릭터 외형 갱신
-//     void UpdateCharacterAppearance();
-// 
-//     // 네트워크 상태로그 출력 할 함수
-//     void PrintNetLog();
-// 
-//     UPROPERTY(BlueprintReadWrite,ReplicatedUsing=OnRep_ChangeMatColor)
-//     int MatColor;
-//     UFUNCTION(BlueprintCallable)
-//     void OnRep_ChangeMatColor();
 
-// 
+    // RPC 내용----------------------------------------
+public:
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
+    UFUNCTION(Server, Reliable)
+    void ServerSetSkeletalMesh(USkeletalMesh* NewMesh, FName MeshCategory);
+//     UFUNCTION(Client, Reliable)
+//     void ClientSetSkeletalMesh(USkeletalMesh* NewMesh, FName MeshCategory);
+    UFUNCTION(NetMulticast, Reliable)
+    void MulticastUpdateSkeletalMesh(USkeletalMesh* NewMesh, FName MeshCategory);
+
+    // 캐릭터 커스터마이징 상태
+    UPROPERTY(ReplicatedUsing = OnRep_CustomizationData)
+    FCharacterCustomizationData CustomizationData;
+
+    UFUNCTION()
+    void OnRep_CustomizationData();
+
+    void UpdateCharacterAppearance();
+
 private:
     int32 CurrentLocationInfo;
-//     // 서버에 CurrentLocationInfo 보내기
-//     void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInfo);
-// 
-//     // 서버 응답 처리
-//     void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+    // 서버에 CurrentLocationInfo 보내기
+    void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInformation);
+
+    // 서버 응답 처리
+    void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 };

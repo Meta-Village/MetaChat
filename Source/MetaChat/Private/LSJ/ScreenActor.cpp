@@ -26,7 +26,7 @@
 #include "CanvasTypes.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingStreamer.h"
-#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
+//#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 // Sets default values
 AScreenActor::AScreenActor()
 {
@@ -69,7 +69,6 @@ AScreenActor::AScreenActor()
 		SceneCapture->SetupAttachment(RootComponent);
 		SceneCapture->CaptureSource = SCS_FinalColorLDR;
   		//SceneCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_LegacySceneCapture;
-       //SceneCapture->CaptureSource=ESceneCaptureSource::SCS_BaseColor;
 		SceneCapture->TextureTarget = RenderTarget;
 		//SceneCapture->bConsiderUnrenderedOpaquePixelAsFullyTranslucent = true;
 }
@@ -329,6 +328,7 @@ void AScreenActor::BeginPlay()
 	Super::BeginPlay();
 	APawn* playerPawn =UGameplayStatics::GetPlayerPawn(GetWorld(),0);
 	UCameraComponent* playerCamera = playerPawn->GetComponentByClass<UCameraComponent>();
+	//WindowScreenPlaneMesh->SetRelativeLocation(FVector(200,0,10));
 	WindowScreenPlaneMesh->SetRelativeScale3D(FVector(3,2,1));
 	sceneComp->AttachToComponent(playerCamera,FAttachmentTransformRules::SnapToTargetIncludingScale);
 
