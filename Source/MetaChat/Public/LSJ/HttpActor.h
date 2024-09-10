@@ -26,9 +26,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UUserWidget> HttpUIFactory;
+	FString CustomCharacterMap;
+	UPROPERTY(EditDefaultsOnly)
+	FString RogoMap;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> CustomCharacterHttpUIFactory;
 	UPROPERTY(BlueprintReadWrite)
 	class UUserWidgetTEST* HttpUI;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> LoginHttpUIFactory;
+	class ULoginScreenWidget* LoginScreenHttpUI;
 
 	// Send 버튼을 눌렀을때 요청할 함수
 	void RsqGetTest(FString url);
