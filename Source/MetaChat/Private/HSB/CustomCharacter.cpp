@@ -99,8 +99,6 @@ void ACustomCharacter::BeginPlay()
 void ACustomCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-//     UpdateState();
 }
 
 // Called to bind functionality to input
@@ -178,16 +176,16 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
     if (OtherActor && OtherActor->ActorHasTag(FName("Room1")))
     {
          // 현재 위치 정보를 1로 설정
-//         // 캐릭터가 1에 들어갔을 때 서버로 정보 전송
-//         FDateTime EntryTime = FDateTime::Now();
-//         FDateTime ExitTime;  // 빈 값으로 처리
-//         FName ZoneName = "ROOM1";  // 가정된 존 이름
-//         FString UserId = "User123";  // 가정된 유저 아이디
-         CurrentLocationInfo = 1;  // 예시로 1
-// 
-//         // 서버에 정보 전송
-//         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-// 
+        // 캐릭터가 1에 들어갔을 때 서버로 정보 전송
+        FDateTime EntryTime = FDateTime::Now();
+        FDateTime ExitTime;  // 빈 값으로 처리
+        FName ZoneName = "ROOM1";  // 가정된 존 이름
+        FString UserId = "User123";  // 가정된 유저 아이디
+        CurrentLocationInfo = 1;  // 예시로 1
+
+        // 서버에 정보 전송
+        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+
 
          if (GEngine)
          {
@@ -200,16 +198,16 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
     if (OtherActor && OtherActor->ActorHasTag(FName("Room2")))
     {
         // 현재 위치 정보를 2로 설정
-//         // 캐릭터가 2에 들어갔을 때 서버로 정보 전송
-//         FDateTime EntryTime = FDateTime::Now();
-//         FDateTime ExitTime;  // 빈 값으로 처리
-//         FName ZoneName = "ROOM2";  // 가정된 존 이름
-//         FString UserId = "User123";  // 가정된 유저 아이디
+        // 캐릭터가 2에 들어갔을 때 서버로 정보 전송
+        FDateTime EntryTime = FDateTime::Now();
+        FDateTime ExitTime;  // 빈 값으로 처리
+        FName ZoneName = "ROOM2";  // 가정된 존 이름
+        FString UserId = "User123";  // 가정된 유저 아이디
         CurrentLocationInfo = 2;  // 예시로 2
 
-//         // 서버에 정보 전송
-//         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-// 
+        // 서버에 정보 전송
+        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+
 
         if (GEngine)
         {
@@ -222,16 +220,16 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
     if (OtherActor && OtherActor->ActorHasTag(FName("Room3")))
     {
         // 현재 위치 정보를 3로 설정
-//         // 캐릭터가 3에 들어갔을 때 서버로 정보 전송
-//         FDateTime EntryTime = FDateTime::Now();
-//         FDateTime ExitTime;  // 빈 값으로 처리
-//         FName ZoneName = "ROOM3";  // 가정된 존 이름
-//         FString UserId = "User123";  // 가정된 유저 아이디
+        // 캐릭터가 3에 들어갔을 때 서버로 정보 전송
+        FDateTime EntryTime = FDateTime::Now();
+        FDateTime ExitTime;  // 빈 값으로 처리
+        FName ZoneName = "ROOM3";  // 가정된 존 이름
+        FString UserId = "User123";  // 가정된 유저 아이디
         CurrentLocationInfo = 3;  
 
-        //         // 서버에 정보 전송
-        //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-        // 
+        // 서버에 정보 전송
+        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+       
 
         if (GEngine)
         {
@@ -244,16 +242,16 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
     if (OtherActor && OtherActor->ActorHasTag(FName("Room4")))
     {
         // 현재 위치 정보를 4로 설정
-//         // 캐릭터가 4에 들어갔을 때 서버로 정보 전송
-//         FDateTime EntryTime = FDateTime::Now();
-//         FDateTime ExitTime;  // 빈 값으로 처리
-//         FName ZoneName = "ROOM4";  // 가정된 존 이름
-//         FString UserId = "User123";  // 가정된 유저 아이디
+        // 캐릭터가 4에 들어갔을 때 서버로 정보 전송
+        FDateTime EntryTime = FDateTime::Now();
+        FDateTime ExitTime;  // 빈 값으로 처리
+        FName ZoneName = "ROOM4";  // 가정된 존 이름
+        FString UserId = "User123";  // 가정된 유저 아이디
         CurrentLocationInfo = 4; 
 
-        //         // 서버에 정보 전송
-        //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-        // 
+        // 서버에 정보 전송
+        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+
 
         if (GEngine)
         {
@@ -285,68 +283,68 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
             GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Left Room1"));
         }
 
-//         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
-//         FDateTime EntryTime;  // 빈 값으로 처리
-//         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-//         FName ZoneName = "ROOM1";  // 가정된 존 이름
-//         FString UserId = "User123";  // 가정된 유저 아이디
-//         int32 CurrentLocationInfo = 0;  // 예시로 0
-// 
-//         // 서버에 정보 전송
-//         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-// 
-//         UE_LOG(LogTemp, Warning, TEXT("Left Room1, Location Info: %d"), CurrentLocationInfo);
+        // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        FDateTime EntryTime;  // 빈 값으로 처리
+        FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        FName ZoneName = "ROOM1";  // 가정된 존 이름
+        FString UserId = "User123";  // 가정된 유저 아이디
+        CurrentLocationInfo = 0;  // 예시로 0
+
+        // 서버에 정보 전송
+        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+
+        UE_LOG(LogTemp, Warning, TEXT("Left Room1, Location Info: %d"), CurrentLocationInfo);
     }
     // 다른 액터에 "Room2" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room2")))
     {
         UE_LOG(LogTemp, Warning, TEXT("Left Room2"));
 
-//         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
-//         FDateTime EntryTime;  // 빈 값으로 처리
-//         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-//         FName ZoneName = "ROOM2";  // 가정된 존 이름
-//         FString UserId = "User123";  // 가정된 유저 아이디
+        // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        FDateTime EntryTime;  // 빈 값으로 처리
+        FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        FName ZoneName = "ROOM2";  // 가정된 존 이름
+        FString UserId = "User123";  // 가정된 유저 아이디
         CurrentLocationInfo = 0;  // 예시로 0
 
-//         // 서버에 정보 전송
-//         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-//
-//         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
+        // 서버에 정보 전송
+        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+
+        UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
     }
     // 다른 액터에 "Room3" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room3")))
     {
         UE_LOG(LogTemp, Warning, TEXT("Left Room3"));
 
-        //         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
-        //         FDateTime EntryTime;  // 빈 값으로 처리
-        //         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-        //         FName ZoneName = "ROOM2";  // 가정된 존 이름
-        //         FString UserId = "User123";  // 가정된 유저 아이디
+        // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        FDateTime EntryTime;  // 빈 값으로 처리
+        FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        FName ZoneName = "ROOM2";  // 가정된 존 이름
+        FString UserId = "User123";  // 가정된 유저 아이디
         CurrentLocationInfo = 0;  // 예시로 0
 
-        //         // 서버에 정보 전송
-        //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-        //
-        //         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
+        // 서버에 정보 전송
+        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+
+        UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
     }
     // 다른 액터에 "Room4" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room4")))
     {
         UE_LOG(LogTemp, Warning, TEXT("Left Room4"));
 
-        //         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
-        //         FDateTime EntryTime;  // 빈 값으로 처리
-        //         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-        //         FName ZoneName = "ROOM2";  // 가정된 존 이름
-        //         FString UserId = "User123";  // 가정된 유저 아이디
+        // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        FDateTime EntryTime;  // 빈 값으로 처리
+        FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        FName ZoneName = "ROOM2";  // 가정된 존 이름
+        FString UserId = "User123";  // 가정된 유저 아이디
         CurrentLocationInfo = 0;  // 예시로 0
 
-        //         // 서버에 정보 전송
-        //         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
-        //
-        //         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
+        // 서버에 정보 전송
+        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, CurrentLocationInfo);
+        
+        UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), CurrentLocationInfo);
     }
  }
 
@@ -498,67 +496,66 @@ void ACustomCharacter::UpdateCharacterAppearance()
     }
 }
 
+// ------------- 회의 구역 정보 서버에 전달 -----------------
+void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInformation)
+{
+    // HTTP 모듈 초기화
+    FHttpModule* Http = &FHttpModule::Get();
+    if (!Http)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("HTTP module is not available"));
+        return;
+    }
 
-// 
-// void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInfo)
-// {
-//     // HTTP 모듈 초기화
-//     FHttpModule* Http = &FHttpModule::Get();
-//     if (!Http)
-//     {
-//         UE_LOG(LogTemp, Warning, TEXT("HTTP module is not available"));
-//         return;
-//     }
-// 
-//     // 요청 생성
-//     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
-// 
-//     // 서버 URL 설정 (여기에 실제 서버 주소를 넣어주세요)
-//     Request->SetURL(TEXT("http://125.132.216.190:8126/api/zoneHistory"));
-//     Request->SetVerb(TEXT("POST"));
-//     Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-// 
-//     // FDateTime을 문자열로 변환 (ISO8601 형식 등)
-//     FString EntryTimeString = entry.ToString(TEXT("%Y-%m-%d %H:%M:%S"));
-//     FString ExitTimeString = exist.ToString(TEXT("%Y-%m-%d %H:%M:%S"));
-// 
-//     // JSON 데이터 생성
-//     TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
-//     JsonObject->SetStringField(TEXT("entryTime"), EntryTimeString);
-//     JsonObject->SetStringField(TEXT("existTime"), ExitTimeString);
-//     JsonObject->SetStringField(TEXT("zoneName"), zoneName.ToString());
-//     JsonObject->SetStringField(TEXT("userId"), userId);
-//     JsonObject->SetNumberField(TEXT("worldId"), CurrentLocationInfo);
-// 
-// 
-//     FString RequestBody;
-//     TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
-//     FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
-// 
-//     Request->SetContentAsString(RequestBody);
-// 
-//     // 응답 처리 바인딩
-//     Request->OnProcessRequestComplete().BindUObject(this, &ACustomCharacter::OnResponseReceived);
-// 
-//     UE_LOG(LogTemp, Warning, TEXT("Entered Section1, Location Info: %d, entryTime: %s, existTime: %s, zoneName: %s, UserID: %s"), CurrentLocationInfo, *EntryTimeString, *ExitTimeString, *zoneName.ToString(), *userId);
-// 
-//     // 요청 전송
-//     if (!Request->ProcessRequest())
-//     {
-//         UE_LOG(LogTemp, Warning, TEXT("Failed to send HTTP request"));
-//     }
-// }
-// 
-// void ACustomCharacter::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
-// {  
-//     if (bWasSuccessful && Response.IsValid())
-//     {
-//         // 서버에서 온 응답 처리
-//         FString ResponseContent = Response->GetContentAsString();
-//         UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *ResponseContent);
-//     }
-//     else
-//     {
-//         UE_LOG(LogTemp, Error, TEXT("Failed to receive valid response from server"));
-//     }
-// }
+    // 요청 생성
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
+
+    // 서버 URL 설정 (여기에 실제 서버 주소를 넣어주세요)
+    Request->SetURL(TEXT("http://125.132.216.190:8126/api/zoneHistory"));
+    Request->SetVerb(TEXT("POST"));
+    Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+    // FDateTime을 문자열로 변환 (ISO8601 형식 등)
+    FString EntryTimeString = entry.ToString(TEXT("%Y-%m-%dT%H:%M:%S"));
+    FString ExitTimeString = exist.ToString(TEXT("%Y-%m-%dT%H:%M:%S"));
+
+    // JSON 데이터 생성
+    TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+    JsonObject->SetStringField(TEXT("entryTime"), EntryTimeString);
+    JsonObject->SetStringField(TEXT("existTime"), ExitTimeString);
+    JsonObject->SetStringField(TEXT("zoneName"), zoneName.ToString());
+    JsonObject->SetStringField(TEXT("userId"), userId);
+    JsonObject->SetNumberField(TEXT("worldId"), CurrentLocationInformation);
+
+
+    FString RequestBody;
+    TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBody);
+    FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+    Request->SetContentAsString(RequestBody);
+
+    // 응답 처리 바인딩
+    Request->OnProcessRequestComplete().BindUObject(this, &ACustomCharacter::OnResponseReceived);
+
+    UE_LOG(LogTemp, Warning, TEXT("Entered Section1, Location Info: %d, entryTime: %s, existTime: %s, zoneName: %s, UserID: %s"), CurrentLocationInformation, *EntryTimeString, *ExitTimeString, *zoneName.ToString(), *userId);
+
+    // 요청 전송
+    if (!Request->ProcessRequest())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to send HTTP request"));
+    }
+}
+
+void ACustomCharacter::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{  
+    if (bWasSuccessful && Response.IsValid())
+    {
+        // 서버에서 온 응답 처리
+        FString ResponseContent = Response->GetContentAsString();
+        UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *ResponseContent);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to receive valid response from server"));
+    }
+}
