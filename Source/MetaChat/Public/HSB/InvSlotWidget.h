@@ -53,4 +53,5 @@ public:
 
 	// 카테고리 변수
 	FName Category;
+
 };
