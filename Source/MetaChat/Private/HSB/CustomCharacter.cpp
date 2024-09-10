@@ -366,7 +366,9 @@ void ACustomCharacter::Load()
             if (LoadedMesh)
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                HairMeshComp->SetSkeletalMesh(LoadedMesh);
+          
+                ServerSetSkeletalMesh(LoadedMesh, "Hair");
+            
                 UE_LOG(LogTemp, Warning, TEXT("Hair mesh has been applied from save."));
             }
         }
@@ -379,7 +381,8 @@ void ACustomCharacter::Load()
             if (LoadedMesh)
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
+//                 UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
+                ServerSetSkeletalMesh(LoadedMesh, "Upper");
                 UE_LOG(LogTemp, Warning, TEXT("Upper body mesh has been applied from save."));
             }
         }
@@ -392,7 +395,8 @@ void ACustomCharacter::Load()
             if (LoadedMesh)
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                LowerBodyMeshComp->SetSkeletalMesh(LoadedMesh);
+//                 LowerBodyMeshComp->SetSkeletalMesh(LoadedMesh);
+                ServerSetSkeletalMesh(LoadedMesh, "Lower");
                 UE_LOG(LogTemp, Warning, TEXT("Lower body mesh has been applied from save."));
             }
         }
@@ -405,7 +409,8 @@ void ACustomCharacter::Load()
             if (LoadedMesh)
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                FeetMeshComp->SetSkeletalMesh(LoadedMesh);
+//                 FeetMeshComp->SetSkeletalMesh(LoadedMesh);
+                ServerSetSkeletalMesh(LoadedMesh, "Feet");
                 UE_LOG(LogTemp, Warning, TEXT("Feet mesh has been applied from save."));
             }
         }
@@ -441,8 +446,8 @@ void ACustomCharacter::ServerSetSkeletalMesh_Implementation(USkeletalMesh* NewMe
     }
 
     // 모든 클라이언트에 이 변경사항을 브로드캐스트
-//     MulticastUpdateSkeletalMesh(NewMesh, MeshCategory);
-    ClientSetSkeletalMesh(NewMesh, MeshCategory);
+     MulticastUpdateSkeletalMesh(NewMesh, MeshCategory);
+//    ClientSetSkeletalMesh(NewMesh, MeshCategory);
 }
 
 // void ACustomCharacter::ClientSetSkeletalMesh_Implementation(USkeletalMesh* NewMesh, FName MeshCategory)
