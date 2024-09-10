@@ -447,30 +447,7 @@ void ACustomCharacter::ServerSetSkeletalMesh_Implementation(USkeletalMesh* NewMe
 
     // 모든 클라이언트에 이 변경사항을 브로드캐스트
      MulticastUpdateSkeletalMesh(NewMesh, MeshCategory);
-//    ClientSetSkeletalMesh(NewMesh, MeshCategory);
 }
-
-// void ACustomCharacter::ClientSetSkeletalMesh_Implementation(USkeletalMesh* NewMesh, FName MeshCategory)
-// {
-//     // 클라이언트에서 메쉬 업데이트
-//     if (MeshCategory == "Hair" && HairMeshComp)
-//     {
-//         HairMeshComp->SetSkeletalMesh(NewMesh);
-//     }
-//     if (MeshCategory == "Upper" && UpperBodyMeshComp)
-//     {
-//         UpperBodyMeshComp->SetSkeletalMesh(NewMesh);
-//     }
-//     if (MeshCategory == "Lower" && LowerBodyMeshComp)
-//     {
-//         LowerBodyMeshComp->SetSkeletalMesh(NewMesh);
-//     }
-//     if (MeshCategory == "Shoes" && FeetMeshComp)
-//     {
-//         FeetMeshComp->SetSkeletalMesh(NewMesh);
-//     }
-// }
-
 
 void ACustomCharacter::MulticastUpdateSkeletalMesh_Implementation(USkeletalMesh* NewMesh, FName MeshCategory)
 {
@@ -491,6 +468,8 @@ void ACustomCharacter::MulticastUpdateSkeletalMesh_Implementation(USkeletalMesh*
     {
         FeetMeshComp->SetSkeletalMesh(NewMesh);
     }
+
+    UpdateState();
 }
 
 void ACustomCharacter::OnRep_CustomizationData()
