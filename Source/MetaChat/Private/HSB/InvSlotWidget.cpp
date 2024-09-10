@@ -56,7 +56,7 @@ void UInvSlotWidget::OnItemClicked()
     Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld() , 0));
     // Mesh 설정할 캐릭터의 SkeletalMeshComponent
     USkeletalMeshComponent* TargetMeshComponent = nullptr;
-    if(Character)
+    if(Character && Character->HasAuthority())
 	{
         if(Category == "" )
             UE_LOG(LogTemp , Warning , TEXT("Problem in Loading Category."));
@@ -85,14 +85,18 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
                 }
-                if (TargetMeshComponent)
-                {
-                    TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                }
                 else
                 {
-                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 1"));
+                    Character->ServerSetSkeletalMesh(NewMesh, "Hair");
                 }
+//                 if (TargetMeshComponent)
+//                 {
+//                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
+//                 }
+//                 else
+//                 {
+//                     UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 1"));
+//                 }
             }
             else if ( ButtonName.Contains(ExpectedButtonName1) )
             {
@@ -103,14 +107,18 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
-                if (TargetMeshComponent)
-                {
-                    TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                }
                 else
                 {
-                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+                    Character->ServerSetSkeletalMesh(NewMesh, "Hair");
                 }
+//                 if (TargetMeshComponent)
+//                 {
+//                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
+//                 }
+//                 else
+//                 {
+//                     UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+//                 }
             }
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,15 +137,19 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
                 }
-                if (TargetMeshComponent)
-                {
-                    TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 1"));
-                }
                 else
                 {
-                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+                    Character->ServerSetSkeletalMesh(NewMesh, "Upper");
                 }
+//                 if (TargetMeshComponent)
+//                 {
+//                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
+//                     UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 1"));
+//                 }
+//                 else
+//                 {
+//                     UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+//                 }
             }
             else if (ButtonName.Contains(ExpectedButtonName1))
             {
@@ -146,15 +158,19 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
-                if (TargetMeshComponent)
-                {
-                    TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
-                }
                 else
                 {
-                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+                    Character->ServerSetSkeletalMesh(NewMesh, "Upper");
                 }
+//                 if (TargetMeshComponent)
+//                 {
+//                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
+//                     UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
+//                 }
+//                 else
+//                 {
+//                     UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+//                 }
             }
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,15 +189,19 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
                 }
-                if (TargetMeshComponent)
-                {
-                    TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 1"));
-                }
                 else
                 {
-                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+                    Character->ServerSetSkeletalMesh(NewMesh, "Lower");
                 }
+//                 if (TargetMeshComponent)
+//                 {
+//                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
+//                     UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 1"));
+//                 }
+//                 else
+//                 {
+//                     UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+//                 }
             }
             else if (ButtonName.Contains(ExpectedButtonName1))
             {
@@ -190,15 +210,19 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
-                if (TargetMeshComponent)
-                {
-                    TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
-                }
                 else
                 {
-                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+                    Character->ServerSetSkeletalMesh(NewMesh, "Lower");
                 }
+//                 if (TargetMeshComponent)
+//                 {
+//                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
+//                     UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
+//                 }
+//                 else
+//                 {
+//                     UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+//                 }
             }
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,15 +241,19 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 1"));
                 }
-                if (TargetMeshComponent)
-                {
-                    TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 1"));
-                }
                 else
                 {
-                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 1"));
+                    Character->ServerSetSkeletalMesh(NewMesh, "Shoes");
                 }
+//                 if (TargetMeshComponent)
+//                 {
+//                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
+//                     UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 1"));
+//                 }
+//                 else
+//                 {
+//                     UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 1"));
+//                 }
             }
             else if (ButtonName.Contains(ExpectedButtonName1))
             {
@@ -234,15 +262,19 @@ void UInvSlotWidget::OnItemClicked()
                 {
                     UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh 2"));
                 }
-                if (TargetMeshComponent)
-                {
-                    TargetMeshComponent->SetSkeletalMesh(NewMesh);
-                    UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
-                }
                 else
                 {
-                    UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+                    Character->ServerSetSkeletalMesh(NewMesh, "Shoes");
                 }
+//                 if (TargetMeshComponent)
+//                 {
+//                     TargetMeshComponent->SetSkeletalMesh(NewMesh);
+//                     UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh 2"));
+//                 }
+//                 else
+//                 {
+//                     UE_LOG(LogTemp, Error, TEXT("Failed to Set SkeletalMesh 2"));
+//                 }
             }
         }
 	}
