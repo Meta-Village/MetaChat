@@ -130,6 +130,9 @@ void UCustomWidget::OnHairButtonClicked()
     {
         // UImage의 Brush 속성 변경
         Img_hair->SetBrushFromTexture(NewHairTexture, true);
+        Img_upper->SetBrushFromTexture(OriginUpperTexture, true);
+        Img_lower->SetBrushFromTexture(OriginLowerTexture, true);
+        Img_shoes->SetBrushFromTexture(OriginShoesTexture, true);
     }
 
     UE_LOG(LogTemp , Warning , TEXT("%s"), *DesiredCategory.ToString());
@@ -147,7 +150,10 @@ void UCustomWidget::OnUpperButtonClicked()
     if (Img_upper && NewUpperTexture)
     {
         // UImage의 Brush 속성 변경
+        Img_hair->SetBrushFromTexture(OriginHairTexture, true);
         Img_upper->SetBrushFromTexture(NewUpperTexture, true);
+        Img_lower->SetBrushFromTexture(OriginLowerTexture, true);
+        Img_shoes->SetBrushFromTexture(OriginShoesTexture, true);
     }
 
     UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
@@ -165,7 +171,10 @@ void UCustomWidget::OnLowerButtonClicked()
     if (Img_lower && NewLowerTexture)
     {
         // UImage의 Brush 속성 변경
+        Img_hair->SetBrushFromTexture(OriginHairTexture, true);
+        Img_upper->SetBrushFromTexture(OriginUpperTexture, true);
         Img_lower->SetBrushFromTexture(NewLowerTexture, true);
+        Img_shoes->SetBrushFromTexture(OriginShoesTexture, true);
     }
 
     UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
@@ -183,6 +192,9 @@ void UCustomWidget::OnShoesButtonClicked()
     if (Img_shoes && NewShoesTexture)
     {
         // UImage의 Brush 속성 변경
+        Img_hair->SetBrushFromTexture(OriginHairTexture, true);
+        Img_upper->SetBrushFromTexture(OriginUpperTexture, true);
+        Img_lower->SetBrushFromTexture(OriginLowerTexture, true);
         Img_shoes->SetBrushFromTexture(NewShoesTexture, true);
     }
 

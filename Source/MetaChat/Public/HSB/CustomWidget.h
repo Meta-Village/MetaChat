@@ -49,21 +49,32 @@ public:
 	// 변경될 이미지
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UTexture2D* NewHairTexture;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UTexture2D* OriginHairTexture;
+
 	UPROPERTY(meta = (BindWidget))
 	class UImage* Img_upper;
 	// 변경될 이미지
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UTexture2D* NewUpperTexture;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UTexture2D* OriginUpperTexture;
+
 	UPROPERTY(meta = (BindWidget))
 	class UImage* Img_lower;
 	// 변경될 이미지
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UTexture2D* NewLowerTexture;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UTexture2D* OriginLowerTexture;
+
 	UPROPERTY(meta = (BindWidget))
 	class UImage* Img_shoes;
 	// 변경될 이미지
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UTexture2D* NewShoesTexture;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UTexture2D* OriginShoesTexture;
 
 	// 적용 버튼 바인딩
 	UPROPERTY(meta=(BindWidget))
