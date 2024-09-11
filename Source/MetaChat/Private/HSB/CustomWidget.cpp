@@ -125,6 +125,13 @@ void UCustomWidget::OnHairButtonClicked()
     DesiredCategory = "Hair";
     InitSlot(); // 슬롯 재생성
 
+    // 버튼 클릭 시 이미지가 변경되도록 설정
+    if (Img_hair && NewHairTexture)
+    {
+        // UImage의 Brush 속성 변경
+        Img_hair->SetBrushFromTexture(NewHairTexture, true);
+    }
+
     UE_LOG(LogTemp , Warning , TEXT("%s"), *DesiredCategory.ToString());
 }
 
@@ -135,6 +142,13 @@ void UCustomWidget::OnUpperButtonClicked()
 
     DesiredCategory = "Upper";
     InitSlot(); // 슬롯 재생성
+
+    // 버튼 클릭 시 이미지가 변경되도록 설정
+    if (Img_upper && NewUpperTexture)
+    {
+        // UImage의 Brush 속성 변경
+        Img_upper->SetBrushFromTexture(NewUpperTexture, true);
+    }
 
     UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
 }
@@ -147,6 +161,13 @@ void UCustomWidget::OnLowerButtonClicked()
     DesiredCategory = "Lower";
     InitSlot(); // 슬롯 재생성
 
+    // 버튼 클릭 시 이미지가 변경되도록 설정
+    if (Img_lower && NewLowerTexture)
+    {
+        // UImage의 Brush 속성 변경
+        Img_lower->SetBrushFromTexture(NewLowerTexture, true);
+    }
+
     UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
 }
 
@@ -157,6 +178,13 @@ void UCustomWidget::OnShoesButtonClicked()
 
     DesiredCategory = "Shoes";
     InitSlot(); // 슬롯 재생성
+
+    // 버튼 클릭 시 이미지가 변경되도록 설정
+    if (Img_shoes && NewShoesTexture)
+    {
+        // UImage의 Brush 속성 변경
+        Img_shoes->SetBrushFromTexture(NewShoesTexture, true);
+    }
 
     UE_LOG(LogTemp , Warning , TEXT("%s") , *DesiredCategory.ToString());
 }

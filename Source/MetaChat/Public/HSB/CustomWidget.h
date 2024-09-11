@@ -43,6 +43,28 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BtnShoes;
 
+	// 버튼 별 이미지 바인딩
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Img_hair;
+	// 변경될 이미지
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UTexture2D* NewHairTexture;
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Img_upper;
+	// 변경될 이미지
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UTexture2D* NewUpperTexture;
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Img_lower;
+	// 변경될 이미지
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UTexture2D* NewLowerTexture;
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Img_shoes;
+	// 변경될 이미지
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UTexture2D* NewShoesTexture;
+
 	// 적용 버튼 바인딩
 	UPROPERTY(meta=(BindWidget))
 	class UButton* BtnApply;
