@@ -21,12 +21,18 @@ public:
 	class UAnimMontage* Idle;
 	UPROPERTY(EditDefaultsOnly)
 	class UAnimMontage* Walk;
+	UPROPERTY(EditDefaultsOnly)
+	class UAnimMontage* Sit;
 
 	UFUNCTION(BlueprintCallable)
 	void PlayIdleMontage();
 	UFUNCTION(BlueprintCallable)
 	void PlayWalkMontage();
+	UFUNCTION(BlueprintCallable)
+	void PlaySitMontage();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool IsWalking;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool IsSitting;
 };

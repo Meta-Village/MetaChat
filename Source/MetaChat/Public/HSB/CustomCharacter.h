@@ -31,7 +31,8 @@ UENUM(BlueprintType)
 enum class ELocationState : uint8 
 {
 	IDLE,
-	MOVE
+	MOVE,
+    SIT
 };
 
 UCLASS()
@@ -46,6 +47,7 @@ public:
     void UpdateState();
     void Idle();
     void Move();
+    void Sit();
 
     UPROPERTY()
 	class UCustomAnimInstance* CustomAnimInstance;
@@ -118,9 +120,10 @@ public:
 
     void UpdateCharacterAppearance();
 
-private:
-    int32 CurrentLocationInfo;
+    int32 WorldId;
     // 서버에 CurrentLocationInfo 보내기
+
+private:  
     void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInformation);
 
     // 서버 응답 처리

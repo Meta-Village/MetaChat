@@ -15,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "HSB/CustomCharacter.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
+#include "HSB/CustomAnimInstance.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -186,8 +187,13 @@ void AMetaChatPlayerController::MoveToLocationTick()
 		float DistanceSquared = FVector::DistSquared(ControlledPawn->GetActorLocation(), CachedDestination);
 		const float StopDistanceSquared = FMath::Square(50.0f);  // 허용 오차 범위
 
-		// 속도가 0이 되면 IDLE 상태로 전환
-		if (Speed <= 1.0f)
+		if (Customcharacter->GetMesh())
+		{
+			CustomAnimInstance = Cast<UCustomAnimInstance>(Customcharacter->GetMesh()->GetAnimInstance());
+		}
+
+		// 속도가 0이 되고, 의자에 앉지 않을 때 IDLE 상태로 전환
+		if (Speed <= 1.0f && CustomAnimInstance->IsSitting == false)
 		{
 			Customcharacter->SetUpLocation(ELocationState::IDLE);
 // 			UE_LOG(LogTemp, Warning, TEXT("Character set to IDLE state"));
@@ -205,9 +211,9 @@ void AMetaChatPlayerController::MoveToLocationTick()
 			// 목표 지점에 도달하지 않았을 때만 이동 입력을 추가
 			FVector Direction = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
 			ControlledPawn->AddMovementInput(Direction, 1.0f, false);
-			if(Speed > 1.0f)
+			if(Speed > 1.0f && CustomAnimInstance->IsSitting == false)
 			{
-				// MOVE 상태로 전환
+				// MOVE 상태로 전환 (의자에 다가가지 않았을 때만)
 				Customcharacter->SetUpLocation(ELocationState::MOVE);
 			}
 		}

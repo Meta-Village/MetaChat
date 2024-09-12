@@ -43,21 +43,10 @@ public:
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* SetDestinationTouchAction;
-//---------------------------------------------------------------------
-	// 레벨 전환 처리
-// 	void RequestTravelToCustomizationLevel();
-// // 	UFUNCTION(BlueprintCallable)
-// // 	void OnCustomButtonClicked();
-// 
-// 	UFUNCTION(Server, Reliable, WithValidation)  // 클라 -> 리슨서버
-// 	void ServerRequestTravelToCustomLevel();
-// 	void ServerRequestTravelToCustomLevel_Implementation();
-// 	bool ServerRequestTravelToCustomLevel_Validate();
 
-// 	// 커스텀 데이터를 캐릭터에 전달하는 중간 역할
-// 	UFUNCTION(BlueprintCallable, Category="Customization")
-// 	void SubmitcustomizationData(const FCharacterCustomizationData& NewData);
-//---------------------------------------------------------------------
+	// 애니메이션 인스턴스
+	UPROPERTY()
+	class UCustomAnimInstance* CustomAnimInstance;
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */

@@ -25,3 +25,8 @@ void UCustomAnimInstance::PlayWalkMontage()
 {
 	Montage_Play(Walk);
 }
+
+void UCustomAnimInstance::PlaySitMontage()
+{
+	Montage_Play(Sit);
+}
