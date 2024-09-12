@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UUserWidget> CustomCharacterHttpUIFactory;
 	UPROPERTY(BlueprintReadWrite)
-	class UUserWidgetTEST* HttpUI;
+	class USessionWidget* HttpUI;
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UUserWidget> LoginHttpUIFactory;
 	class ULoginScreenWidget* LoginScreenHttpUI;
@@ -50,6 +50,8 @@ public:
 	void OnResPostCreateWorld(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 	void RsqPostCreateID(FString url, FString json);
 	void OnRsqPostCreateID(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
+	void RsqPostLogin(FString url, FString json);
+	void OnRsqPostLogin(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 	void RsqGetFindSession(FString url);
 	void OnRsqGetFindSession(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
 

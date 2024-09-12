@@ -79,8 +79,49 @@ void UJsonParseLib::JsonParsePassword(const FString& json,int32& WorldID,FString
         // 파싱 실패 시 로그 출력
         UE_LOG(LogTemp, Error, TEXT("JSON 파싱 실패"));
     }
-}
 
+}
+bool UJsonParseLib::JsonParseUserInfo(const FString& json, FString& UserToken)
+{
+	// JSON 파싱을 위한 Reader 생성
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(json);
+
+    // JSON 객체를 저장할 포인터 선언
+    TSharedPtr<FJsonObject> JsonObject;
+
+    // JSON 문자열을 파싱하여 JsonObject에 저장
+	if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+    {
+        // "message" 값 가져오기
+        FString Message = JsonObject->GetStringField(TEXT("message"));
+
+        // "userInfo" 객체 가져오기
+        TSharedPtr<FJsonObject> UserInfo = JsonObject->GetObjectField(TEXT("userInfo"));
+        if (UserInfo.IsValid())
+        {
+            // "userId" 값 가져오기
+            FString UserId = UserInfo->GetStringField(TEXT("userId"));
+
+            // "userNo" 값 가져오기
+            int32 UserNo = UserInfo->GetIntegerField(TEXT("userNo"));
+
+            // "userPass" 값 가져오기
+            UserToken = UserInfo->GetStringField(TEXT("userPass"));
+
+            // 여기서 추출된 데이터를 사용하거나 처리 가능
+            UE_LOG(LogTemp, Log, TEXT("Message: %s"), *Message);
+            UE_LOG(LogTemp, Log, TEXT("UserId: %s"), *UserId);
+            UE_LOG(LogTemp, Log, TEXT("UserNo: %d"), UserNo);
+            UE_LOG(LogTemp, Log, TEXT("UserPass: %s"), *UserToken);
+        }
+		return true;
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to parse JSON"));
+    }
+	return false;
+}
 FString UJsonParseLib::MakeJson(const TMap<FString, FString> source)
 {
 	//source를 jsonObject형식으로 만든다.

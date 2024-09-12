@@ -2,7 +2,7 @@
 
 
 #include "LSJ/HttpActor.h"
-#include "LSJ/UserWidgetTEST.h"
+#include "LSJ/SessionWidget.h"
 #include <HttpModule.h>
 #include "LSJ/JsonParseLib.h"
 
@@ -31,7 +31,7 @@ void AHttpActor::BeginPlay()
 	FString CurrentWorldName =UGameplayStatics::GetCurrentLevelName(GetWorld(),true);
 	if (CurrentWorldName == CustomCharacterMap)
 	{
-		HttpUI = Cast<UUserWidgetTEST>(CreateWidget(GetWorld(), CustomCharacterHttpUIFactory));
+		HttpUI = Cast<USessionWidget>(CreateWidget(GetWorld(), CustomCharacterHttpUIFactory));
 		if (HttpUI)
 		{
 			HttpUI->AddToViewport(2);
@@ -91,10 +91,6 @@ void AHttpActor::OnRsqGetTest(FHttpRequestPtr Request, FHttpResponsePtr Response
 		FString result = Response->GetContentAsString(); //어떤 타입으로 받을 것인지
 		int32 ResultResponseCode = Response->GetResponseCode();
 
-		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
-
-		HttpUI->SetTextLog(UJsonParseLib::JsonParsePassword(result));
-
 	}
 	else
 	{
@@ -127,8 +123,7 @@ void AHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Respons
 	{
 		//통신성공
 		FString result = Response->GetContentAsString(); //어떤 타입으로 받을 것인지
-		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
-		HttpUI->SetTextLog(result);
+
 	}
 	else
 	{
@@ -163,7 +158,6 @@ void AHttpActor::OnResPostCreateWorld(FHttpRequestPtr Request, FHttpResponsePtr 
 		FString result = Response->GetContentAsString(); //어떤 타입으로 받을 것인지
 		int32 ResultResponseCode = Response->GetResponseCode();
 		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
-		HttpUI->SetTextLog(result);
 		HttpUI->RecvCreatingWorldInfo(result,ResultResponseCode);
 	}
 	else
@@ -199,6 +193,7 @@ void AHttpActor::OnRsqPostCreateID(FHttpRequestPtr Request, FHttpResponsePtr Res
 		FString result = Response->GetContentAsString(); //어떤 타입으로 받을 것인지
 		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
 		int code = Response->GetResponseCode();
+		LoginScreenHttpUI->OnButtonRegisterResponse(result,code);
 	}
 	else
 	{
@@ -206,7 +201,40 @@ void AHttpActor::OnRsqPostCreateID(FHttpRequestPtr Request, FHttpResponsePtr Res
 		UE_LOG(LogTemp, Error, TEXT("OnResPostTest Fail.."));
 	}
 }
+void AHttpActor::RsqPostLogin(FString url, FString json)
+{
+	//Http 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get();
+	//IHttpRequest = TSharedRef<IHttpRequest> //스마트 포인터 //댕글링포인터가 되는것을 방지
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest();
 
+	//요청할 정보를 설정
+	req->SetURL(url);
+	req->SetVerb(TEXT("POST"));
+	req->SetHeader(TEXT("Content-Type"), TEXT("Application/json")); //Http Content type 
+	req->SetContentAsString(json);
+	//응답받을 함수를 연결
+	req->OnProcessRequestComplete().BindUObject(this, &AHttpActor::OnRsqPostLogin);
+	//서버에 요청
+	req->ProcessRequest();
+}
+
+void AHttpActor::OnRsqPostLogin(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully)
+{
+	if (bConnectedSuccessfully)
+	{
+		//통신성공
+		FString result = Response->GetContentAsString(); //어떤 타입으로 받을 것인지
+		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
+		int code = Response->GetResponseCode();
+		LoginScreenHttpUI->OnButtonLoginResponse(result,code);
+	}
+	else
+	{
+		//통신성공
+		UE_LOG(LogTemp, Error, TEXT("OnResPostTest Fail.."));
+	}
+}
 void AHttpActor::RsqGetFindSession(FString url)
 {
 	//Http 모듈 생성
@@ -234,8 +262,6 @@ void AHttpActor::OnRsqGetFindSession(FHttpRequestPtr Request, FHttpResponsePtr R
 		int32 ResultResponseCode = Response->GetResponseCode();
 
 		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
-
-		HttpUI->SetTextLog(UJsonParseLib::JsonParsePassword(result));
 		HttpUI->RecvFindSessionInfo(result,ResultResponseCode);
 	}
 	else
