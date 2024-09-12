@@ -18,7 +18,7 @@ void UChatPanel::NativeConstruct()
 	{
 		ChatInputBox->OnTextCommitted.AddDynamic(this, &UChatPanel::OnTextCommitted);
 	}
-
+ 
 }
 
 void UChatPanel::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
