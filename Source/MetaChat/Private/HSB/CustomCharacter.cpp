@@ -206,7 +206,7 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         // 캐릭터가 1에 들어갔을 때 서버로 정보 전송
         FDateTime EntryTime = FDateTime::Now();
         FDateTime ExitTime;  // 빈 값으로 처리
-        FName ZoneName = "ROOM1";  // 가정된 존 이름
+        ZoneName = "ROOM1";  // 가정된 존 이름
         FString UserId = "User123";  // 가정된 유저 아이디
         WorldId = 1;  // 예시로 1
 
@@ -228,7 +228,7 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         // 캐릭터가 2에 들어갔을 때 서버로 정보 전송
         FDateTime EntryTime = FDateTime::Now();
         FDateTime ExitTime;  // 빈 값으로 처리
-        FName ZoneName = "ROOM2";  // 가정된 존 이름
+        ZoneName = "ROOM2";  // 가정된 존 이름
         FString UserId = "User123";  // 가정된 유저 아이디
         WorldId = 2;  // 예시로 2
 
@@ -250,7 +250,7 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         // 캐릭터가 3에 들어갔을 때 서버로 정보 전송
         FDateTime EntryTime = FDateTime::Now();
         FDateTime ExitTime;  // 빈 값으로 처리
-        FName ZoneName = "ROOM3";  // 가정된 존 이름
+        ZoneName = "ROOM3";  // 가정된 존 이름
         FString UserId = "User123";  // 가정된 유저 아이디
         WorldId = 3;  
 
@@ -272,7 +272,7 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         // 캐릭터가 4에 들어갔을 때 서버로 정보 전송
         FDateTime EntryTime = FDateTime::Now();
         FDateTime ExitTime;  // 빈 값으로 처리
-        FName ZoneName = "ROOM4";  // 가정된 존 이름
+        ZoneName = "ROOM4";  // 가정된 존 이름
         FString UserId = "User123";  // 가정된 유저 아이디
         WorldId = 4; 
 
@@ -314,7 +314,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
         FDateTime EntryTime;  // 빈 값으로 처리
         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-        FName ZoneName = "ROOM1";  // 가정된 존 이름
+        ZoneName = "ROOM1";  // 가정된 존 이름
         FString UserId = "User123";  // 가정된 유저 아이디
         WorldId = 0;  // 예시로 0
 
@@ -331,7 +331,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
         FDateTime EntryTime;  // 빈 값으로 처리
         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-        FName ZoneName = "ROOM2";  // 가정된 존 이름
+        ZoneName = "ROOM2";  // 가정된 존 이름
         FString UserId = "User123";  // 가정된 유저 아이디
         WorldId = 0;  // 예시로 0
 
@@ -348,7 +348,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
         FDateTime EntryTime;  // 빈 값으로 처리
         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-        FName ZoneName = "ROOM2";  // 가정된 존 이름
+        ZoneName = "ROOM2";  // 가정된 존 이름
         FString UserId = "User123";  // 가정된 유저 아이디
         WorldId = 0;  // 예시로 0
 
@@ -365,7 +365,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
         FDateTime EntryTime;  // 빈 값으로 처리
         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-        FName ZoneName = "ROOM2";  // 가정된 존 이름
+        ZoneName = "ROOM2";  // 가정된 존 이름
         FString UserId = "User123";  // 가정된 유저 아이디
         WorldId = 0;  // 예시로 0
 
@@ -525,7 +525,12 @@ void ACustomCharacter::UpdateCharacterAppearance()
 }
 
 // ------------- 회의 구역 정보 서버에 전달 -----------------
-void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInformation)
+FString ACustomCharacter::GetCurrentZoneName() const
+{
+    return ZoneName.ToString();  // 현재 ZoneName을 반환
+}
+
+void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 worldId)
 {
     // HTTP 모듈 초기화
     FHttpModule* Http = &FHttpModule::Get();
@@ -553,7 +558,7 @@ void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist
     JsonObject->SetStringField(TEXT("existTime"), ExitTimeString);
     JsonObject->SetStringField(TEXT("zoneName"), zoneName.ToString());
     JsonObject->SetStringField(TEXT("userId"), userId);
-    JsonObject->SetNumberField(TEXT("worldId"), CurrentLocationInformation);
+    JsonObject->SetNumberField(TEXT("worldId"), worldId);
 
 
     FString RequestBody;
@@ -565,7 +570,7 @@ void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist
     // 응답 처리 바인딩
     Request->OnProcessRequestComplete().BindUObject(this, &ACustomCharacter::OnResponseReceived);
 
-    UE_LOG(LogTemp, Warning, TEXT("Entered Section1, Location Info: %d, entryTime: %s, existTime: %s, zoneName: %s, UserID: %s"), CurrentLocationInformation, *EntryTimeString, *ExitTimeString, *zoneName.ToString(), *userId);
+    UE_LOG(LogTemp, Warning, TEXT("Entered Section1, Location Info: %d, entryTime: %s, existTime: %s, zoneName: %s, UserID: %s"), worldId, *EntryTimeString, *ExitTimeString, *zoneName.ToString(), *userId);
 
     // 요청 전송
     if (!Request->ProcessRequest())

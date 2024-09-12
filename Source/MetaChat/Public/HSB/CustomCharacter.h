@@ -121,7 +121,10 @@ public:
     void UpdateCharacterAppearance();
 
     int32 WorldId;
+    FName ZoneName;
     // 서버에 CurrentLocationInfo 보내기
+    // 다른 곳에서의 참조용 변수
+    FString GetCurrentZoneName() const;
 
 private:  
     void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInformation);
