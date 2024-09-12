@@ -18,7 +18,7 @@ public:
 	class UUniformGridPanel* PartsPanel;
 	
 	// TSubClass
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UUserWidget> InvFactory;
 
 	UPROPERTY()
@@ -31,7 +31,15 @@ public:
 	UFUNCTION()
 	void InitSlot();
 
-	int32 P_clickcnt = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite) 
+	int32 P_clickcnt;
+
+	// 뒤로가기 버튼 바인딩 (블프에 추가 로직 있음)
+	UPROPERTY(meta=(BindWidget))
+	class UButton* BtnBack;
+
+	UFUNCTION()
+	void OnButtonBack();
 
 	// 카테고리 클릭하면 슬롯 필터링
 	UPROPERTY(meta=(BindWidget))

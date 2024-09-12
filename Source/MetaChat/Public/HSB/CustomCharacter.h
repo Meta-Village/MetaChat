@@ -95,6 +95,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Character Parts")
     USkeletalMeshComponent* FeetMeshComp;
 
+    // CustomWidget의 P_clickcnt가 초기화 되므로 계속 로딩해줄 변수
+	UPROPERTY(EditDefaultsOnly)
+	int32 P_ClickLoad;
 
     // level 넘어갈 때 로드될 정보
 	UFUNCTION(BlueprintCallable)

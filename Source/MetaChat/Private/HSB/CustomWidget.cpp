@@ -39,11 +39,23 @@ void UCustomWidget::NativeConstruct()
     {
         BtnApply->OnClicked.AddDynamic(this , &UCustomWidget::OnButtonApply);
     }
+    // 뒤로가기 버튼 이벤트 바인딩
+    if (BtnApply)
+    {
+        BtnBack->OnClicked.AddDynamic(this, &UCustomWidget::OnButtonBack);
+    }
 //     // 버튼 클릭 이벤트 바인딩
 //     if ( BtnUndo )
 //     {
 //         BtnUndo->OnClicked.AddDynamic(this , &UCustomWidget::OnButtonUndo);
 //     }
+
+    // 캐릭터 변수로 저장해둔 P_ClickLoad값 가져오기
+    ACustomCharacter* Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+    if (Character)
+    {
+        P_clickcnt = Character->P_ClickLoad;
+    }
 }
 
 void UCustomWidget::InitSlot()
@@ -243,7 +255,14 @@ void UCustomWidget::OnButtonApply()
 	}
 }
 
-
+void UCustomWidget::OnButtonBack()
+{
+    ACustomCharacter* Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+    if(Character)
+    {
+        Character->P_ClickLoad = P_clickcnt;
+    }
+}
 
 // void UCustomWidget::OnButtonUndo()
 // {

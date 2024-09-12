@@ -53,12 +53,16 @@ void UInvSlotWidget::SetItemData(const TArray<FSlot>& ItemsData)
 
 void UInvSlotWidget::OnItemClicked()
 {
+    UE_LOG(LogTemp, Warning, TEXT("OnItemClicked called"));
+
     // 카테고리를 구분한다
     Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld() , 0));
     // Mesh 설정할 캐릭터의 SkeletalMeshComponent
     USkeletalMeshComponent* TargetMeshComponent = nullptr;
     if(Character && Character->HasAuthority())
 	{
+        UE_LOG(LogTemp, Warning, TEXT("Authority confirmed"));
+
         if(Category == "" )
             UE_LOG(LogTemp , Warning , TEXT("Problem in Loading Category."));
 

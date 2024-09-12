@@ -45,7 +45,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnItemClicked();
-
+	
+	// 돌아가기 이후 다시 위젯 들어오면 초기화 된 상태여야 함
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite) 
 	int32 clickcnt=0;
 
 	UPROPERTY()
