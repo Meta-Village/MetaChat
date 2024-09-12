@@ -20,6 +20,7 @@ void UInvSlotWidget::NativeConstruct()
     // 버튼 클릭 이벤트 바인딩
     if ( Button_ItemIcon_1 )
     {
+        Button_ItemIcon_1->OnClicked.RemoveAll(this); // 기존 바인딩 제거
         Button_ItemIcon_1->OnClicked.AddDynamic(this , &UInvSlotWidget::OnItemClicked);
     }
 }
