@@ -123,8 +123,13 @@ public:
 
     void UpdateCharacterAppearance();
 
-    int32 WorldId;
+    // 서버에 보낼 데이터들
+    FDateTime EntryTime;
+    FDateTime ExitTime;
     FName ZoneName;
+    FString UserId;
+    int32 WorldId;
+    
     // 서버에 CurrentLocationInfo 보내기
     // 다른 곳에서의 참조용 변수
     FString GetCurrentZoneName() const;
