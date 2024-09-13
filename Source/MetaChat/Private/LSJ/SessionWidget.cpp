@@ -108,9 +108,9 @@ void USessionWidget::RecvFindSessionInfo(FString result, int32 resultCode)
 {
 	if (resultCode == 200 || resultCode == 201)
 	{
-		int32 RecvWorldID;
-		UJsonParseLib::JsonParsePassword(result, RecvWorldID, WorldName);
-		JoinSession(RecvWorldID);
+		//int32 RecvWorldID;
+		//UJsonParseLib::JsonParsePassword(result, RecvWorldID, WorldName);
+		JoinSession(FCString::Atoi(*WorldName));
 	}
 	else if (resultCode == 404)
 	{
