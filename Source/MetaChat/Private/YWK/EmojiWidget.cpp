@@ -6,7 +6,6 @@
 void UEmojiWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 }
 
 void UEmojiWidget::OnReCeiveEmoji()
