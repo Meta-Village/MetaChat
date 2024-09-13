@@ -9,6 +9,7 @@
 #include "Components/TextBlock.h"
 #include "Components/EditableText.h"
 #include "Components/Image.h"
+#include "LSJ/MetaChatGameInstance.h"
 
 void USessionWidget::NativeConstruct()
 {
@@ -87,6 +88,10 @@ void USessionWidget::RecvCreatingWorldInfo(FString result, int32 resultCode)
 	{
 		int32 RecvWorldID;
 		UJsonParseLib::JsonParsePassword(result, RecvWorldID, WorldName);
+		
+		auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+		gi->WorldID =RecvWorldID;
+
 		CreateSession(RecvWorldID);
 		RemoveFromParent();
 	}

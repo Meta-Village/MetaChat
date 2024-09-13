@@ -23,11 +23,11 @@ class METACHAT_API ULoginScreenWidget : public UUserWidget
 	class UButton* ButtonToLoginScreen;
 	UPROPERTY(meta=(BindWidget))
 	class UImage* ImageFailLogin;
-		UPROPERTY(meta=(BindWidget))
+	UPROPERTY(meta=(BindWidget))
 	class UImage* ImageFailRegister;
-			UPROPERTY(meta=(BindWidget))
+	UPROPERTY(meta=(BindWidget))
 	class UImage* ImageSuccessRegister;
-				UPROPERTY(meta=(BindWidget))
+	UPROPERTY(meta=(BindWidget))
 	class UImage* ImageFailInput;
 	
 protected:
