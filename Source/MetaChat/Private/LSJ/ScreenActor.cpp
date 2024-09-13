@@ -26,6 +26,7 @@
 #include "CanvasTypes.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingStreamer.h"
+#include "LSJ/MetaChatGameInstance.h"
 //#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 // Sets default values
 AScreenActor::AScreenActor()
@@ -344,6 +345,10 @@ void AScreenActor::BeginPlay()
 		MainWidget->AddToViewport(-1);
 		MainWidget->SetScreenActor(this);
 	}
+
+	auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+	UE_LOG(LogTemp,Error,TEXT("UMetaChatGameInstance : WorldID %d"),gi->WorldID);
+
 }
 
 // Called every frame

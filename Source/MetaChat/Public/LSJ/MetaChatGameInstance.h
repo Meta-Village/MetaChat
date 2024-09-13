@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -42,6 +42,14 @@ public:
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	virtual void Init();
+
+	//캐릭터 정보
+	UPROPERTY(BlueprintReadWrite)
+	FString UserID;
+	UPROPERTY(BlueprintReadWrite)
+	FString UserToken;
+	UPROPERTY(BlueprintReadWrite)
+	int32 WorldID;
 	/*
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnFindSessionComplete(bool bWasSuccessful);

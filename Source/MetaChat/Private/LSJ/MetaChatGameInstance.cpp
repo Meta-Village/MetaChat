@@ -146,17 +146,20 @@ void UMetaChatGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSess
 void UMetaChatGameInstance::Init()
 {
 	Super::Init();
-	// OnlineSubsystem에 Access
-	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
-	if (OnlineSubsystem)
-	{
-		// 온라인 세션 받아오기
-		OnlineSessionInterface = OnlineSubsystem->GetSessionInterface();
-		OnlineSessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMetaChatGameInstance::OnFindSessionsComplete);
 
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Purple, FString::Printf(TEXT("Subsystem Name : % s"), *OnlineSubsystem->GetSubsystemName().ToString()));
-	}
+	// OnlineSubsystem에 Access
+	//IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	//if (OnlineSubsystem)
+	//{
+	//	// 온라인 세션 받아오기
+	//	OnlineSessionInterface = OnlineSubsystem->GetSessionInterface();
+	//	OnlineSessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMetaChatGameInstance::OnFindSessionsComplete);
+
+	//	if (GEngine)
+	//		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Purple, FString::Printf(TEXT("Subsystem Name : % s"), *OnlineSubsystem->GetSubsystemName().ToString()));
+	//}
+
+
 }
 /*
 void UMetaChatGameInstance::OnFindSessionComplete(bool bWasSuccessful)

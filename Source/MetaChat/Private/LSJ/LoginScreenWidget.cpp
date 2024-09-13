@@ -12,7 +12,8 @@
 #include "MetaChat/MetaChat.h"
 #include "LSJ/JsonParseLib.h"
 #include "TimerManager.h"
-
+#include "Kismet/GameplayStatics.h"
+#include "LSJ/MetaChatGameInstance.h"
 
 void ULoginScreenWidget::NativeConstruct()
 {
@@ -79,7 +80,13 @@ void ULoginScreenWidget::OnButtonLoginResponse(FString result,int code)
 			 }, 3.f, false);
         }
         else
+        {
+            auto* gi = Cast<UMetaChatGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+            gi->UserID =  WBP_Login->EditID->GetText().ToString();
+            gi->UserToken = UserToken;
             UGameplayStatics::OpenLevel(GetWorld(),*HttpActor->CustomCharacterMap);
+        }
+            
    }
    else if (code == 500)
    {
@@ -133,6 +140,7 @@ void ULoginScreenWidget::OnButtonRegisterResponse(FString result,int code)
 { //성공
    if (code == 200)
    {
+
        WBP_Register->SetVisibility(ESlateVisibility::Hidden);
 	   ImageSuccessRegister->SetVisibility(ESlateVisibility::Visible);
 	   FTimerHandle handle;
