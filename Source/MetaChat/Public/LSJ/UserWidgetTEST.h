@@ -84,7 +84,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FString WorldName;
 	UPROPERTY(BlueprintReadWrite)
-	FString WorldPassworld;
+	FString WorldPassword;
 
 	//회원가입정보 http 통신
 	UFUNCTION(BlueprintCallable)

@@ -31,9 +31,9 @@ public:
 	UTexture2D* CapturedTexture;
 	class UMaterialInstanceDynamic* DynamicMaterial;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	class USceneComponent* sceneComp;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
     class UStaticMeshComponent* WindowScreenPlaneMesh;
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainWidgetFactory;
@@ -50,8 +50,8 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FString UserID;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture")
+	UPROPERTY(EditDefaultsOnly, Category = "Capture")
     class UTextureRenderTarget2D* RenderTarget;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture")
+	UPROPERTY(EditDefaultsOnly, Category = "Capture")
 	class USceneCaptureComponent2D* SceneCapture;
 };

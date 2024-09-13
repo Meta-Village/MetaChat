@@ -72,6 +72,7 @@ AScreenActor::AScreenActor()
   		//SceneCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_LegacySceneCapture;
 		SceneCapture->TextureTarget = RenderTarget;
 		//SceneCapture->bConsiderUnrenderedOpaquePixelAsFullyTranslucent = true;
+
 }
 
 void AScreenActor::UpdateTexture()
@@ -346,9 +347,8 @@ void AScreenActor::BeginPlay()
 		MainWidget->SetScreenActor(this);
 	}
 
-	auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
-	UE_LOG(LogTemp,Error,TEXT("UMetaChatGameInstance : WorldID %d"),gi->WorldID);
-
+	/*auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+	UE_LOG(LogTemp,Error,TEXT("UMetaChatGameInstance : WorldID %d"),gi->WorldID);*/
 }
 
 // Called every frame
