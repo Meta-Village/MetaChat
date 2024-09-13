@@ -60,10 +60,16 @@ void USessionWidget::OpenJoinSessionScreen()
 
 void USessionWidget::SendFindSessionInfo(FString SendWorldID)
 {
-	FString createWorldURL = "http://125.132.216.190:8126/api/v1/worlds/";
-	FString fullURL = FString::Printf(TEXT("%s%s"), *createWorldURL, *SendWorldID);
+	//FString createWorldURL = "http://125.132.216.190:8126/api/v1/worlds/";
+	//FString fullURL = FString::Printf(TEXT("%s%s"), *createWorldURL, *SendWorldID);
+	FString fullURL = "http://125.132.216.190:8126/api/v1/worlds/";
+	fullURL = FString::Printf(TEXT("%s%s/validate-password"), *fullURL,*WorldName);
 
-    HttpActor->RsqGetFindSession(fullURL);
+	TMap<FString, FString> WorldData;
+	WorldData.Add("password", WorldPassworld);
+	FString json = UJsonParseLib::MakeJson(WorldData);
+
+	HttpActor->RsqPostJoinWorld(fullURL, json);
 }
 
 
