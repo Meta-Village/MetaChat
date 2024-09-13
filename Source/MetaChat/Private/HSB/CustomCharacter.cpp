@@ -22,6 +22,7 @@
 #include "Json.h"
 #include "JsonUtilities.h"
 #include "HSB/CustomAnimInstance.h"
+#include "LSJ/MetaChatGameInstance.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -199,6 +200,8 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 
     }
 
+    auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+
     // 다른 액터에 "Room1" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room1")))
     {
@@ -207,8 +210,8 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         FDateTime EntryTime = FDateTime::Now();
         FDateTime ExitTime;  // 빈 값으로 처리
         ZoneName = "ROOM1";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 1;  // 예시로 1
+        FString UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
@@ -229,8 +232,8 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         FDateTime EntryTime = FDateTime::Now();
         FDateTime ExitTime;  // 빈 값으로 처리
         ZoneName = "ROOM2";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 2;  // 예시로 2
+        FString UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
@@ -251,8 +254,8 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         FDateTime EntryTime = FDateTime::Now();
         FDateTime ExitTime;  // 빈 값으로 처리
         ZoneName = "ROOM3";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 3;  
+        FString UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
@@ -273,8 +276,8 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         FDateTime EntryTime = FDateTime::Now();
         FDateTime ExitTime;  // 빈 값으로 처리
         ZoneName = "ROOM4";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 4; 
+        FString UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
@@ -303,6 +306,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         }
     }
 
+    auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+
     // 다른 액터에 "Room1" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room1")))
     {
@@ -315,8 +320,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         FDateTime EntryTime;  // 빈 값으로 처리
         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM1";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 0;  // 예시로 0
+        FString UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
@@ -332,8 +337,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         FDateTime EntryTime;  // 빈 값으로 처리
         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM2";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 0;  // 예시로 0
+        FString UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
@@ -349,8 +354,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         FDateTime EntryTime;  // 빈 값으로 처리
         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM2";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 0;  // 예시로 0
+        FString UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
@@ -366,8 +371,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         FDateTime EntryTime;  // 빈 값으로 처리
         FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM2";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 0;  // 예시로 0
+        FString UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
