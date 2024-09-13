@@ -18,6 +18,10 @@ protected:
 	virtual void NativeConstruct();
 public:
 	UPROPERTY(meta=(BindWidget))
+	class UButton* ButtonClose;
+	UFUNCTION()
+	void ClosePopup();
+	UPROPERTY(meta=(BindWidget))
 	class UButton* ButtonCreateSession;
 	UPROPERTY(meta=(BindWidget))
 	class UButton* ButtonJoinSession;
@@ -62,7 +66,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FString WorldName;
 	UPROPERTY(BlueprintReadWrite)
-	FString WorldPassworld;
+	FString WorldPassword;
 
 	class AHttpActor* HttpActor;
 	//UPROPERTY(meta=(BindWidget))

@@ -380,7 +380,7 @@ void UUserWidgetTEST::SendCreatingWorldInfo()
 
 	TMap<FString, FString> studentData;
 	studentData.Add("worldName", WorldName);
-	studentData.Add("worldPassword", WorldPassworld);
+	studentData.Add("worldPassword", WorldPassword);
 	FString json = UJsonParseLib::MakeJson(studentData);
 
 	HttpActor->RsqPostCreateWorld(createWorldURL, json);
@@ -394,7 +394,7 @@ void UUserWidgetTEST::SendCreatingIDInfo()
 
    	TMap<FString, FString> studentData;
 	studentData.Add("worldName", WorldName);
-	studentData.Add("worldPassword", WorldPassworld);
+	studentData.Add("worldPassword", WorldPassword);
 	FString json = UJsonParseLib::MakeJson(studentData);
 
 	HttpActor->RsqPostCreateID(createIDURL, json);
