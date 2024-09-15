@@ -43,7 +43,7 @@ void ULSJMainWidget::NativeOnInitialized()
 void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry,InDeltaTime);
-	if (bStreaming && nullptr != ScreenActor)
+	if (Streaming() && nullptr != ScreenActor)
 	{
 		ScreenActor->UpdateTexture();
 	}
@@ -59,9 +59,9 @@ void ULSJMainWidget::NativeConstruct()
 
 void ULSJMainWidget::OnButtonWindowScreen()
 {
-	bStreaming = !bStreaming;
+	Streaming(!Streaming());
 	FString streamID = "Editor";
-	if (bStreaming)
+	if (Streaming())
 	{
 		TextWindowScreen->SetText(FText::FromString(TEXT("공유중")));
 
@@ -111,8 +111,11 @@ void ULSJMainWidget::OnButtonWindowScreen()
 					//Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
 					CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
 					
+					//시그널 서버에 연결하고 StreamID 목록에서 비어있거나 추가할 StreamID를 탐색한다. 탐색 후 그 StreamID를 UserStreamID로 저장한다.
+					ScreenActor->BeginLookSharingScreen();
+
 					//스트리밍을 시작합니다.
-					CurrentStreamer->StartStreaming();
+					//CurrentStreamer->StartStreaming();
 
 					
 					////Back Buffer를 비디오 입력으로 설정합니다.
@@ -137,6 +140,7 @@ void ULSJMainWidget::OnButtonWindowScreen()
 	}
 	else
 	{
+		ScreenActor->UserStreamID = "";
 		TextWindowScreen->SetText(FText::FromString(TEXT("화면공유")));
 		ScreenActor->WindowScreenPlaneMesh->SetVisibility(false);
 
@@ -167,8 +171,8 @@ void ULSJMainWidget::OnButtonWindowScreen()
 
 void ULSJMainWidget::OnButtonLookSharingScreen()
 {
-	bLookStreaming = !bLookStreaming;
-	if (bLookStreaming)
+	LookStreaming(!LookStreaming());
+	if (LookStreaming())
 	{
 		TextLookSharingScreen->SetText(FText::FromString(TEXT("보는중")));
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
@@ -223,14 +227,14 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
 
 
     // 아이템 데이터 바탕으로 슬롯 생성 및 추가
-    for(FString UserID : Items)
+    for(FString UserStreamID : Items)
 	{
         SharingUserSlot = CastChecked<USharingUserSlot>(CreateWidget(GetWorld(), SharingUserSlotFactory));
         if (SharingUserSlot)
         {
             // 슬롯 가시성 및 레이아웃 확인
             SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
-            SharingUserSlot->SetUserID(UserID);
+            SharingUserSlot->SetUserID(UserStreamID);
 			SharingUserSlot->FUserIDButtonDelegate_OneParam.BindUFunction(this,FName("SetUserID"));
             // Grid에 슬롯 추가
             SharingUserPanel->AddChildToUniformGrid(SharingUserSlot, Row, Column);
