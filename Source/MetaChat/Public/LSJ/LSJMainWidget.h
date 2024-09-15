@@ -68,4 +68,8 @@ public:
 
     // Pixel Streaming video input from render target
     TSharedPtr<class FPixelStreamingVideoInputRenderTarget> VideoInput;
+	bool Streaming() const { return bStreaming; }
+	void Streaming(bool val) { bStreaming = val; }
+	bool LookStreaming() const { return bLookStreaming; }
+	void LookStreaming(bool val) { bLookStreaming = val; }
 };

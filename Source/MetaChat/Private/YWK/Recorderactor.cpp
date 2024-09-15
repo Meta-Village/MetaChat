@@ -32,3 +32,8 @@ void ARecorderactor::Tick(float DeltaTime)
 
 }
 
+void ARecorderactor::AddUser(FString pUserID, FString pStreamID)
+{
+	StreamingUsers.Add(pUserID,pStreamID);
+}
+

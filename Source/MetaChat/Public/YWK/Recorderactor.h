@@ -25,7 +25,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	void AddUser(FString pUserID, FString pStreamID);
 
 
 };
