@@ -60,7 +60,4 @@ public:
 	class UTextureRenderTarget2D* RenderTarget;
 	UPROPERTY(EditDefaultsOnly, Category = "Capture")
 	class USceneCaptureComponent2D* SceneCapture;
-
-	//구역 정보에 UserID와 StreamID 넣기
-	void AddUserInfoToArea(AActor* AreaActor);
 };
