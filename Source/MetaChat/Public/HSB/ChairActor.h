@@ -26,7 +26,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* boxComp;
 	UPROPERTY(EditDefaultsOnly)
-	class UMeshComponent* meshComp;
+	class UStaticMeshComponent* meshComp;
 
 	UPROPERTY(EditDefaultsOnly)
 	class UArrowComponent* arrowComp;
