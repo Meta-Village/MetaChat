@@ -89,7 +89,7 @@ void AYWKHttpActor::OnRsqGetTest(FHttpRequestPtr Request, FHttpResponsePtr Respo
 
 		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
 
-		YWKHttpUI->SetTextLog(UYWKJsonParseLib::JsonParsePassword(result));
+		/*YWKHttpUI->SetTextLog(UYWKJsonParseLib::JsonParsePassword(result));*/
 
 	}
 	else
