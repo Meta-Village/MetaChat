@@ -50,6 +50,8 @@ public:
 	FString UserToken;
 	UPROPERTY(BlueprintReadWrite)
 	int32 WorldID;
+	UPROPERTY(BlueprintReadWrite)
+	FString WorldPW;
 	/*
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnFindSessionComplete(bool bWasSuccessful);

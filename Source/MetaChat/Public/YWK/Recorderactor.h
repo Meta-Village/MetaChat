@@ -14,6 +14,9 @@ class METACHAT_API ARecorderactor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ARecorderactor();
+	//UserID //StreamID = Editor,Editor1,Editor2
+	//스트리밍을 하지 않는다면 StreamID = "";
+	TMap<FString,FString> StreamingUsers;
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,7 +25,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	void AddUser(FString pUserID, FString pStreamID);
 
 
 };

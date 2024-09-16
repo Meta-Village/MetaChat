@@ -12,6 +12,7 @@
 #include "LSJ/MetaChatGameInstance.h"
 #include "HSB/CustomCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Interfaces/IHttpRequest.h"
 
 void UChatPanel::NativeConstruct()
 {
@@ -21,7 +22,7 @@ void UChatPanel::NativeConstruct()
 	{
 		ChatInputBox->OnTextCommitted.AddDynamic(this, &UChatPanel::OnTextCommitted);
 	}
-    
+    RequestChatHistory();
 }
 
 void UChatPanel::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
@@ -57,18 +58,7 @@ void UChatPanel::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMeth
 
 void UChatPanel::SendChatToServer(const FString& PlayerName, const FString& ChatMessage)
 {
-    // PlayerController 가져오기
     APlayerController* PlayerController = Cast<APlayerController>(GetOwningPlayer());
-
-    //if (PlayerController)
-    //{
-    //    // BP_TopDownPlayerController로 캐스팅
-    //    if (ABP_TopDownPlayerController* BPController = Cast<ABP_TopDownPlayerController>(PlayerController))
-    //    {
-    //        // 블루프린트에서 정의된 SR_SubmitChat 호출
-    //        BPController->SR_SubmitChat(PlayerName, ChatMessage);
-    //    }
-    //}
 }
 
 void UChatPanel::UpdateChat(const FString& PlayerName, const FString& ChatMessage)
@@ -138,14 +128,80 @@ void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& 
         HttpActor->RsqPostTest(TEXT("http://125.132.216.190:8126/api/chat"), OutputString);
     }
 }
-
 void UChatPanel::RequestChatHistory()
 {
+    //GameInstance에서 WorldID와 userID가져오기 
+    auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+    if (!gi)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("GameInstance is null, cannot request chat history"));
+        return;
+    }
+    int32 WorldId = gi->WorldID;
+    FString UserId = gi->UserID;
+
+    //URL 구성
+    FString RequestUrl = FString::Printf(TEXT("http://125.132.216.190:8126/api/chat/"),WorldId, *UserId);
+
+
     // HTTP 액터를 통해 채팅 기록 요청
     AYWKHttpActor* HttpActor = GetWorld()->SpawnActor<AYWKHttpActor>();
     if (HttpActor)
     {
         // 채팅 내역을 요청하는 GET 요청을 보낸다.
-        HttpActor->RsqGetTest(TEXT("http://125.132.216.190:8126/api/chat/{worldId}"));
+        HttpActor->RsqGetTest(RequestUrl);
     }
 }
+
+void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+    if (bWasSuccessful && Response.IsValid())
+    {
+        // 서버로부터 응답처리
+        FString ResponseContent = Response->GetContentAsString();
+        UE_LOG(LogTemp, Log, TEXT("Chat history response: %s"), *ResponseContent);
+
+        //Json 파싱
+        TSharedPtr<FJsonObject> JsonObject;
+        TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseContent);
+        if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid()) 
+        {
+            int32 status =JsonObject->GetIntegerField(TEXT("status"));
+            if (status == 200)
+            {
+                // data 필드에서 채팅 가져오기
+                const TArray<TSharedPtr<FJsonValue>>* ChatMessages;
+                if (JsonObject->TryGetArrayField(TEXT("data"), ChatMessages))
+                {
+                    // 기존 채팅 지우기
+                    Chat_ScrollBox->ClearChildren();
+
+                    // 각 채팅 메시지를 스크롤박스에 추가
+                    for (const TSharedPtr<FJsonValue>& MessageValue : *ChatMessages)
+                    {
+                        TSharedPtr<FJsonObject> MessageObject = MessageValue->AsObject();
+                        if (MessageObject.IsValid())
+                        {
+                            FString PlayerName = MessageObject->GetStringField(TEXT("userName"));
+                            FString ChatMessage = MessageObject->GetStringField(TEXT("chatContent"));
+
+                            // 채팅 메시지를 스크롤박스에 추가하는 함수 호출
+                            UpdateChat(PlayerName, ChatMessage);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Failed to retrieve chat history. Status: %d"), status);
+            }
+        }
+    }
+    else
+    {
+        // 요청 실패 처리
+        UE_LOG(LogTemp, Error, TEXT("Failed to get chat history from server"));
+    }
+}
+
+
