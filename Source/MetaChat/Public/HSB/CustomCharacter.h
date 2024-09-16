@@ -136,7 +136,13 @@ public:
     // 서버에 CurrentLocationInfo 보내기
     // 다른 곳에서의 참조용 변수
     FString GetCurrentZoneName() const;
-
+    
+    //StreamID UserID 레코드액터에 넣기
+    AActor* AreaActor;
+    UFUNCTION(Server, Reliable)
+    void ServerAddUserInfoToRecordActor(AActor* pRecordActor, const FString& pUserID,const FString& pStreamID);
+     UFUNCTION(Server, Reliable)
+    void ServerRemoveUserInfoToRecordActor(AActor* pRecordActor, const FString& pUserID);
 private:  
     void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInformation);
 

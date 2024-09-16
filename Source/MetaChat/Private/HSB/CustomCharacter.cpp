@@ -26,6 +26,8 @@
 #include "Engine/TimerHandle.h"
 #include "HSB/ChairActor.h"
 #include "Components/ArrowComponent.h"
+#include "YWK/Recorderactor.h"
+#include "LSJ/ScreenActor.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -193,6 +195,28 @@ void ACustomCharacter::SitIdle()
     }
 }
 
+void ACustomCharacter::ServerAddUserInfoToRecordActor_Implementation(AActor* pRecordActor,const FString& pUserID,const FString& pStreamID)
+{
+    auto* RecorderActor = Cast<ARecorderactor>(pRecordActor);
+	if (RecorderActor)
+	{
+		if(pUserID.IsEmpty())
+			return;
+		RecorderActor->AddUser(pUserID,pStreamID);
+	}
+}
+
+void ACustomCharacter::ServerRemoveUserInfoToRecordActor_Implementation(AActor* pRecordActor, const FString& pUserID)
+{
+    auto* RecorderActor = Cast<ARecorderactor>(pRecordActor);
+	if (RecorderActor)
+	{
+		if(pUserID.IsEmpty())
+			return;
+		RecorderActor->RemoveUser(pUserID);
+	}
+}
+
 void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
      // 의자 액터에 overlap 되었는지
@@ -231,7 +255,14 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         ZoneName = "ROOM1";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
+        AreaActor = OtherActor;
 
+		if (IsLocallyControlled())
+		{
+            AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+			ServerAddUserInfoToRecordActor(AreaActor, UserId, ScreenActor->UserStreamID);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("UserID : %s"), *UserId));
+		}
          if (GEngine)
          {
              FString Message = FString::Printf(TEXT("Entered Location Info: %d"), WorldId);
@@ -249,7 +280,13 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         ZoneName = "ROOM2";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
-
+        AreaActor = OtherActor;
+		if (IsLocallyControlled())
+		{
+            AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+			ServerAddUserInfoToRecordActor(AreaActor, UserId, ScreenActor->UserStreamID);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("UserID : %s"), *UserId));
+		}
         if (GEngine)
         {
             FString Message = FString::Printf(TEXT("Entered Location Info: %d"), WorldId);
@@ -267,7 +304,13 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         ZoneName = "ROOM3";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디       
-
+        AreaActor = OtherActor;
+		if (IsLocallyControlled())
+		{
+            AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+			ServerAddUserInfoToRecordActor(AreaActor, UserId, ScreenActor->UserStreamID);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("UserID : %s"), *UserId));
+		}
         if (GEngine)
         {
             FString Message = FString::Printf(TEXT("Entered Location Info: %d"), WorldId);
@@ -285,7 +328,13 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         ZoneName = "ROOM4";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
-
+        AreaActor = OtherActor;
+		if (IsLocallyControlled())
+		{
+            AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+			ServerAddUserInfoToRecordActor(AreaActor, UserId, ScreenActor->UserStreamID);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("UserID : %s"), *UserId));
+		}
         if (GEngine)
         {
             FString Message = FString::Printf(TEXT("Entered Location Info: %d"), WorldId);
@@ -324,7 +373,9 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         ZoneName = "ROOM1";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
-
+        if(IsLocallyControlled())
+	        ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
+	    AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
@@ -340,7 +391,9 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         ZoneName = "ROOM2";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
-
+        if(IsLocallyControlled())
+	        ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
+	    AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
@@ -356,7 +409,9 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         ZoneName = "ROOM2";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
-
+        if(IsLocallyControlled())
+	       ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
+	    AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
@@ -372,7 +427,9 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         ZoneName = "ROOM2";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
-
+        if(IsLocallyControlled())
+	       ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
+	    AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
         
