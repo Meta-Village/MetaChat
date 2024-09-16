@@ -307,17 +307,6 @@ void AScreenActor::ChangeLookSharingScreen()
 	}
 }
 
-void AScreenActor::AddUserInfoToArea(AActor* AreaActor)
-{
-	auto* RecorderActor = Cast<ARecorderactor>(AreaActor);
-	if (RecorderActor)
-	{
-		if(UserID.IsEmpty())
-			return;
-		RecorderActor->AddUser(UserID,UserStreamID);
-	}
-}
-
 // Called when the game starts or when spawned
 void AScreenActor::BeginPlay()
 {
