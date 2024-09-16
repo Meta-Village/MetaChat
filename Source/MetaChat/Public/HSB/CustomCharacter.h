@@ -48,6 +48,9 @@ public:
     void Idle();
     void Move();
     void Sit();
+    void SitIdle();
+
+    FTimerHandle handle;
 
     UPROPERTY()
 	class UCustomAnimInstance* CustomAnimInstance;

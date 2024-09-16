@@ -30,3 +30,8 @@ void UCustomAnimInstance::PlaySitMontage()
 {
 	Montage_Play(Sit);
 }
+
+void UCustomAnimInstance::PlaySitIdleMontage()
+{
+	Montage_Play(Sit_Idle);
+}

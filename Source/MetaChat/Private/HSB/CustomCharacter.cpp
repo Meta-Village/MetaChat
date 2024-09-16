@@ -23,6 +23,7 @@
 #include "JsonUtilities.h"
 #include "HSB/CustomAnimInstance.h"
 #include "LSJ/MetaChatGameInstance.h"
+#include "Engine/TimerHandle.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -150,6 +151,7 @@ void ACustomCharacter::Idle()
     {
         CustomAnimInstance->IsWalking = false;
         CustomAnimInstance->IsSitting = false;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlayIdleMontage();
     }
 }
@@ -160,6 +162,7 @@ void ACustomCharacter::Move()
     {
         CustomAnimInstance->IsWalking = true;
         CustomAnimInstance->IsSitting = false;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlayWalkMontage();
     }
 }
@@ -170,7 +173,21 @@ void ACustomCharacter::Sit()
     {
         CustomAnimInstance->IsWalking = false;
         CustomAnimInstance->IsSitting = true;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlaySitMontage();
+        // 몇 초 뒤에 PlaySitIdleMontage() 실행
+        GetWorldTimerManager().SetTimer(handle, this, &ACustomCharacter::SitIdle, 2.f, false);
+    }
+}
+
+void ACustomCharacter::SitIdle()
+{
+    if (CustomAnimInstance)
+    {
+        CustomAnimInstance->PlaySitIdleMontage();
+        CustomAnimInstance->IsWalking = false;
+        CustomAnimInstance->IsSitting = true;
+        CustomAnimInstance->WasSit = true;
     }
 }
 
