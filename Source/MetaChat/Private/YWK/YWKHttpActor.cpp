@@ -30,9 +30,11 @@ void AYWKHttpActor::BeginPlay()
 	if (!YWKHttpUI && HttpUIFactory)
 	{
 		YWKHttpUI = Cast<UYWKHttpUI>(CreateWidget(GetWorld(), HttpUIFactory));
+
 		if (YWKHttpUI)
 		{
 			YWKHttpUI->AddToViewport();
+			UE_LOG(LogTemp, Log, TEXT("YWKHttpUI successfully created and added to viewport."));
 		}
 		else
 		{
@@ -88,8 +90,10 @@ void AYWKHttpActor::OnRsqGetTest(FHttpRequestPtr Request, FHttpResponsePtr Respo
 
 
 		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
-
-		/*YWKHttpUI->SetTextLog(UYWKJsonParseLib::JsonParsePassword(result));*/
+		if (YWKHttpUI)
+		{
+			YWKHttpUI->SetTextLog(UYWKJsonParseLib::JsonParsePassword(result));
+		}
 
 	}
 	else
