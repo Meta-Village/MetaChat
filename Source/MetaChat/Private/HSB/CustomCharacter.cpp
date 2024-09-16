@@ -23,6 +23,9 @@
 #include "JsonUtilities.h"
 #include "HSB/CustomAnimInstance.h"
 #include "LSJ/MetaChatGameInstance.h"
+#include "Engine/TimerHandle.h"
+#include "HSB/ChairActor.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -150,6 +153,7 @@ void ACustomCharacter::Idle()
     {
         CustomAnimInstance->IsWalking = false;
         CustomAnimInstance->IsSitting = false;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlayIdleMontage();
     }
 }
@@ -160,6 +164,7 @@ void ACustomCharacter::Move()
     {
         CustomAnimInstance->IsWalking = true;
         CustomAnimInstance->IsSitting = false;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlayWalkMontage();
     }
 }
@@ -170,27 +175,41 @@ void ACustomCharacter::Sit()
     {
         CustomAnimInstance->IsWalking = false;
         CustomAnimInstance->IsSitting = true;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlaySitMontage();
+        // 몇 초 뒤에 PlaySitIdleMontage() 실행
+        GetWorldTimerManager().SetTimer(handle, this, &ACustomCharacter::SitIdle, 2.f, false);
+    }
+}
+
+void ACustomCharacter::SitIdle()
+{
+    if (CustomAnimInstance)
+    {
+        CustomAnimInstance->PlaySitIdleMontage();
+        CustomAnimInstance->IsWalking = false;
+        CustomAnimInstance->IsSitting = true;
+        CustomAnimInstance->WasSit = true;
     }
 }
 
 void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-       // 의자 액터에 overlap 되었는지
+     // 의자 액터에 overlap 되었는지
     if (OtherActor && OtherActor->ActorHasTag(FName("Chair")))
     {
+        AChairActor* Chair = Cast<AChairActor>(OtherActor);
+
         // 의자에 앉는 애니메이션 작동
         SetUpLocation(ELocationState::SIT);
-        // 특정 방향으로 앉도록 설정
-        FVector ChairDir = OtherActor->GetActorForwardVector();
-//         FVector NormalizedDir = ChairDir.GetSafeNormal();
-        FRotator Rot = FRotationMatrix::MakeFromX(ChairDir).Rotator();
-
-        Rot.Pitch = 0.0f;
-        Rot.Roll = 0.0f;
-
-        SetActorRotation(Rot);
-        UE_LOG(LogTemp, Warning, TEXT("%f"), Rot.Yaw);
+//         // 의자의 회전 값을 가져옴 (의자의 회전값과 캐릭터의 회전을 일치시킴)
+//         FRotator ChairRotation = Chair->GetActorRotation();
+// 
+//         // 캐릭터의 회전을 의자의 회전과 동일하게 설정
+//         this->SetActorRotation(ChairRotation);
+// 
+//         // 회전 값을 로그로 출력
+//         UE_LOG(LogTemp, Warning, TEXT("Chair Rotation Yaw: %f"), ChairRotation.Yaw);
 
         if (GEngine)
         {

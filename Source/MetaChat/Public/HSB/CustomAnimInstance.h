@@ -23,6 +23,8 @@ public:
 	class UAnimMontage* Walk;
 	UPROPERTY(EditDefaultsOnly)
 	class UAnimMontage* Sit;
+	UPROPERTY(EditDefaultsOnly)
+	class UAnimMontage* Sit_Idle;
 
 	UFUNCTION(BlueprintCallable)
 	void PlayIdleMontage();
@@ -30,9 +32,13 @@ public:
 	void PlayWalkMontage();
 	UFUNCTION(BlueprintCallable)
 	void PlaySitMontage();
+	UFUNCTION(BlueprintCallable)
+	void PlaySitIdleMontage();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool IsWalking;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool IsSitting;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool WasSit;
 };
