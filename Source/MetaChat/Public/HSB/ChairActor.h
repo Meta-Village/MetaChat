@@ -28,6 +28,4 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UStaticMeshComponent* meshComp;
 
-	UPROPERTY(EditDefaultsOnly)
-	class UArrowComponent* arrowComp;
 };

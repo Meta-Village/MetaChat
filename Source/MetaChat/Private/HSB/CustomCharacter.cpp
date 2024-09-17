@@ -226,14 +226,13 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 
         // 의자에 앉는 애니메이션 작동
         SetUpLocation(ELocationState::SIT);
-//         // 의자의 회전 값을 가져옴 (의자의 회전값과 캐릭터의 회전을 일치시킴)
-//         FRotator ChairRotation = Chair->GetActorRotation();
-// 
-//         // 캐릭터의 회전을 의자의 회전과 동일하게 설정
-//         this->SetActorRotation(ChairRotation);
-// 
-//         // 회전 값을 로그로 출력
-//         UE_LOG(LogTemp, Warning, TEXT("Chair Rotation Yaw: %f"), ChairRotation.Yaw);
+
+        // 오버랩 된 액터의 방향과 같은 방향으로 앉도록
+        FRotator Rot = OtherActor->GetActorRotation();
+        FVector Loc = OtherActor->GetActorLocation();
+// //         Rot.Yaw += 180.f;
+        this->SetActorLocationAndRotation(Loc, Rot);
+
 
         if (GEngine)
         {
@@ -379,6 +378,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
+        // 서버에 정보 보낸 이후엔 현위치 로비
+        ZoneName = "ROOM0";
         UE_LOG(LogTemp, Warning, TEXT("Left Room1, Location Info: %d"), WorldId);
     }
     // 다른 액터에 "Room2" 태그가 있는지 확인
@@ -397,6 +398,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
+        // 서버에 정보 보낸 이후엔 현위치 로비
+        ZoneName = "ROOM0";
         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
     }
     // 다른 액터에 "Room3" 태그가 있는지 확인
@@ -415,6 +418,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
+        // 서버에 정보 보낸 이후엔 현위치 로비
+        ZoneName = "ROOM0";
         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
     }
     // 다른 액터에 "Room4" 태그가 있는지 확인
@@ -433,6 +438,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
         
+        // 서버에 정보 보낸 이후엔 현위치 로비
+        ZoneName = "ROOM0";
         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
     }
  }

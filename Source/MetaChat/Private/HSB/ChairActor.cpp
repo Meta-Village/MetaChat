@@ -16,9 +16,6 @@ AChairActor::AChairActor()
 	SetRootComponent(boxComp);
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("meshComp"));
 	meshComp->SetupAttachment(RootComponent);
-
-	arrowComp = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComp"));
-	arrowComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
