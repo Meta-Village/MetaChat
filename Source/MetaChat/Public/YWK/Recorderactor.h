@@ -16,6 +16,8 @@ public:
 	FString UserID;
 	UPROPERTY(EditAnywhere)
 	FString UserStreamID;
+	UPROPERTY(EditAnywhere)
+	bool bClicked;
 };
 UCLASS()
 class METACHAT_API ARecorderactor : public AActor
@@ -27,7 +29,8 @@ public:
 	ARecorderactor();
 	//UserID //StreamID = Editor,Editor1,Editor2
 	//스트리밍을 하지 않는다면 StreamID = "";
-	UPROPERTY(VisibleAnywhere)
+	//UPROPERTY(VisibleAnywhere,Replicated)
+	UPROPERTY(VisibleAnywhere,ReplicatedUsing = OnRep_UpdateSlot)
 	TArray<FUserStreamingInfo> UserStreamingInfo;
 
 protected:
@@ -42,6 +45,9 @@ public:
 
 	void RemoveUser(FString pUserID);
 
+	void UpdateUser(FString pUserID, FString pStreamID);
 	UFUNCTION(Server, Reliable)
 	void ServerAddUserInfoToRecordActor(const FString& pUserID,const FString& pStreamUserID);
+	UFUNCTION()
+	void OnRep_UpdateSlot();
 };

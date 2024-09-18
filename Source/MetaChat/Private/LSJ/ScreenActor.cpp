@@ -28,7 +28,8 @@
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingStreamer.h"
 #include "LSJ/MetaChatGameInstance.h"
 #include "YWK/Recorderactor.h"
-//#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
+#include "HSB/CustomCharacter.h"
+#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 // Sets default values
 AScreenActor::AScreenActor()
 {
@@ -59,7 +60,7 @@ AScreenActor::AScreenActor()
 
 
 	RenderTarget = CreateDefaultSubobject<UTextureRenderTarget2D>(TEXT("RenderTarget"));
-	//RenderTarget->CompressionSettings = TextureCompressionSettings::TC_Default;
+	RenderTarget->CompressionSettings = TextureCompressionSettings::TC_Default;
 	RenderTarget->SRGB = false;
 	RenderTarget->bAutoGenerateMips = false;
 	RenderTarget->bForceLinearGamma = true;
@@ -70,7 +71,6 @@ AScreenActor::AScreenActor()
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCapture->SetupAttachment(RootComponent);
 	SceneCapture->CaptureSource = SCS_FinalColorLDR;
-	SceneCapture->TextureTarget = RenderTarget;
 
 }
 
@@ -93,12 +93,8 @@ void AScreenActor::UpdateTexture()
         
 		if (DynamicMaterial && CapturedTexture&& WindowScreenPlaneMesh)
 		{
-			//CapturedTexture->SRGB = true;
 			// BaseTexture 파라미터에 텍스처 설정
 			DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
-			RenderTarget->UpdateResourceImmediate();
-			// PlaneMesh에 머티리얼 적용
-			
 		}
 	}
 }
@@ -159,41 +155,8 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
 	DeleteDC(hMemoryDC);
 	ReleaseDC(NULL, hScreenDC);
 
-
-					/*FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
-					FTextureResource* TextureResource = Texture->GetResource();
-					*/
-									//if (RenderTargetResource && TextureResource)
-									//{
-									//	ENQUEUE_RENDER_COMMAND(DrawTextureToRenderTarget)(
-									//		[RenderTargetResource, TextureResource](FRHICommandListImmediate& RHICmdList)
-									//		{
-									//			// FCanvas를 사용하여 RenderTarget에 그리기
-									//			FCanvas Canvas(RenderTargetResource, nullptr, 0, 0, 0, ERHIFeatureLevel::SM5);
-         //   
-									//			// GGlobalShaderMap을 사용하여 셰이더가 제대로 로드되었는지 확인
-									//			if (!GGlobalShaderMap[ERHIFeatureLevel::SM5])
-									//			{
-									//				UE_LOG(LogTemp, Error, TEXT("Shader map not loaded properly."));
-									//				return;
-									//			}
-
-									//			Canvas.Clear(FLinearColor::Black);  // RenderTarget 초기화
-
-									//			// 텍스처를 그리기 위한 FCanvasTileItem 생성
-									//			FCanvasTileItem TileItem(FVector2D(0, 0), TextureResource, FLinearColor::White);
-									//			TileItem.BlendMode = SE_BLEND_Opaque;
-
-									//			// 텍스처를 RenderTarget에 그리기
-									//			Canvas.DrawItem(TileItem);
-									//			Canvas.Flush_GameThread();  // 모든 그리기 명령을 처리
-									//		}
-									//	);
-									//}
-									//RenderTarget->UpdateResource();
-									//RenderTarget->UpdateResourceImmediate();
-									//SceneCapture->UpdateContent();
-									
+	FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
+	FTextureResource* TextureResource = Texture->GetResource();						
 
 	return Texture;
     //int32 ScreenWidth =  GetSystemMetrics(SM_CXSCREEN);
@@ -334,6 +297,15 @@ void AScreenActor::BeginPlay()
 	UserID = gi->UserID;
 	//UE_LOG(LogTemp,Error,TEXT("UMetaChatGameInstance : WorldID %d"),gi->WorldID);
 
+	if (RenderTarget && SceneCapture)
+    {
+        SceneCapture->TextureTarget = RenderTarget;
+        //SceneCapture->CaptureScene();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Initialization failed in BeginPlay"));
+    }
 }
 
 // Called every frame
@@ -344,9 +316,11 @@ void AScreenActor::Tick(float DeltaTime)
 
 FString AScreenActor::GetSharingUsers(TArray<FString> Users)
 {
+	//스트리밍 중이고 UserStreamID가 정해지지 않았다면
 	if (MainWidget->Streaming() && UserStreamID.IsEmpty())
 	{
 		int32 currentNum = 0;
+		bool bEditor = false;
 		for(FString ID : Users)
 		{	
 			if(false==ID.Contains(TEXT("Editor"), ESearchCase::CaseSensitive))
@@ -356,7 +330,7 @@ FString AScreenActor::GetSharingUsers(TArray<FString> Users)
 
 			if (Numstrings[1].Equals(""))
 			{
-				
+				bEditor = true;
 			}
 			else if (currentNum != FCString::Atoi(*Numstrings[1]))
 			{
@@ -369,15 +343,33 @@ FString AScreenActor::GetSharingUsers(TArray<FString> Users)
 			currentNum++;
 			//UE_LOG(LogTemp,Error,TEXT("Numstrings : %s"),*Numstrings[1]);
 		}
-		if(UserStreamID == "")
-			UserStreamID = "Editor" + FString::FromInt(currentNum);
 
+		if(UserStreamID == "" && false==bEditor)
+			UserStreamID = "Editor";
+		else if(UserStreamID == "" && true==bEditor)
+			UserStreamID = "Editor" + FString::FromInt(currentNum);
+		
 		MainWidget->CurrentStreamer->StartStreaming();
+
+		//캐릭터의 AreaActor 안에 UserStreamingInfo의 StreamID를 수정한다.
+		
+		ACustomCharacter* player = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (nullptr == player)
+			return "";
+		if (nullptr == player->AreaActor)
+			return "";
+		player->ServerUpdateUserInfoToRecordActor(player->AreaActor,UserID,UserStreamID);
+		//TArray<FString> Items;
+		//MainWidget->InitSlot(Items);
 		return "";
 	}
 
-	if(MainWidget)
+	if (MainWidget)
+	{
+		
 		MainWidget->InitSlot(Users);
+	}
+		
 	if(Users.Num()>0)
 		return Users[0];
 	else

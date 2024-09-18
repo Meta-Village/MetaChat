@@ -204,6 +204,18 @@ void ACustomCharacter::ServerAddUserInfoToRecordActor_Implementation(AActor* pRe
 			return;
 		RecorderActor->AddUser(pUserID,pStreamID);
 	}
+    //MulticastAddUserInfoToRecordActor(pRecordActor,pUserID,pStreamID);
+}
+
+void ACustomCharacter::ServerUpdateUserInfoToRecordActor_Implementation(AActor* pRecordActor, const FString& pUserID, const FString& pStreamID)
+{
+    auto* RecorderActor = Cast<ARecorderactor>(pRecordActor);
+	if (RecorderActor)
+	{
+		if(pUserID.IsEmpty())
+			return;
+		RecorderActor->UpdateUser(pUserID,pStreamID);
+	}
 }
 
 void ACustomCharacter::ServerRemoveUserInfoToRecordActor_Implementation(AActor* pRecordActor, const FString& pUserID)
