@@ -97,11 +97,16 @@ void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& 
     int32 WorldId = gi->WorldID;
     FString UserId = gi->UserID;
     FString UserName = gi->UserID;
-    FString ZoneName = "ROOM1";
+    // ZoneName을 초기화
+    FString ZoneName = TEXT("");
     ACustomCharacter* PlayerCharacter = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
     if (PlayerCharacter)
     {
         ZoneName = PlayerCharacter->GetCurrentZoneName();
+    }
+    else
+    {
+        ZoneName = TEXT("Unknown");
     }
 
     // Json 형식 만들기
@@ -112,7 +117,7 @@ void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& 
     JsonObject->SetStringField(TEXT("userId"), UserId); // 나중에 변경예정
     JsonObject->SetNumberField(TEXT("meetingId"), 0); // 0으로 해야겠다
     JsonObject->SetStringField(TEXT("userName"), UserName);
-    JsonObject->SetStringField(TEXT("zoneName"), "ROOM1"); //나중에 변경 예정
+    JsonObject->SetStringField(TEXT("zoneName"), ZoneName); //나중에 변경 예정
     JsonObject->SetStringField(TEXT("chatTime"), FDateTime::Now().ToIso8601()); // 현재 시간을 ISO8601 형식으로
     JsonObject->SetStringField(TEXT("chatContent"), ChatMessage);
 
