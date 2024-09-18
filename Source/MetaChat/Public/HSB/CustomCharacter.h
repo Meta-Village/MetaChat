@@ -141,6 +141,8 @@ public:
     AActor* AreaActor;
     UFUNCTION(Server, Reliable)
     void ServerAddUserInfoToRecordActor(AActor* pRecordActor, const FString& pUserID,const FString& pStreamID);
+    UFUNCTION(Server, UnReliable)
+    void ServerUpdateUserInfoToRecordActor(AActor* pRecordActor, const FString& pUserID,const FString& pStreamID);
      UFUNCTION(Server, Reliable)
     void ServerRemoveUserInfoToRecordActor(AActor* pRecordActor, const FString& pUserID);
 private:  

@@ -2,6 +2,10 @@
 
 
 #include "YWK/Recorderactor.h"
+#include "Net/UnrealNetwork.h"
+#include "LSJ/ScreenActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "LSJ/LSJMainWidget.h"
 
 
 // Sets default values
@@ -15,9 +19,14 @@ ARecorderactor::ARecorderactor()
 	//구역 안에 있는 UserID 모음
 	//소리 들리는 범위? 
 	//VOIP //???
-
+	
 }
+void ARecorderactor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+    DOREPLIFETIME(ARecorderactor, UserStreamingInfo);
+}
 // Called when the game starts or when spawned
 void ARecorderactor::BeginPlay()
 {
@@ -44,6 +53,8 @@ void ARecorderactor::AddUser(FString pUserID, FString pStreamID)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("FUserStreamingInfo : ID : %s  / stream : %s"),*(InfoID.UserID),*(InfoID.UserStreamID)));
 	}
+	if(HasAuthority())
+		OnRep_UpdateSlot();
 }
 void ARecorderactor::RemoveUser(FString pUserID)
 {
@@ -55,8 +66,22 @@ void ARecorderactor::RemoveUser(FString pUserID)
 			break;
 		}
 	}
+	if(HasAuthority())
+		OnRep_UpdateSlot();
 }
-
+void ARecorderactor::UpdateUser(FString pUserID, FString pStreamID)
+{
+	for (int i = 0; i < UserStreamingInfo.Num(); i++)
+	{
+		if (UserStreamingInfo[i].UserID.Equals(pUserID))
+		{
+			UserStreamingInfo[i].UserStreamID=pStreamID;
+			break;
+		}
+	}
+	if(HasAuthority())
+		OnRep_UpdateSlot();
+}
 void ARecorderactor::ServerAddUserInfoToRecordActor_Implementation(const FString& pUserID,const FString& pStreamUserID)
 {
 	FUserStreamingInfo Info;
@@ -68,4 +93,12 @@ void ARecorderactor::ServerAddUserInfoToRecordActor_Implementation(const FString
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("FUserStreamingInfo : ID : %s  / stream : %s"),*(InfoID.UserID),*(InfoID.UserStreamID)));
 	}
+}
+
+void ARecorderactor::OnRep_UpdateSlot()
+{
+	AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+	TArray<FString> Items;
+
+	ScreenActor->MainWidget->InitSlot(Items);
 }

@@ -42,7 +42,10 @@ class METACHAT_API ULSJMainWidget : public UUserWidget
 	bool bLookStreaming;
 	UFUNCTION()
 	void SetUserID(FString ID);
+	UFUNCTION()
+	void ClickSlot(FString ID, bool bClick);
 protected:
+	void NativeDestruct();
 	virtual void NativeOnInitialized();
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);

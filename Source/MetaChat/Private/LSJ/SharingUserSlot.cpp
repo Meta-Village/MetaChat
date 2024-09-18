@@ -17,5 +17,9 @@ void USharingUserSlot::SetUserID(FString UserID)
 
 void USharingUserSlot::ViewButtonOnClick()
 {
-	FUserIDButtonDelegate_OneParam.Execute(TextUserID->GetText().ToString());
+	
+	bClicked = !bClicked;
+	//FUserIDButtonDelegate_OneParam.Execute(TextUserID->GetText().ToString());
+
+	UserIDButtonDelegate_TwoParams.Execute(TextUserID->GetText().ToString(),bClicked);
 }

@@ -29,13 +29,66 @@
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingEditor/Public/PixelStreamingVideoInputViewport.h"
+#include "HSB/CustomCharacter.h"
+#include "YWK/Recorderactor.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void ULSJMainWidget::SetUserID(FString ID)
 {
 	ScreenActor->SetViewSharingUserID(ID);
 }
+void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
+{
+	//Button의 텍스트를 ID표시
+	//ScreenActor->ViewSharingUserStreamID는 StreamID로 표시
+	ACustomCharacter* CustomPlayer = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
+	if(nullptr==CustomPlayer)
+		return;
+	if(nullptr==CustomPlayer->AreaActor)
+		return;
+	ARecorderactor* AreaActor = Cast<ARecorderactor>(CustomPlayer->AreaActor);
+	if (AreaActor)
+	{
+		if(AreaActor->UserStreamingInfo.Num()<=0)
+			return;
+		for (FUserStreamingInfo& IDInfo : AreaActor->UserStreamingInfo)
+		{
+			if (IDInfo.UserID.Equals(ID))
+			{
+				IDInfo.bClicked = !(IDInfo.bClicked);
+				if (IDInfo.bClicked)
+				{
+					ScreenActor->ViewSharingUserStreamID = IDInfo.UserStreamID;
+					ScreenActor->BeginLookSharingScreen();
+					//ScreenActor->ChangeLookSharingScreen();
+					ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
+					LookStreaming(true);
+				}
+				else
+				{
+					ScreenActor->ViewSharingUserStreamID = "";
+					ScreenActor->StopLookSharingScreen();
+					ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
+					LookStreaming(false);
+				}
+			}
+			else
+				IDInfo.bClicked = false;
+		}
+	}
+	//ChangeLookSharingScreen()로 StreamID로 스트림 화면 전환
+	//bClick값에 따라 ImageSharingScreen 켜지고 꺼지고
 
+	//bClick을 키면 현재 키를 제외한 다른 모든 버튼의 bClick값을 false로 변경
+	
+}
+void ULSJMainWidget::NativeDestruct()
+{
+	Super::NativeDestruct();
+	if(CurrentStreamer)
+		CurrentStreamer->SetVideoInput(nullptr);
+}
 void ULSJMainWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -156,6 +209,13 @@ void ULSJMainWidget::OnButtonWindowScreen()
 			{
 				// 4. 스트리밍을 시작합니다.
 				Streamer->StopStreaming();
+
+				ACustomCharacter* player = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+				if (nullptr == player)
+					return;
+				if (nullptr == player->AreaActor)
+					return;
+				player->ServerUpdateUserInfoToRecordActor(player->AreaActor, ScreenActor->UserID, "");
 			}
 			else
 			{
@@ -225,30 +285,68 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
     int32 Row = 0;
     int32 Column = 0;
 
-
-    // 아이템 데이터 바탕으로 슬롯 생성 및 추가
-    for(FString UserStreamID : Items)
+	ACustomCharacter* CustomPlayer = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
+	if(nullptr==CustomPlayer)
+		return;
+	if(nullptr==CustomPlayer->AreaActor)
+		return;
+	ARecorderactor* AreaActor = Cast<ARecorderactor>(CustomPlayer->AreaActor);
+	if (AreaActor)
 	{
-        SharingUserSlot = CastChecked<USharingUserSlot>(CreateWidget(GetWorld(), SharingUserSlotFactory));
-        if (SharingUserSlot)
-        {
-            // 슬롯 가시성 및 레이아웃 확인
-            SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
-            SharingUserSlot->SetUserID(UserStreamID);
-			SharingUserSlot->FUserIDButtonDelegate_OneParam.BindUFunction(this,FName("SetUserID"));
-            // Grid에 슬롯 추가
-            SharingUserPanel->AddChildToUniformGrid(SharingUserSlot, Row, Column);
+		if(AreaActor->UserStreamingInfo.Num()<=0)
+			return;
+		for (FUserStreamingInfo IDInfo : AreaActor->UserStreamingInfo)
+		{
+			if(IDInfo.UserStreamID.IsEmpty())
+				continue;
 
-            // Row 값 증가
-            Row++;
+			SharingUserSlot = CastChecked<USharingUserSlot>(CreateWidget(GetWorld(), SharingUserSlotFactory));
+			if (SharingUserSlot)
+			{
+				// 슬롯 가시성 및 레이아웃 확인
+				SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
+				SharingUserSlot->SetUserID(IDInfo.UserID);
+				//SharingUserSlot->FUserIDButtonDelegate_OneParam.BindUFunction(this,FName("SetUserID"));
+				SharingUserSlot->UserIDButtonDelegate_TwoParams.BindUFunction(this,FName("ClickSlot"));
+				// Grid 에 슬롯 추가
+				SharingUserPanel->AddChildToUniformGrid(SharingUserSlot, Row, Column);
 
-            if (!SharingUserPanel)
-            {
-                UE_LOG(LogTemp, Error, TEXT("PartsPanel is not valid."));
-                return;
-            }
+				// Row 값 증가
+				Row++;
 
-            //SharingUserSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
-        }
+				if (!SharingUserPanel)
+				{
+					UE_LOG(LogTemp, Error, TEXT("PartsPanel is not valid."));
+					return;
+				}
+
+				//SharingUserSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
+			}
+		}
 	}
+ //   // 아이템 데이터 바탕으로 슬롯 생성 및 추가
+ //   for(FString UserStreamID : Items)
+	//{
+ //       SharingUserSlot = CastChecked<USharingUserSlot>(CreateWidget(GetWorld(), SharingUserSlotFactory));
+ //       if (SharingUserSlot)
+ //       {
+ //           // 슬롯 가시성 및 레이아웃 확인
+ //           SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
+ //           SharingUserSlot->SetUserID(UserStreamID);
+	//		SharingUserSlot->FUserIDButtonDelegate_OneParam.BindUFunction(this,FName("SetUserID"));
+ //           // Grid에 슬롯 추가
+ //           SharingUserPanel->AddChildToUniformGrid(SharingUserSlot, Row, Column);
+
+ //           // Row 값 증가
+ //           Row++;
+
+ //           if (!SharingUserPanel)
+ //           {
+ //               UE_LOG(LogTemp, Error, TEXT("PartsPanel is not valid."));
+ //               return;
+ //           }
+
+ //           //SharingUserSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
+ //       }
+	//}
 }
