@@ -48,6 +48,9 @@ public:
     void Idle();
     void Move();
     void Sit();
+    void SitIdle();
+
+    FTimerHandle handle;
 
     UPROPERTY()
 	class UCustomAnimInstance* CustomAnimInstance;
@@ -123,12 +126,23 @@ public:
 
     void UpdateCharacterAppearance();
 
-    int32 WorldId;
+    // 서버에 보낼 데이터들
+    FDateTime EntryTime;
+    FDateTime ExitTime;
     FName ZoneName;
+    FString UserId;
+    int32 WorldId;
+    
     // 서버에 CurrentLocationInfo 보내기
     // 다른 곳에서의 참조용 변수
     FString GetCurrentZoneName() const;
-
+    
+    //StreamID UserID 레코드액터에 넣기
+    AActor* AreaActor;
+    UFUNCTION(Server, Reliable)
+    void ServerAddUserInfoToRecordActor(AActor* pRecordActor, const FString& pUserID,const FString& pStreamID);
+     UFUNCTION(Server, Reliable)
+    void ServerRemoveUserInfoToRecordActor(AActor* pRecordActor, const FString& pUserID);
 private:  
     void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInformation);
 

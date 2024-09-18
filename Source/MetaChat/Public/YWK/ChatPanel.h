@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
 #include "ChatPanel.generated.h"
 
 /**
@@ -37,5 +39,5 @@ private:
 
 	void SendChatToServerHttp(const FString& PlayerName, const FString& ChatMessage);
 
-	
+	void OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 };

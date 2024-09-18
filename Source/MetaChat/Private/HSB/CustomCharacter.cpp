@@ -22,6 +22,12 @@
 #include "Json.h"
 #include "JsonUtilities.h"
 #include "HSB/CustomAnimInstance.h"
+#include "LSJ/MetaChatGameInstance.h"
+#include "Engine/TimerHandle.h"
+#include "HSB/ChairActor.h"
+#include "Components/ArrowComponent.h"
+#include "YWK/Recorderactor.h"
+#include "LSJ/ScreenActor.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -149,6 +155,7 @@ void ACustomCharacter::Idle()
     {
         CustomAnimInstance->IsWalking = false;
         CustomAnimInstance->IsSitting = false;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlayIdleMontage();
     }
 }
@@ -159,6 +166,7 @@ void ACustomCharacter::Move()
     {
         CustomAnimInstance->IsWalking = true;
         CustomAnimInstance->IsSitting = false;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlayWalkMontage();
     }
 }
@@ -169,27 +177,62 @@ void ACustomCharacter::Sit()
     {
         CustomAnimInstance->IsWalking = false;
         CustomAnimInstance->IsSitting = true;
+        CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlaySitMontage();
+        // 몇 초 뒤에 PlaySitIdleMontage() 실행
+        GetWorldTimerManager().SetTimer(handle, this, &ACustomCharacter::SitIdle, 2.f, false);
     }
+}
+
+void ACustomCharacter::SitIdle()
+{
+    if (CustomAnimInstance)
+    {
+        CustomAnimInstance->PlaySitIdleMontage();
+        CustomAnimInstance->IsWalking = false;
+        CustomAnimInstance->IsSitting = true;
+        CustomAnimInstance->WasSit = true;
+    }
+}
+
+void ACustomCharacter::ServerAddUserInfoToRecordActor_Implementation(AActor* pRecordActor,const FString& pUserID,const FString& pStreamID)
+{
+    auto* RecorderActor = Cast<ARecorderactor>(pRecordActor);
+	if (RecorderActor)
+	{
+		if(pUserID.IsEmpty())
+			return;
+		RecorderActor->AddUser(pUserID,pStreamID);
+	}
+}
+
+void ACustomCharacter::ServerRemoveUserInfoToRecordActor_Implementation(AActor* pRecordActor, const FString& pUserID)
+{
+    auto* RecorderActor = Cast<ARecorderactor>(pRecordActor);
+	if (RecorderActor)
+	{
+		if(pUserID.IsEmpty())
+			return;
+		RecorderActor->RemoveUser(pUserID);
+	}
 }
 
 void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-       // 의자 액터에 overlap 되었는지
+     // 의자 액터에 overlap 되었는지
     if (OtherActor && OtherActor->ActorHasTag(FName("Chair")))
     {
+        AChairActor* Chair = Cast<AChairActor>(OtherActor);
+
         // 의자에 앉는 애니메이션 작동
         SetUpLocation(ELocationState::SIT);
-        // 특정 방향으로 앉도록 설정
-        FVector ChairDir = OtherActor->GetActorForwardVector();
-//         FVector NormalizedDir = ChairDir.GetSafeNormal();
-        FRotator Rot = FRotationMatrix::MakeFromX(ChairDir).Rotator();
 
-        Rot.Pitch = 0.0f;
-        Rot.Roll = 0.0f;
+        // 오버랩 된 액터의 방향과 같은 방향으로 앉도록
+        FRotator Rot = OtherActor->GetActorRotation();
+        FVector Loc = OtherActor->GetActorLocation();
+// //         Rot.Yaw += 180.f;
+        this->SetActorLocationAndRotation(Loc, Rot);
 
-        SetActorRotation(Rot);
-        UE_LOG(LogTemp, Warning, TEXT("%f"), Rot.Yaw);
 
         if (GEngine)
         {
@@ -199,21 +242,26 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 
     }
 
+    auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+
     // 다른 액터에 "Room1" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room1")))
     {
          // 현재 위치 정보를 1로 설정
         // 캐릭터가 1에 들어갔을 때 서버로 정보 전송
-        FDateTime EntryTime = FDateTime::Now();
-        FDateTime ExitTime;  // 빈 값으로 처리
+        EntryTime = FDateTime::Now();
+        ExitTime;  // 빈 값으로 처리
         ZoneName = "ROOM1";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 1;  // 예시로 1
+        UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
+        AreaActor = OtherActor;
 
-        // 서버에 정보 전송
-        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
-
-
+		if (IsLocallyControlled())
+		{
+            AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+			ServerAddUserInfoToRecordActor(AreaActor, UserId, ScreenActor->UserStreamID);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("UserID : %s"), *UserId));
+		}
          if (GEngine)
          {
              FString Message = FString::Printf(TEXT("Entered Location Info: %d"), WorldId);
@@ -226,16 +274,18 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
     {
         // 현재 위치 정보를 2로 설정
         // 캐릭터가 2에 들어갔을 때 서버로 정보 전송
-        FDateTime EntryTime = FDateTime::Now();
-        FDateTime ExitTime;  // 빈 값으로 처리
+        EntryTime = FDateTime::Now();
+        ExitTime;  // 빈 값으로 처리
         ZoneName = "ROOM2";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 2;  // 예시로 2
-
-        // 서버에 정보 전송
-        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
-
-
+        UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
+        AreaActor = OtherActor;
+		if (IsLocallyControlled())
+		{
+            AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+			ServerAddUserInfoToRecordActor(AreaActor, UserId, ScreenActor->UserStreamID);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("UserID : %s"), *UserId));
+		}
         if (GEngine)
         {
             FString Message = FString::Printf(TEXT("Entered Location Info: %d"), WorldId);
@@ -248,16 +298,18 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
     {
         // 현재 위치 정보를 3로 설정
         // 캐릭터가 3에 들어갔을 때 서버로 정보 전송
-        FDateTime EntryTime = FDateTime::Now();
-        FDateTime ExitTime;  // 빈 값으로 처리
+        EntryTime = FDateTime::Now();
+        ExitTime;  // 빈 값으로 처리
         ZoneName = "ROOM3";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 3;  
-
-        // 서버에 정보 전송
-        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
-       
-
+        UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디       
+        AreaActor = OtherActor;
+		if (IsLocallyControlled())
+		{
+            AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+			ServerAddUserInfoToRecordActor(AreaActor, UserId, ScreenActor->UserStreamID);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("UserID : %s"), *UserId));
+		}
         if (GEngine)
         {
             FString Message = FString::Printf(TEXT("Entered Location Info: %d"), WorldId);
@@ -270,16 +322,18 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
     {
         // 현재 위치 정보를 4로 설정
         // 캐릭터가 4에 들어갔을 때 서버로 정보 전송
-        FDateTime EntryTime = FDateTime::Now();
-        FDateTime ExitTime;  // 빈 값으로 처리
+        EntryTime = FDateTime::Now();
+        ExitTime;  // 빈 값으로 처리
         ZoneName = "ROOM4";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 4; 
-
-        // 서버에 정보 전송
-        SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
-
-
+        UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
+        AreaActor = OtherActor;
+		if (IsLocallyControlled())
+		{
+            AScreenActor* ScreenActor =Cast<AScreenActor>(UGameplayStatics::GetActorOfClass(GetWorld(),AScreenActor::StaticClass()));
+			ServerAddUserInfoToRecordActor(AreaActor, UserId, ScreenActor->UserStreamID);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Black, FString::Printf(TEXT("UserID : %s"), *UserId));
+		}
         if (GEngine)
         {
             FString Message = FString::Printf(TEXT("Entered Location Info: %d"), WorldId);
@@ -303,6 +357,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         }
     }
 
+    auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+
     // 다른 액터에 "Room1" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room1")))
     {
@@ -312,15 +368,18 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         }
 
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
-        FDateTime EntryTime;  // 빈 값으로 처리
-        FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM1";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 0;  // 예시로 0
-
+        UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
+        if(IsLocallyControlled())
+	        ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
+	    AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
+        // 서버에 정보 보낸 이후엔 현위치 로비
+        ZoneName = "ROOM0";
         UE_LOG(LogTemp, Warning, TEXT("Left Room1, Location Info: %d"), WorldId);
     }
     // 다른 액터에 "Room2" 태그가 있는지 확인
@@ -329,15 +388,18 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         UE_LOG(LogTemp, Warning, TEXT("Left Room2"));
 
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
-        FDateTime EntryTime;  // 빈 값으로 처리
-        FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM2";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 0;  // 예시로 0
-
+        UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
+        if(IsLocallyControlled())
+	        ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
+	    AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
+        // 서버에 정보 보낸 이후엔 현위치 로비
+        ZoneName = "ROOM0";
         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
     }
     // 다른 액터에 "Room3" 태그가 있는지 확인
@@ -346,15 +408,18 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         UE_LOG(LogTemp, Warning, TEXT("Left Room3"));
 
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
-        FDateTime EntryTime;  // 빈 값으로 처리
-        FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM2";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 0;  // 예시로 0
-
+        UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
+        if(IsLocallyControlled())
+	       ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
+	    AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
+        // 서버에 정보 보낸 이후엔 현위치 로비
+        ZoneName = "ROOM0";
         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
     }
     // 다른 액터에 "Room4" 태그가 있는지 확인
@@ -363,15 +428,18 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         UE_LOG(LogTemp, Warning, TEXT("Left Room4"));
 
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
-        FDateTime EntryTime;  // 빈 값으로 처리
-        FDateTime ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
+        ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM2";  // 가정된 존 이름
-        FString UserId = "User123";  // 가정된 유저 아이디
-        WorldId = 0;  // 예시로 0
-
+        UserId = gi->UserID;  // 유저 아이디
+        WorldId = gi->WorldID; // 세션 아이디
+        if(IsLocallyControlled())
+	       ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
+	    AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
         
+        // 서버에 정보 보낸 이후엔 현위치 로비
+        ZoneName = "ROOM0";
         UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
     }
  }

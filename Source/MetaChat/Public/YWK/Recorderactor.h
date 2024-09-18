@@ -6,6 +6,17 @@
 #include "GameFramework/Actor.h"
 #include "Recorderactor.generated.h"
 
+USTRUCT(Atomic,BlueprintType)
+struct FUserStreamingInfo
+{
+public:
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FString UserID;
+	UPROPERTY(EditAnywhere)
+	FString UserStreamID;
+};
 UCLASS()
 class METACHAT_API ARecorderactor : public AActor
 {
@@ -14,6 +25,10 @@ class METACHAT_API ARecorderactor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ARecorderactor();
+	//UserID //StreamID = Editor,Editor1,Editor2
+	//스트리밍을 하지 않는다면 StreamID = "";
+	UPROPERTY(VisibleAnywhere)
+	TArray<FUserStreamingInfo> UserStreamingInfo;
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,7 +37,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void AddUser(FString pUserID, FString pStreamID);
 
 
+	void RemoveUser(FString pUserID);
 
+	UFUNCTION(Server, Reliable)
+	void ServerAddUserInfoToRecordActor(const FString& pUserID,const FString& pStreamUserID);
 };

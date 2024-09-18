@@ -17,15 +17,21 @@ void USessionWidget::NativeConstruct()
 	ButtonCreateSession->OnClicked.AddDynamic(this,&USessionWidget::OpenCreateSessionScreen);
 	ButtonJoinSession->OnClicked.AddDynamic(this,&USessionWidget::OpenJoinSessionScreen);
 	ButtonComfirm->OnClicked.AddDynamic(this,&USessionWidget::OnButtonConfirm);
+	ButtonClose->OnClicked.AddDynamic(this,&USessionWidget::ClosePopup);
+}
+
+void USessionWidget::ClosePopup()
+{
+	PanelSession->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void USessionWidget::OnButtonConfirm()
 {
 	WorldName = RoomNum->GetText().ToString();
-	WorldPassworld = RoomPwd->GetText().ToString();
+	WorldPassword = RoomPwd->GetText().ToString();
 	WorldName = WorldName.TrimStartAndEnd();
-	WorldPassworld = WorldPassworld.TrimStartAndEnd();
-    if (WorldName.IsEmpty() || WorldPassworld.IsEmpty())
+	WorldPassword = WorldPassword.TrimStartAndEnd();
+    if (WorldName.IsEmpty() || WorldPassword.IsEmpty())
     {
           ImageFailInput->SetVisibility(ESlateVisibility::Visible);
 	   FTimerHandle handle;
@@ -60,10 +66,16 @@ void USessionWidget::OpenJoinSessionScreen()
 
 void USessionWidget::SendFindSessionInfo(FString SendWorldID)
 {
-	FString createWorldURL = "http://125.132.216.190:8126/api/v1/worlds/";
-	FString fullURL = FString::Printf(TEXT("%s%s"), *createWorldURL, *SendWorldID);
+	//FString createWorldURL = "http://125.132.216.190:8126/api/v1/worlds/";
+	//FString fullURL = FString::Printf(TEXT("%s%s"), *createWorldURL, *SendWorldID);
+	FString fullURL = "http://125.132.216.190:8126/api/v1/worlds/";
+	fullURL = FString::Printf(TEXT("%s%s/validate-password"), *fullURL,*WorldName);
 
-    HttpActor->RsqGetFindSession(fullURL);
+	TMap<FString, FString> WorldData;
+	WorldData.Add("password", WorldPassword);
+	FString json = UJsonParseLib::MakeJson(WorldData);
+
+	HttpActor->RsqPostJoinWorld(fullURL, json);
 }
 
 
@@ -74,10 +86,11 @@ void USessionWidget::SendCreatingWorldInfo()
 
 	TMap<FString, FString> WorldData;
 	WorldData.Add("worldName", WorldName);
-	WorldData.Add("worldPassword", WorldPassworld);
+	WorldData.Add("worldPassword", WorldPassword);
 	FString json = UJsonParseLib::MakeJson(WorldData);
 
 	HttpActor->RsqPostCreateWorld(createWorldURL, json);
+
 	//FString createWorldURL2 = "http://125.132.216.190:8126/api/v1/worlds";
 	//HttpActor->RsqGetTest(createWorldURL);
 }
@@ -91,7 +104,7 @@ void USessionWidget::RecvCreatingWorldInfo(FString result, int32 resultCode)
 		
 		auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
 		gi->WorldID =RecvWorldID;
-
+		gi->WorldPW = WorldPassword;
 		CreateSession(RecvWorldID);
 		RemoveFromParent();
 	}
@@ -102,9 +115,12 @@ void USessionWidget::RecvFindSessionInfo(FString result, int32 resultCode)
 {
 	if (resultCode == 200 || resultCode == 201)
 	{
-		int32 RecvWorldID;
-		UJsonParseLib::JsonParsePassword(result, RecvWorldID, WorldName);
-		JoinSession(RecvWorldID);
+		//int32 RecvWorldID;
+		//UJsonParseLib::JsonParsePassword(result, RecvWorldID, WorldName);
+		auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+		gi->WorldID =FCString::Atoi(*WorldName);
+		gi->WorldPW = WorldPassword;
+		JoinSession(FCString::Atoi(*WorldName));
 	}
 	else if (resultCode == 404)
 	{

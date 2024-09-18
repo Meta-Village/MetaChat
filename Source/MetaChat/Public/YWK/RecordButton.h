@@ -15,26 +15,17 @@ class METACHAT_API URecordButton : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	
 	virtual void NativeConstruct() override;
 
-	//// 재생버튼
-	//UFUNCTION()
-	//void OnPlayButtonClicked();
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
+	// 위젯 스윗쳐
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UWidgetSwitcher* WidgetSwitcher_50;
 
-	//// 스탑버튼
-	//UFUNCTION()
-	//void OnStopButtonClicked();
-	//
-	//// 녹음 시작기능 호출
-	//void StartRecording();
+	// 스윗쳐 보이기
+	UFUNCTION()
+	void VisibleSwitcher(bool bIsVisible);
 
-	//// 녹음 중단기능 호출
-	//void StopRecording();
-
-	////UI들에 대한 참조
-	//UPROPERTY(meta = (BindWidget))
-	//UTextBlock* TextBlock_96;
-
-	//UPROPERTY(meta = (BindWidget))
-	//UWidgetSwitcher* WidgetSwitcher_50;
 };

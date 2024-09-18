@@ -12,6 +12,7 @@ class METACHAT_API AScreenActor : public AActor
 {
 	GENERATED_BODY()
 	FCriticalSection CriticalSection;
+
 public:	
 	// Sets default values for this actor's properties
 	AScreenActor();
@@ -26,14 +27,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString GetSharingUsers(TArray<FString> Users);
 	void SetViewSharingUserID(FString ID);
+	UFUNCTION(BlueprintCallable)
+	bool GetLookStreaming();
 	void UpdateTexture();
 	UTexture2D* CaptureScreenToTexture();
 	UTexture2D* CapturedTexture;
 	class UMaterialInstanceDynamic* DynamicMaterial;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	class USceneComponent* sceneComp;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
     class UStaticMeshComponent* WindowScreenPlaneMesh;
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainWidgetFactory;
@@ -42,16 +45,19 @@ public:
 
 	//블루프린트 함수 호출
 	void StopLookSharingScreen();
-	void BeginStreaming();
 	void BeginLookSharingScreen();
 
 	void ChangeLookSharingScreen();
 	//ViewSharingUserID
 	UPROPERTY(BlueprintReadWrite)
 	FString UserID;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture")
-    class UTextureRenderTarget2D* RenderTarget;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture")
+	UPROPERTY(BlueprintReadWrite)
+	FString UserStreamID = "";
+	UPROPERTY(BlueprintReadWrite)
+	FString ViewSharingUserStreamID;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Capture")
+	class UTextureRenderTarget2D* RenderTarget;
+	UPROPERTY(EditDefaultsOnly, Category = "Capture")
 	class USceneCaptureComponent2D* SceneCapture;
 };

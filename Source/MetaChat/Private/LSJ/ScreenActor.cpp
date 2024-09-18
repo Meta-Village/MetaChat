@@ -27,6 +27,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/IPixelStreamingStreamer.h"
 #include "LSJ/MetaChatGameInstance.h"
+#include "YWK/Recorderactor.h"
 //#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 // Sets default values
 AScreenActor::AScreenActor()
@@ -57,21 +58,20 @@ AScreenActor::AScreenActor()
 	WindowScreenPlaneMesh->SetVisibility(false);
 
 
-		RenderTarget = CreateDefaultSubobject<UTextureRenderTarget2D>(TEXT("RenderTarget"));
-  		RenderTarget->CompressionSettings = TextureCompressionSettings::TC_Default;
-  		RenderTarget->SRGB = false;
-  		RenderTarget->bAutoGenerateMips = false;
-		RenderTarget->bForceLinearGamma = true;
-		RenderTarget->TargetGamma = 2.2f;
-		RenderTarget->AddressX = TextureAddress::TA_Clamp;
-		RenderTarget->AddressY = TextureAddress::TA_Clamp;
-		RenderTarget->InitAutoFormat(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
-		SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
-		SceneCapture->SetupAttachment(RootComponent);
-		SceneCapture->CaptureSource = SCS_FinalColorLDR;
-  		//SceneCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_LegacySceneCapture;
-		SceneCapture->TextureTarget = RenderTarget;
-		//SceneCapture->bConsiderUnrenderedOpaquePixelAsFullyTranslucent = true;
+	RenderTarget = CreateDefaultSubobject<UTextureRenderTarget2D>(TEXT("RenderTarget"));
+	//RenderTarget->CompressionSettings = TextureCompressionSettings::TC_Default;
+	RenderTarget->SRGB = false;
+	RenderTarget->bAutoGenerateMips = false;
+	RenderTarget->bForceLinearGamma = true;
+	RenderTarget->TargetGamma = 2.2f;
+	RenderTarget->AddressX = TextureAddress::TA_Clamp;
+	RenderTarget->AddressY = TextureAddress::TA_Clamp;
+	RenderTarget->InitAutoFormat(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
+	SceneCapture->SetupAttachment(RootComponent);
+	SceneCapture->CaptureSource = SCS_FinalColorLDR;
+	SceneCapture->TextureTarget = RenderTarget;
+
 }
 
 void AScreenActor::UpdateTexture()
@@ -269,24 +269,7 @@ void AScreenActor::StopLookSharingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
 	}
 }
-void AScreenActor::BeginStreaming()
-{
-	// 블루프린트 함수 이름
-	FName FunctionName(TEXT("NewFunction")); // 블루프린트에서 정의한 함수명
 
-	// 블루프린트 함수 가져오기
-	UFunction* Function = FindFunction(FunctionName);
-
-	if (Function)
-	{
-		// 블루프린트 함수 호출 (매개변수가 없는 경우)
-		ProcessEvent(Function, nullptr);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
-	}
-}
 void AScreenActor::BeginLookSharingScreen()
 {
 	// 블루프린트 함수 이름
@@ -323,6 +306,7 @@ void AScreenActor::ChangeLookSharingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
 	}
 }
+
 // Called when the game starts or when spawned
 void AScreenActor::BeginPlay()
 {
@@ -347,7 +331,8 @@ void AScreenActor::BeginPlay()
 	}
 
 	auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
-	UE_LOG(LogTemp,Error,TEXT("UMetaChatGameInstance : WorldID %d"),gi->WorldID);
+	UserID = gi->UserID;
+	//UE_LOG(LogTemp,Error,TEXT("UMetaChatGameInstance : WorldID %d"),gi->WorldID);
 
 }
 
@@ -359,6 +344,38 @@ void AScreenActor::Tick(float DeltaTime)
 
 FString AScreenActor::GetSharingUsers(TArray<FString> Users)
 {
+	if (MainWidget->Streaming() && UserStreamID.IsEmpty())
+	{
+		int32 currentNum = 0;
+		for(FString ID : Users)
+		{	
+			if(false==ID.Contains(TEXT("Editor"), ESearchCase::CaseSensitive))
+				continue;
+			TArray<FString> Numstrings;
+			ID.ParseIntoArray(Numstrings,TEXT("Editor"),false);
+
+			if (Numstrings[1].Equals(""))
+			{
+				
+			}
+			else if (currentNum != FCString::Atoi(*Numstrings[1]))
+			{
+				if(FCString::Atoi(*Numstrings[1]) == 1)
+					UserStreamID = "Editor";
+				else
+					UserStreamID = "Editor" + FString::FromInt(currentNum);
+				break;
+			}
+			currentNum++;
+			//UE_LOG(LogTemp,Error,TEXT("Numstrings : %s"),*Numstrings[1]);
+		}
+		if(UserStreamID == "")
+			UserStreamID = "Editor" + FString::FromInt(currentNum);
+
+		MainWidget->CurrentStreamer->StartStreaming();
+		return "";
+	}
+
 	if(MainWidget)
 		MainWidget->InitSlot(Users);
 	if(Users.Num()>0)
@@ -366,8 +383,14 @@ FString AScreenActor::GetSharingUsers(TArray<FString> Users)
 	else
 		return "";
 }
+
 void AScreenActor::SetViewSharingUserID(FString ID)
 {
-	UserID = ID;
+	ViewSharingUserStreamID = ID;
 	ChangeLookSharingScreen();
+}
+
+bool AScreenActor::GetLookStreaming()
+{
+	return MainWidget->LookStreaming();
 }
