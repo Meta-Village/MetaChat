@@ -10,6 +10,9 @@
 
 
 
+// 플레이어의 이전 존을 저장할 변수
+FString PreviousZoneName = TEXT("");
+
 void URecordButton::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -21,17 +24,23 @@ void URecordButton::NativeConstruct()
 void URecordButton::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+
 	// 현재 플레이어 캐릭터 가져오기
-	ACustomCharacter* PlayerCharacter = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
+	ACustomCharacter* PlayerCharacter = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (PlayerCharacter)
 	{
 		// 현재 플레이어가 있는 존
-		FString ZoneName = PlayerCharacter->GetCurrentZoneName();
+		FString CurrentZoneName = PlayerCharacter->GetCurrentZoneName();
 
-		UE_LOG(LogTemp, Log, TEXT("Current Zone: %s"), *ZoneName);
+		// 존이 변경되었을 때만 로그 출력
+		if (CurrentZoneName != PreviousZoneName)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Current Zone: %s"), *CurrentZoneName);
+			PreviousZoneName = CurrentZoneName;  // 이전 존 업데이트
+		}
 
-		// 1,2번 방이면 보이게
-		if (ZoneName == "ROOM1" || ZoneName == "ROOM2")
+		// 존이 ROOM1 또는 ROOM2이면 위젯을 보이게 설정
+		if (CurrentZoneName == "ROOM1" || CurrentZoneName == "ROOM2" || CurrentZoneName == "ROOM3" || CurrentZoneName == "ROOM4")
 		{
 			VisibleSwitcher(true);
 		}
