@@ -612,10 +612,10 @@ void ACustomCharacter::UpdateCharacterAppearance()
 // ------------- 회의 구역 정보 서버에 전달 -----------------
 FString ACustomCharacter::GetCurrentZoneName() const
 {
-    return ZoneName.ToString();  // 현재 ZoneName을 반환
+    return ZoneName;  // 현재 ZoneName을 반환
 }
 
-void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 worldId)
+void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist, FString zoneName, FString userId, int32 worldId)
 {
     // HTTP 모듈 초기화
     FHttpModule* Http = &FHttpModule::Get();
@@ -641,7 +641,7 @@ void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist
     TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
     JsonObject->SetStringField(TEXT("entryTime"), EntryTimeString);
     JsonObject->SetStringField(TEXT("existTime"), ExitTimeString);
-    JsonObject->SetStringField(TEXT("zoneName"), zoneName.ToString());
+    JsonObject->SetStringField(TEXT("zoneName"), zoneName);
     JsonObject->SetStringField(TEXT("userId"), userId);
     JsonObject->SetNumberField(TEXT("worldId"), worldId);
 
@@ -655,7 +655,7 @@ void ACustomCharacter::SendLocationInfoToServer(FDateTime entry, FDateTime exist
     // 응답 처리 바인딩
     Request->OnProcessRequestComplete().BindUObject(this, &ACustomCharacter::OnResponseReceived);
 
-    UE_LOG(LogTemp, Warning, TEXT("Entered Section1, Location Info: %d, entryTime: %s, existTime: %s, zoneName: %s, UserID: %s"), worldId, *EntryTimeString, *ExitTimeString, *zoneName.ToString(), *userId);
+    UE_LOG(LogTemp, Warning, TEXT("Entered Section1, Location Info: %d, entryTime: %s, existTime: %s, zoneName: %s, UserID: %s"), worldId, *EntryTimeString, *ExitTimeString, *zoneName, *userId);
 
     // 요청 전송
     if (!Request->ProcessRequest())

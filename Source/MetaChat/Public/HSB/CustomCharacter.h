@@ -129,7 +129,7 @@ public:
     // 서버에 보낼 데이터들
     FDateTime EntryTime;
     FDateTime ExitTime;
-    FName ZoneName;
+    FString ZoneName;
     FString UserId;
     int32 WorldId;
     
@@ -150,7 +150,7 @@ public:
      UFUNCTION(Server, Reliable)
     void ServerRemoveUserInfoToRecordActor(AActor* pRecordActor, const FString& pUserID);
 private:  
-    void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FName zoneName, FString userId, int32 CurrentLocationInformation);
+    void SendLocationInfoToServer(FDateTime entry, FDateTime exist, FString zoneName, FString userId, int32 CurrentLocationInformation);
 
     // 서버 응답 처리
     void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
