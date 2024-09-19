@@ -85,20 +85,23 @@ void AYWKHttpActor::OnRsqGetTest(FHttpRequestPtr Request, FHttpResponsePtr Respo
 {
 	if (bConnectedSuccessfully)
 	{
-		//통신성공
-		FString result = Response->GetContentAsString(); //어떤 타입으로 받을 것인지
+		// 통신 성공
+		FString result = Response->GetContentAsString(); // 응답 데이터를 문자열로 받음
 
+		// 1. 서버 응답 데이터를 로그로 출력
+		UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *result);
 
-		//필요한 정보를 뽑아서 화면에 출력하고 싶다.
+		// 2. 파싱 로직은 응답 데이터를 확인한 후 추가
+		/*
 		if (YWKHttpUI)
 		{
 			YWKHttpUI->SetTextLog(UYWKJsonParseLib::JsonParsePassword(result));
 		}
-
+		*/
 	}
 	else
 	{
-		//통신성공
+		// 통신 실패
 		UE_LOG(LogTemp, Error, TEXT("bConnectedSuccessfully Fail.."));
 	}
 }
