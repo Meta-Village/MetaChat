@@ -28,7 +28,7 @@
 
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
 #include "Components/SceneCaptureComponent2D.h"
-#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingEditor/Public/PixelStreamingVideoInputViewport.h"
+//#include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreamingEditor/Public/PixelStreamingVideoInputViewport.h"
 #include "HSB/CustomCharacter.h"
 #include "YWK/Recorderactor.h"
 #include "Kismet/GameplayStatics.h"

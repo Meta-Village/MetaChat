@@ -17,7 +17,7 @@ public class MetaChat : ModuleRules
         {
             //PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "LevelEditor", "SourceControlWindows", "UnsavedAssetsTracker" });
 
-        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "PixelStreaming",  "OnlineSubsystem", "PixelStreamingEditor" }); //"UnrealEd", "LevelEditor"
+        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "PixelStreaming",  "OnlineSubsystem" }); //"UnrealEd", "LevelEditor", "PixelStreamingEditor"
         }
 
     }
