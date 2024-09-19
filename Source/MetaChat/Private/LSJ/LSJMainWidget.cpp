@@ -93,15 +93,25 @@ void ULSJMainWidget::NativeDestruct()
 	Super::NativeDestruct();
 	if(CurrentStreamer)
 		CurrentStreamer->SetVideoInput(nullptr);
+
+	TextureSharingIdle->RemoveFromRoot();
+	TextureSharingClicked->RemoveFromRoot();
+	TextureIdle->RemoveFromRoot();
+	TextureClicked->RemoveFromRoot();
 }
 void ULSJMainWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
+	
 	TextureSharingIdle = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_25__1_"));
     TextureSharingClicked = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_23"));
     TextureIdle = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_5"));
 	TextureClicked = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_38.Group_38"));
+
+	TextureSharingIdle->AddToRoot();
+	TextureSharingClicked->AddToRoot();
+	TextureIdle->AddToRoot();
+	TextureClicked->AddToRoot();
 }
 void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -223,33 +233,21 @@ void ULSJMainWidget::OnButtonWindowScreen()
 		ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
 		//ScreenActor->BeginStreaming();
 		// 1. PixelStreaming 모듈을 가져옵니다.
-		IPixelStreamingModule* PixelStreamingModule = FModuleManager::Get().LoadModulePtr<IPixelStreamingModule>("PixelStreaming");
-		//FModuleManager::GetModulePtr<IPixelStreamingModule>("PixelStreaming");
-	
-		if (PixelStreamingModule)
+		if (GIsEditor)
 		{
-			// 현재 세션의 아이디를 가져와서 Streamer를 생성한다.
-			CurrentStreamer = PixelStreamingModule->FindStreamer(streamID);//GetCurrentSessionID());
-			//TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->CreateStreamer("Test01");
-			if (CurrentStreamer.IsValid())
-			{
-				/*FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>("LevelEditor");
-				TSharedPtr<SLevelViewport> ActiveLevelViewport = LevelEditorModule.GetFirstActiveLevelViewport();
-				if (!ActiveLevelViewport.IsValid())
-				{
-					return;
-				}
+			// 에디터에서 실행 중일 때
+			UE_LOG(LogTemp, Warning, TEXT("Running in Editor!"));
 
-				FLevelEditorViewportClient& LevelViewportClient = ActiveLevelViewport->GetLevelViewportClient();
-				FSceneViewport* SceneViewport = static_cast<FSceneViewport*>(LevelViewportClient.Viewport);
-				Streamer->SetTargetViewport(SceneViewport->GetViewportWidget());
-				Streamer->SetTargetWindow(SceneViewport->FindWindow());
-				Streamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWindow);
-				Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));*/
+			IPixelStreamingModule* PixelStreamingModule = FModuleManager::Get().LoadModulePtr<IPixelStreamingModule>("PixelStreaming");
+
+			if (PixelStreamingModule)
+			{
+				// 현재 세션의 아이디를 가져와서 Streamer를 생성한다.
+				CurrentStreamer = PixelStreamingModule->FindStreamer(streamID);//GetCurrentSessionID());
+				//TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->CreateStreamer("Test01");
+				if (CurrentStreamer.IsValid())
 				{
 					SetButtonStyle(ButtonWindowScreen,TextureSharingClicked,TextureSharingClicked,TextureSharingClicked);
-
-					ScreenActor->UpdateTexture();
 				
 					//TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
 					//Back Buffer를 비디오 입력으로 설정합니다.
@@ -260,39 +258,57 @@ void ULSJMainWidget::OnButtonWindowScreen()
 					ScreenActor->SceneCapture->Activate();
 	
 					
-// 2. Pixel Streaming 비디오 입력으로 설정
-					VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
+	// 2. Pixel Streaming 비디오 입력으로 설정
+						VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
 
-					CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
+						CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
 	
-					//Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
-					CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
+						//Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
+						CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
 					
-					//시그널 서버에 연결하고 StreamID 목록에서 비어있거나 추가할 StreamID를 탐색한다. 탐색 후 그 StreamID를 UserStreamID로 저장한다.
-					ScreenActor->BeginLookSharingScreen();
-
-					//스트리밍을 시작합니다.
-					//CurrentStreamer->StartStreaming();
-
+						//시그널 서버에 연결하고 StreamID 목록에서 비어있거나 추가할 StreamID를 탐색한다. 탐색 후 그 StreamID를 UserStreamID로 저장한다.
+						ScreenActor->BeginLookSharingScreen();
 					
-					////Back Buffer를 비디오 입력으로 설정합니다.
-					//CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
-					//CurrentStreamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(CurrentStreamer));
-					//CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
-					//
-					////스트리밍을 시작합니다.
-					//CurrentStreamer->StartStreaming();
 				}
-				
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("Could not find a valid streamer with the given ID."));
+				}
 			}
 			else
 			{
-				UE_LOG(LogTemp, Error, TEXT("Could not find a valid streamer with the given ID."));
+				UE_LOG(LogTemp, Error, TEXT("PixelStreamingModule is not available."));
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("PixelStreamingModule is not available."));
+			// 패키징된 게임에서 실행 중일 때
+			UE_LOG(LogTemp, Warning, TEXT("Running in Packaged Game!"));
+
+			IPixelStreamingModule& PixelStreamingModule1 = FModuleManager::LoadModuleChecked<IPixelStreamingModule>("PixelStreaming");
+			CurrentStreamer = PixelStreamingModule1.CreateStreamer(streamID);
+			
+			SetButtonStyle(ButtonWindowScreen,TextureSharingClicked,TextureSharingClicked,TextureSharingClicked);
+				
+			//TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
+			//Back Buffer를 비디오 입력으로 설정합니다.
+			CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
+
+					
+			UGameViewportClient* GameViewport = GEngine->GameViewport;
+			ScreenActor->SceneCapture->Activate();
+	
+					
+// 2. Pixel Streaming 비디오 입력으로 설정
+			VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
+
+			CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
+	
+			//Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
+			CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
+					
+			//시그널 서버에 연결하고 StreamID 목록에서 비어있거나 추가할 StreamID를 탐색한다. 탐색 후 그 StreamID를 UserStreamID로 저장한다.
+			ScreenActor->BeginLookSharingScreen();
 		}
 	}
 	else
@@ -421,8 +437,8 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
 				SharingUserSlot->UserIDButtonDelegate_TwoParams.BindUFunction(this,FName("ClickSlot"));
 	
 				// Grid 에 슬롯 추가
-				SharingUserPanel->AddChildToUniformGrid(SharingUserSlot, SharingUserPanel->GetChildrenCount(), 0);
-
+				SharingUserPanel->AddChildToUniformGrid(SharingUserSlot,Row, 0);
+				
 				// Row 값 증가
 				Row++;
 
