@@ -136,6 +136,10 @@ public:
     // 서버에 CurrentLocationInfo 보내기
     // 다른 곳에서의 참조용 변수
     FString GetCurrentZoneName() const;
+
+    // 캐릭터 머리 위에 띄울 이모지
+    UPROPERTY(VisibleAnywhere)
+    class UWidgetComponent* EmojiUIComp;
     
     //StreamID UserID 레코드액터에 넣기
     AActor* AreaActor;

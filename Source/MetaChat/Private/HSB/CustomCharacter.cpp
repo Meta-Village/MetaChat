@@ -28,6 +28,7 @@
 #include "Components/ArrowComponent.h"
 #include "YWK/Recorderactor.h"
 #include "LSJ/ScreenActor.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -72,6 +73,10 @@ ACustomCharacter::ACustomCharacter()
     {
         SpringArm->bUsePawnControlRotation = false;
     }
+
+    // 캐릭터 머리 위 이모지
+    EmojiUIComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("EmojiUIComp"));
+    EmojiUIComp->SetupAttachment(RootComponent);
 }
 
 void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -426,7 +431,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         WorldId = gi->WorldID; // 세션 아이디
         if(IsLocallyControlled())
 	       ServerRemoveUserInfoToRecordActor(AreaActor,UserId);
-	    AreaActor = nullptr;
+	    AreaActor = nullptr; 
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
 
