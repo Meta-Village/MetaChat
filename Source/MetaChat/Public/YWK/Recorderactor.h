@@ -17,7 +17,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString UserStreamID;
 	UPROPERTY(EditAnywhere)
-	bool bClicked;
+	bool bClicked = false;
 };
 UCLASS()
 class METACHAT_API ARecorderactor : public AActor

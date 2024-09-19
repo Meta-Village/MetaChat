@@ -59,19 +59,11 @@ AScreenActor::AScreenActor()
 	WindowScreenPlaneMesh->SetVisibility(false);
 
 
-	RenderTarget = CreateDefaultSubobject<UTextureRenderTarget2D>(TEXT("RenderTarget"));
-	RenderTarget->CompressionSettings = TextureCompressionSettings::TC_Default;
-	RenderTarget->SRGB = false;
-	RenderTarget->bAutoGenerateMips = false;
-	RenderTarget->bForceLinearGamma = true;
-	RenderTarget->TargetGamma = 2.2f;
-	RenderTarget->AddressX = TextureAddress::TA_Clamp;
-	RenderTarget->AddressY = TextureAddress::TA_Clamp;
-	RenderTarget->InitAutoFormat(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCapture->SetupAttachment(RootComponent);
 	SceneCapture->CaptureSource = SCS_FinalColorLDR;
-	SceneCapture->TextureTarget = RenderTarget;
+	//SceneCapture->TextureTarget = RenderTarget;
 }
 
 void AScreenActor::UpdateTexture()
@@ -214,6 +206,13 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
     //return Texture;  // 캡처된 모니터 화면을 텍스처로 반환
 }
 
+void AScreenActor::StopLookSharingScreenWidget()
+{
+	ViewSharingUserStreamID = "";
+	StopLookSharingScreen();
+	MainWidget->LookStreaming(false);
+}
+
 void AScreenActor::StopLookSharingScreen()
 {
 	// 블루프린트 함수 이름
@@ -296,6 +295,16 @@ void AScreenActor::BeginPlay()
 	auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
 	UserID = gi->UserID;
 	//UE_LOG(LogTemp,Error,TEXT("UMetaChatGameInstance : WorldID %d"),gi->WorldID);
+
+	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
+	RenderTarget->CompressionSettings = TextureCompressionSettings::TC_Default;
+	RenderTarget->SRGB = false;
+	RenderTarget->bAutoGenerateMips = false;
+	RenderTarget->bForceLinearGamma = true;
+	RenderTarget->TargetGamma = 2.2f;
+	RenderTarget->AddressX = TextureAddress::TA_Clamp;
+	RenderTarget->AddressY = TextureAddress::TA_Clamp;
+	RenderTarget->InitAutoFormat(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 
 	if (RenderTarget && SceneCapture)
     {
