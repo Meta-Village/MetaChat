@@ -46,10 +46,10 @@ class METACHAT_API ULSJMainWidget : public UUserWidget
 	void ClickSlot(FString ID, bool bClick);
 	FString PreviousZoneName = TEXT("");
 	AActor* PreviousZoneActor;
-	TObjectPtr<class UTexture2D> TextureSharingClicked;
-	TObjectPtr<class UTexture2D> TextureSharingIdle;
-	TObjectPtr<class UTexture2D> TextureClicked;
-	TObjectPtr<class UTexture2D> TextureIdle;
+	class UTexture2D* TextureSharingClicked;
+	class UTexture2D* TextureSharingIdle;
+	class UTexture2D* TextureClicked;
+	class UTexture2D* TextureIdle;
 protected:
 	void NativeDestruct();
 	virtual void NativeOnInitialized();
