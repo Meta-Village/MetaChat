@@ -69,10 +69,13 @@ void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 				}
 				else
 				{
-					ScreenActor->ViewSharingUserStreamID = "";
+					//보기 종료
+					ScreenActor->StopLookSharingScreenWidget();
+					IDInfo.bClicked = false;
+					/*ScreenActor->ViewSharingUserStreamID = "";
 					ScreenActor->StopLookSharingScreen();
 					ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
-					LookStreaming(false);
+					LookStreaming(false);*/
 				}
 			}
 			else
@@ -97,6 +100,8 @@ void ULSJMainWidget::NativeOnInitialized()
 
 	TextureSharingIdle = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_25__1_"));
     TextureSharingClicked = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_23"));
+    TextureIdle = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_5"));
+	TextureClicked = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_38.Group_38"));
 }
 void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -408,10 +413,15 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
 				// 슬롯 가시성 및 레이아웃 확인
 				SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
 				SharingUserSlot->SetUserID(IDInfo.UserID);
+				if(IDInfo.bClicked)
+					SetButtonStyle(SharingUserSlot->ViewButton,TextureClicked,TextureClicked,TextureClicked);
+				else
+					SetButtonStyle(SharingUserSlot->ViewButton,TextureIdle,TextureIdle,TextureIdle);
 				//SharingUserSlot->FUserIDButtonDelegate_OneParam.BindUFunction(this,FName("SetUserID"));
 				SharingUserSlot->UserIDButtonDelegate_TwoParams.BindUFunction(this,FName("ClickSlot"));
+	
 				// Grid 에 슬롯 추가
-				SharingUserPanel->AddChildToUniformGrid(SharingUserSlot, Row, Column);
+				SharingUserPanel->AddChildToUniformGrid(SharingUserSlot, SharingUserPanel->GetChildrenCount(), 0);
 
 				// Row 값 증가
 				Row++;
@@ -451,4 +461,11 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
  //           //SharingUserSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
  //       }
 	//}
+}
+
+void ULSJMainWidget::LookStreaming(bool val)
+{
+	 bLookStreaming = val; 
+	 if(false==val)
+		ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 }

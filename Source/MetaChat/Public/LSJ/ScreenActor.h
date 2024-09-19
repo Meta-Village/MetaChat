@@ -33,6 +33,8 @@ public:
 	bool GetLookStreaming();
 	void UpdateTexture();
 	UTexture2D* CaptureScreenToTexture();
+	UFUNCTION(BlueprintCallable)
+	void StopLookSharingScreenWidget();
 	UTexture2D* CapturedTexture;
 	class UMaterialInstanceDynamic* DynamicMaterial;
 

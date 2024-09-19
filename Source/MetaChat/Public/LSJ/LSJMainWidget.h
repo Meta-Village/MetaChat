@@ -46,8 +46,10 @@ class METACHAT_API ULSJMainWidget : public UUserWidget
 	void ClickSlot(FString ID, bool bClick);
 	FString PreviousZoneName = TEXT("");
 	AActor* PreviousZoneActor;
-	class UTexture2D* TextureSharingClicked;
-	class UTexture2D* TextureSharingIdle;
+	TObjectPtr<class UTexture2D> TextureSharingClicked;
+	TObjectPtr<class UTexture2D> TextureSharingIdle;
+	TObjectPtr<class UTexture2D> TextureClicked;
+	TObjectPtr<class UTexture2D> TextureIdle;
 protected:
 	void NativeDestruct();
 	virtual void NativeOnInitialized();
@@ -80,5 +82,5 @@ public:
 	bool Streaming() const { return bStreaming; }
 	void Streaming(bool val) { bStreaming = val; }
 	bool LookStreaming() const { return bLookStreaming; }
-	void LookStreaming(bool val) { bLookStreaming = val; }
+	void LookStreaming(bool val);
 };
