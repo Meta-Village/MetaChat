@@ -25,6 +25,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable)
+	void UserStartStreaming(TArray<FString> Users);
+	UFUNCTION(BlueprintCallable)
 	FString GetSharingUsers(TArray<FString> Users);
 	void SetViewSharingUserID(FString ID);
 	UFUNCTION(BlueprintCallable)
@@ -57,7 +59,7 @@ public:
 	FString ViewSharingUserStreamID;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Capture")
-	class UTextureRenderTarget2D* RenderTarget;
+	TObjectPtr <class UTextureRenderTarget2D> RenderTarget;
 	UPROPERTY(EditDefaultsOnly, Category = "Capture")
 	class USceneCaptureComponent2D* SceneCapture;
 };
