@@ -148,7 +148,7 @@ void UChatPanel::RequestChatHistory()
     FString UserId = gi->UserID;
 
     //URL 구성
-    FString RequestUrl = FString::Printf(TEXT("http://125.132.216.190:8126/api/chat/"),WorldId, *UserId);
+    FString RequestUrl = FString::Printf(TEXT("http://125.132.216.190:8126/api/chat/%s"),WorldId, *UserId);
 
 
     // HTTP 액터를 통해 채팅 기록 요청
