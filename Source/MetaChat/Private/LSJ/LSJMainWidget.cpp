@@ -40,6 +40,8 @@ void ULSJMainWidget::SetUserID(FString ID)
 }
 void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 {
+	//시그널 서버와 처음부터 연결
+
 	//Button의 텍스트를 ID표시
 	//ScreenActor->ViewSharingUserStreamID는 StreamID로 표시
 	ACustomCharacter* CustomPlayer = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
@@ -60,8 +62,8 @@ void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 				if (IDInfo.bClicked)
 				{
 					ScreenActor->ViewSharingUserStreamID = IDInfo.UserStreamID;
-					ScreenActor->BeginLookSharingScreen();
-					//ScreenActor->ChangeLookSharingScreen();
+					//ScreenActor->BeginLookSharingScreen();
+					ScreenActor->ChangeLookSharingScreen();
 					ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
 					LookStreaming(true);
 				}
@@ -92,6 +94,9 @@ void ULSJMainWidget::NativeDestruct()
 void ULSJMainWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
+	TextureSharingIdle = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_25__1_"));
+    TextureSharingClicked = LoadObject<UTexture2D>(nullptr, TEXT("/Game/XR_LSJ/Image/Group_23"));
 }
 void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -100,23 +105,115 @@ void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	{
 		ScreenActor->UpdateTexture();
 	}
+
+		// 현재 플레이어 캐릭터 가져오기
+	ACustomCharacter* PlayerCharacter = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter)
+	{
+		// 현재 플레이어가 있는 존
+		FString CurrentZoneName = PlayerCharacter->GetCurrentZoneName();
+
+		// 존이 변경되었을 때만 로그 출력
+		if (CurrentZoneName != PreviousZoneName)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Current Zone: %s"), *CurrentZoneName);
+			PreviousZoneName = CurrentZoneName;  // 이전 존 업데이트
+		}
+
+		// 존이 ROOM1 또는 ROOM2이면 위젯을 보이게 설정
+		if (CurrentZoneName == "ROOM1" || CurrentZoneName == "ROOM2" || CurrentZoneName == "ROOM3" || CurrentZoneName == "ROOM4")
+		{
+			VisibleSwitcher(true);
+			PreviousZoneActor = PlayerCharacter->AreaActor;
+		}
+		else
+		{
+			//스트리밍 중지
+			if (Streaming())
+			{
+				OnButtonWindowScreen();
+			}
+			//스트리밍 보기 중지
+			ARecorderactor* AreaActor = Cast<ARecorderactor>(PreviousZoneActor);
+			if (AreaActor)
+				for (FUserStreamingInfo& IDInfo : AreaActor->UserStreamingInfo)
+				{
+					IDInfo.bClicked = false;
+				}
+			ScreenActor->ViewSharingUserStreamID = "";
+			ScreenActor->StopLookSharingScreen();
+			LookStreaming(false);
+			//스트리밍 보기 버튼 감추기
+			if(SharingUserPanel)
+				SharingUserPanel->ClearChildren();
+			VisibleSwitcher(false);
+		}
+	}
 }
+
+void ULSJMainWidget::VisibleSwitcher(bool bIsVisible)
+{
+	if (ButtonWindowScreen)
+	{
+		// 보여야 할 때
+		if (bIsVisible)
+		{
+			//보이기
+			ButtonWindowScreen->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			// 숨기기
+			ButtonWindowScreen->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+}
+
 void ULSJMainWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	
 	ButtonLookSharingScreen->OnClicked.AddDynamic(this,&ULSJMainWidget::OnButtonLookSharingScreen);
 	ButtonWindowScreen->OnClicked.AddDynamic(this, &ULSJMainWidget::OnButtonWindowScreen);
 	ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 	ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
+	ButtonLookSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 }
+// 버튼 스타일의 이미지를 변경하는 함수
+void ULSJMainWidget::SetButtonStyle(UButton* Button, UTexture2D* NormalTexture, UTexture2D* PressedTexture, UTexture2D* HoveredTexture)
+{
+    if (!Button || !NormalTexture || !PressedTexture || !HoveredTexture) return;
 
+    // 버튼 스타일 가져오기
+    FButtonStyle ButtonStyle = Button->WidgetStyle;
+
+    // Normal 상태의 이미지 설정
+    FSlateBrush NormalBrush;
+    NormalBrush.SetResourceObject(NormalTexture);
+    ButtonStyle.SetNormal(NormalBrush);
+
+    // Pressed 상태의 이미지 설정
+    FSlateBrush PressedBrush;
+    PressedBrush.SetResourceObject(PressedTexture);
+    ButtonStyle.SetPressed(PressedBrush);
+
+    // Hovered 상태의 이미지 설정
+    FSlateBrush HoveredBrush;
+	HoveredBrush.TintColor = FSlateColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.5f)); 
+    HoveredBrush.SetResourceObject(HoveredTexture);
+    ButtonStyle.SetHovered(HoveredBrush);
+
+    // 버튼에 수정된 스타일 적용
+    Button->SetStyle(ButtonStyle);
+}
 void ULSJMainWidget::OnButtonWindowScreen()
 {
 	Streaming(!Streaming());
 	FString streamID = "Editor";
 	if (Streaming())
 	{
-		TextWindowScreen->SetText(FText::FromString(TEXT("공유중")));
+		//TextWindowScreen->SetText(FText::FromString(TEXT("공유중")));
 
 		ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
 		//ScreenActor->BeginStreaming();
@@ -145,6 +242,8 @@ void ULSJMainWidget::OnButtonWindowScreen()
 				Streamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWindow);
 				Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));*/
 				{
+					SetButtonStyle(ButtonWindowScreen,TextureSharingClicked,TextureSharingClicked,TextureSharingClicked);
+
 					ScreenActor->UpdateTexture();
 				
 					//TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
@@ -194,38 +293,41 @@ void ULSJMainWidget::OnButtonWindowScreen()
 	else
 	{
 		ScreenActor->UserStreamID = "";
-		TextWindowScreen->SetText(FText::FromString(TEXT("화면공유")));
+		//TextWindowScreen->SetText(FText::FromString(TEXT("화면공유")));
 		ScreenActor->WindowScreenPlaneMesh->SetVisibility(false);
 
-		// 1. PixelStreaming 모듈을 가져옵니다.
-		IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>("PixelStreaming");
-
-		if (PixelStreamingModule)
+		if (CurrentStreamer.IsValid())
 		{
-			// 2. 스트리머를 가져옵니다.
-			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);
+			SetButtonStyle(ButtonWindowScreen,TextureSharingIdle,TextureSharingIdle,TextureSharingIdle);
 
-			if (Streamer.IsValid())
-			{
-				// 4. 스트리밍을 시작합니다.
-				Streamer->StopStreaming();
+			// 4. 스트리밍을 시작합니다.
+			CurrentStreamer->StopStreaming();
 
-				ACustomCharacter* player = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-				if (nullptr == player)
-					return;
-				if (nullptr == player->AreaActor)
-					return;
-				player->ServerUpdateUserInfoToRecordActor(player->AreaActor, ScreenActor->UserID, "");
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Could not find a valid streamer with the given ID."));
-			}
+			ACustomCharacter* player = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			if (nullptr == player)
+				return;
+			if (nullptr == player->AreaActor)
+				return;
+			player->ServerUpdateUserInfoToRecordActor(player->AreaActor, ScreenActor->UserID, "");
 		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("PixelStreamingModule is not available."));
-		}
+		//// 1. PixelStreaming 모듈을 가져옵니다.
+		//IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>("PixelStreaming");
+
+		//if (PixelStreamingModule)
+		//{
+		//	// 2. 스트리머를 가져옵니다.
+		//	TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);
+
+		//	
+		//	else
+		//	{
+		//		UE_LOG(LogTemp, Error, TEXT("Could not find a valid streamer with the given ID."));
+		//	}
+		//}
+		//else
+		//{
+		//	UE_LOG(LogTemp, Error, TEXT("PixelStreamingModule is not available."));
+		//}
 	}
 }
 

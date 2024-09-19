@@ -71,7 +71,7 @@ AScreenActor::AScreenActor()
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCapture->SetupAttachment(RootComponent);
 	SceneCapture->CaptureSource = SCS_FinalColorLDR;
-
+	SceneCapture->TextureTarget = RenderTarget;
 }
 
 void AScreenActor::UpdateTexture()
@@ -155,8 +155,8 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
 	DeleteDC(hMemoryDC);
 	ReleaseDC(NULL, hScreenDC);
 
-	FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
-	FTextureResource* TextureResource = Texture->GetResource();						
+	/*	FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
+		FTextureResource* TextureResource = Texture->GetResource();		*/
 
 	return Texture;
     //int32 ScreenWidth =  GetSystemMetrics(SM_CXSCREEN);
@@ -312,6 +312,54 @@ void AScreenActor::BeginPlay()
 void AScreenActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AScreenActor::UserStartStreaming(TArray<FString> Users)
+{
+//스트리밍 중이고 UserStreamID가 정해지지 않았다면
+	if (MainWidget->Streaming() && UserStreamID.IsEmpty())
+	{
+		int32 currentNum = 0;
+		bool bEditor = false;
+		for(FString ID : Users)
+		{	
+			if(false==ID.Contains(TEXT("Editor"), ESearchCase::CaseSensitive))
+				continue;
+			TArray<FString> Numstrings;
+			ID.ParseIntoArray(Numstrings,TEXT("Editor"),false);
+
+			if (Numstrings[1].Equals(""))
+			{
+				bEditor = true;
+			}
+			else if (currentNum != FCString::Atoi(*Numstrings[1]))
+			{
+				if(FCString::Atoi(*Numstrings[1]) == 1)
+					UserStreamID = "Editor";
+				else
+					UserStreamID = "Editor" + FString::FromInt(currentNum);
+				break;
+			}
+			currentNum++;
+			//UE_LOG(LogTemp,Error,TEXT("Numstrings : %s"),*Numstrings[1]);
+		}
+
+		if(UserStreamID == "" && false==bEditor)
+			UserStreamID = "Editor";
+		else if(UserStreamID == "" && true==bEditor)
+			UserStreamID = "Editor" + FString::FromInt(currentNum);
+		
+		MainWidget->CurrentStreamer->StartStreaming();
+
+		//캐릭터의 AreaActor 안에 UserStreamingInfo의 StreamID를 수정한다.
+		
+		ACustomCharacter* player = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (nullptr == player)
+			return;
+		if (nullptr == player->AreaActor)
+			return;
+		player->ServerUpdateUserInfoToRecordActor(player->AreaActor,UserID,UserStreamID);
+	}
 }
 
 FString AScreenActor::GetSharingUsers(TArray<FString> Users)

@@ -44,11 +44,17 @@ class METACHAT_API ULSJMainWidget : public UUserWidget
 	void SetUserID(FString ID);
 	UFUNCTION()
 	void ClickSlot(FString ID, bool bClick);
+	FString PreviousZoneName = TEXT("");
+	AActor* PreviousZoneActor;
+	class UTexture2D* TextureSharingClicked;
+	class UTexture2D* TextureSharingIdle;
 protected:
 	void NativeDestruct();
 	virtual void NativeOnInitialized();
 	virtual void NativeConstruct() override;
+	void SetButtonStyle(UButton* Button, UTexture2D* NormalTexture, UTexture2D* PressedTexture, UTexture2D* HoveredTexture);
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	void VisibleSwitcher(bool bIsVisible);
 private:
 	// 버튼을 눌렀을 때, 호출될 델리게이트에 등록할 함수
 	UFUNCTION(BlueprintCallable)
