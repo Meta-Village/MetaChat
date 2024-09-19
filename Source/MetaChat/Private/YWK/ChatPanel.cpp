@@ -104,11 +104,11 @@ void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& 
     ACustomCharacter* PlayerCharacter = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
     if (PlayerCharacter)
     {
-        ZoneName = PlayerCharacter->GetCurrentZoneName();
+        ZoneName = PlayerCharacter->GetCurrentZoneName().ToUpper();
     }
     else
     {
-        ZoneName = TEXT("Unknown");
+        ZoneName = TEXT("UNKNOWN");
     }
 
     // Json 형식 만들기
