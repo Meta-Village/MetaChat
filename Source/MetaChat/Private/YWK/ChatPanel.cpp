@@ -31,30 +31,33 @@ void UChatPanel::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMeth
     {
         FString ChatMessage = Text.ToString();
 
-        // 현재 플레이어 이름 가져오기
-        APlayerController* PlayerController = Cast<APlayerController>(GetOwningPlayer());
-        if (PlayerController)
+        // GameInstance에서 UserID 가져오기
+        auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+        if (!gi)
         {
-            // PlayerState를 가져와서 캐스팅합니다.
-            APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>();
-            if (PlayerState)
-            {
-                FString PlayerName = PlayerState->GetPlayerName();
+            UE_LOG(LogTemp, Warning, TEXT("GameInstance is null, cannot send chat"));
+            return;
+        }
 
-                // 서버로 채팅 전송(로컬)
-                SendChatToServer(PlayerName, ChatMessage);
-                // 서버로 채팅 전송(서버)
-                SendChatToServerHttp(PlayerName, ChatMessage);
-                
+        // UserID를 PlayerName으로 사용
+        FString PlayerName = gi->UserID;
 
-                // 채팅 입력 필드 초기화
-                ChatInputBox->SetText(FText::GetEmpty());
-            }
+        // **디버깅 로그로 UserID 확인**
+        UE_LOG(LogTemp, Log, TEXT("PlayerName (UserID) is: %s"), *PlayerName);
+
+        // 서버로 채팅 전송(로컬)
+        SendChatToServer(PlayerName, ChatMessage);
+
+        // 서버로 채팅 전송(서버)
+        SendChatToServerHttp(PlayerName, ChatMessage);
+
+        // 채팅 입력 필드 초기화
+        if (ChatInputBox)
+        {
+            ChatInputBox->SetText(FText::GetEmpty());
         }
     }
 }
-
-
 
 void UChatPanel::SendChatToServer(const FString& PlayerName, const FString& ChatMessage)
 {
@@ -63,6 +66,7 @@ void UChatPanel::SendChatToServer(const FString& PlayerName, const FString& Chat
 
 void UChatPanel::UpdateChat(const FString& PlayerName, const FString& ChatMessage)
 {
+    UE_LOG(LogTemp, Log, TEXT("Updating chat with PlayerName: %s and ChatMessage: %s"), *PlayerName, *ChatMessage);
     if (Chat_ScrollBox)
     {
         // 새로운 채팅 메세지를 위한 TextBlock 생성
@@ -71,8 +75,6 @@ void UChatPanel::UpdateChat(const FString& PlayerName, const FString& ChatMessag
         {
             // 메시지 형식 설정
             FString FormattedMessage = FString::Printf(TEXT("%s: %s"), *PlayerName, *ChatMessage);
-
-            // 텍스트 설정
             NewChatMessage->SetText(FText::FromString(FormattedMessage));
 
             // ScrollBox에 메세지 추가
@@ -82,8 +84,8 @@ void UChatPanel::UpdateChat(const FString& PlayerName, const FString& ChatMessag
             Chat_ScrollBox->ScrollToEnd();
         }
     }
-
 }
+
 
 void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& ChatMessage)
 {

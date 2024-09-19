@@ -27,7 +27,7 @@ public:
 	class UTextBlock* ChatMessage_Text_1;
 
 	// 플레이어 이름과 채팅 메시지를 설정하는 함수
-	void SetChatData(const FString& PlayerName, const FString& ChatMessage);
+	void SetChatData(const FString& InputPlayerName, const FString& ChatMessage);
 
 	
 };
