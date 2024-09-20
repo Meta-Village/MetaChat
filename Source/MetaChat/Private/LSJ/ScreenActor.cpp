@@ -30,6 +30,7 @@
 #include "YWK/Recorderactor.h"
 #include "HSB/CustomCharacter.h"
 #include "../../../../Plugins/Media/PixelStreaming/Source/PixelStreaming/Public/PixelStreamingVideoInputRenderTarget.h"
+
 // Sets default values
 AScreenActor::AScreenActor()
 {
@@ -58,7 +59,7 @@ AScreenActor::AScreenActor()
     }
 	WindowScreenPlaneMesh->SetVisibility(false);
 
-
+	
 
 	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCapture->SetupAttachment(RootComponent);
@@ -86,7 +87,12 @@ void AScreenActor::UpdateTexture()
 		if (DynamicMaterial && CapturedTexture&& WindowScreenPlaneMesh)
 		{
 			// BaseTexture 파라미터에 텍스처 설정
+			CapturedTexture->SRGB = true;
 			DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
+			PostProcessDynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
+			PostProcessVolume->AddOrUpdateBlendable(DynamicMaterial);
+			
+			//MainWidget->SetImageTexture(CapturedTexture);
 		}
 	}
 }
@@ -118,24 +124,34 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
 	std::vector<BYTE> Buffer(ScreenWidth * ScreenHeight * 4);
 	GetDIBits(hMemoryDC, hBitmap, 0, ScreenHeight, Buffer.data(), (BITMAPINFO*)&bi, DIB_RGB_COLORS);
 
-	 // 명도 감소 비율 (예: 0.8로 명도를 20% 감소)
-    float BrightnessFactor = 0.8f;
+	 //// 명도 감소 비율 (예: 0.8로 명도를 20% 감소)
+  //  float BrightnessFactor = 1.0f;
 
-    // 각 픽셀의 RGB 값을 명도 감소 비율로 조정
-    for (int32 i = 0; i < ScreenWidth * ScreenHeight * 4; i += 4)
-    {
-        // R, G, B 값을 감소
-        Buffer[i] = static_cast<BYTE>(Buffer[i] * BrightnessFactor);     // Red
-        Buffer[i + 1] = static_cast<BYTE>(Buffer[i + 1] * BrightnessFactor); // Green
-        Buffer[i + 2] = static_cast<BYTE>(Buffer[i + 2] * BrightnessFactor); // Blue
-        // 알파 값(Buffer[i+3])은 변경하지 않음 (투명도 유지)
-    }
+  //  // 각 픽셀의 RGB 값을 명도 감소 비율로 조정
+  //  for (int32 i = 0; i < ScreenWidth * ScreenHeight * 4; i += 4)
+  //  {
+  //      // R, G, B 값을 감소
+  //      Buffer[i] = static_cast<BYTE>(Buffer[i] * BrightnessFactor);     // Red
+  //      Buffer[i + 1] = static_cast<BYTE>(Buffer[i + 1] * BrightnessFactor); // Green
+  //      Buffer[i + 2] = static_cast<BYTE>(Buffer[i + 2] * BrightnessFactor); // Blue
+  //      // 알파 값(Buffer[i+3])은 변경하지 않음 (투명도 유지)
+  //  }
 
+  // 감마 보정 적용
+	float Gamma = 2.2f;
+
+	for (int32 i = 0; i < ScreenWidth * ScreenHeight * 4; i += 4)
+	{
+		// R, G, B 값을 감마 보정하여 조정
+		Buffer[i] = static_cast<BYTE>(FMath::Pow(Buffer[i] / 255.0f, 1.0f / Gamma) * 255.0f);     // Red
+		Buffer[i + 1] = static_cast<BYTE>(FMath::Pow(Buffer[i + 1] / 255.0f, 1.0f / Gamma) * 255.0f); // Green
+		Buffer[i + 2] = static_cast<BYTE>(FMath::Pow(Buffer[i + 2] / 255.0f, 1.0f / Gamma) * 255.0f); // Blue
+	}
 	// UTexture2D 동적 생성
 	UTexture2D* Texture = UTexture2D::CreateTransient(ScreenWidth, ScreenHeight, PF_B8G8R8A8);
 	if (!Texture)
 		return nullptr;
-
+	Texture->SRGB = true;
 	// 텍스처 데이터를 업데이트
 	void* TextureData = Texture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 	FMemory::Memcpy(TextureData, Buffer.data(), Buffer.size());
@@ -149,6 +165,12 @@ UTexture2D* AScreenActor::CaptureScreenToTexture()
 
 	/*	FTextureRenderTargetResource* RenderTargetResource = RenderTarget->GameThread_GetRenderTargetResource();
 		FTextureResource* TextureResource = Texture->GetResource();		*/
+	//Texture->NeverStream = true;
+	//Texture->MipGenSettings = TMGS_NoMipmaps;
+	//Texture->Filter = TF_Trilinear;
+	//Texture->CompressionSettings = TC_EditorIcon; 
+
+    Texture->UpdateResource();
 
 	return Texture;
     //int32 ScreenWidth =  GetSystemMetrics(SM_CXSCREEN);
@@ -314,6 +336,20 @@ void AScreenActor::BeginPlay()
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Initialization failed in BeginPlay"));
+    }
+
+
+	// 4. PostProcessVolume 생성 및 설정
+	PostProcessVolume = GetWorld()->SpawnActor<APostProcessVolume>();
+	PostProcessVolume->bUnbound = true;
+	PostProcessVolume->BlendWeight = 0.0f;
+
+	PostProcessDynamicMaterial = UMaterialInstanceDynamic::Create(LoadObject<UMaterial>(nullptr, TEXT("/Game/XR_LSJ/WindowViewer/NewMaterial")), this);
+        
+    if (PostProcessDynamicMaterial)
+    {
+        // Material을 PostProcessVolume에 추가
+        PostProcessVolume->AddOrUpdateBlendable(PostProcessDynamicMaterial);
     }
 }
 

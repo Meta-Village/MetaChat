@@ -165,7 +165,27 @@ void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		}
 	}
 }
-
+void ULSJMainWidget::SetImageTexture(class UTexture2D* Texture)
+{
+	if ( ImageWindowScreen && Texture )
+	{
+		FSlateBrush Brush = ImageWindowScreen->GetBrush();  // 현재 Brush 가져오기
+		Brush.SetResourceObject(Texture);  // Brush에 텍스처 설정
+		ImageWindowScreen->SetBrush(Brush);  // Brush를 다시 설정
+	}
+}
+UTexture2D* ULSJMainWidget::GetImageTexture()
+{
+	if ( ImageWindowScreen )
+	{
+		const FSlateBrush& Brush = ImageWindowScreen->GetBrush();  // Brush를 안전하게 가져옴
+		if ( UObject* ResourceObject = Brush.GetResourceObject() )
+		{
+			return Cast<UTexture2D>(ResourceObject);  // 텍스처 캐스팅
+		}
+	}
+	return nullptr;
+}
 void ULSJMainWidget::VisibleSwitcher(bool bIsVisible)
 {
 	if (ButtonWindowScreen)
@@ -229,9 +249,10 @@ void ULSJMainWidget::OnButtonWindowScreen()
 	if (Streaming())
 	{
 		//TextWindowScreen->SetText(FText::FromString(TEXT("공유중")));
-
-		ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
+		//ImageWindowScreen->SetVisibility(ESlateVisibility::Visible);
+		//ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
 		//ScreenActor->BeginStreaming();
+		ScreenActor->PostProcessVolume->BlendWeight = 1.0f;
 		// 1. PixelStreaming 모듈을 가져옵니다.
 		if (GIsEditor)
 		{
@@ -311,12 +332,13 @@ void ULSJMainWidget::OnButtonWindowScreen()
 			ScreenActor->BeginLookSharingScreen();
 		}
 	}
-	else
+	else //스트리밍 종료
 	{
 		ScreenActor->UserStreamID = "";
 		//TextWindowScreen->SetText(FText::FromString(TEXT("화면공유")));
-		ScreenActor->WindowScreenPlaneMesh->SetVisibility(false);
-
+		//ScreenActor->WindowScreenPlaneMesh->SetVisibility(false);
+		ScreenActor->PostProcessVolume->BlendWeight = 0.0f;
+		ImageWindowScreen->SetVisibility(ESlateVisibility::Hidden);
 		if (CurrentStreamer.IsValid())
 		{
 			SetButtonStyle(ButtonWindowScreen,TextureSharingIdle,TextureSharingIdle,TextureSharingIdle);
