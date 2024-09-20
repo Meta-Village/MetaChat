@@ -164,38 +164,41 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
 {
     if (bWasSuccessful && Response.IsValid())
     {
-        // 서버로부터 응답처리
         FString ResponseContent = Response->GetContentAsString();
         UE_LOG(LogTemp, Log, TEXT("Chat history response: %s"), *ResponseContent);
 
-        //Json 파싱
         TSharedPtr<FJsonObject> JsonObject;
         TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseContent);
-        if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid()) 
+
+        // Json 데이터 파싱
+        if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
         {
-            int32 status =JsonObject->GetIntegerField(TEXT("status"));
+            int32 status = JsonObject->GetIntegerField(TEXT("status"));
             if (status == 200)
             {
-                // data 필드에서 채팅 가져오기
                 const TArray<TSharedPtr<FJsonValue>>* ChatMessages;
                 if (JsonObject->TryGetArrayField(TEXT("data"), ChatMessages))
                 {
-                    // 기존 채팅 지우기
+                    // 기존 채팅 기록 초기화
                     Chat_ScrollBox->ClearChildren();
 
-                    // 각 채팅 메시지를 스크롤박스에 추가
+                    // 채팅 메시지들을 바로 ScrollBox에 추가
                     for (const TSharedPtr<FJsonValue>& MessageValue : *ChatMessages)
                     {
                         TSharedPtr<FJsonObject> MessageObject = MessageValue->AsObject();
                         if (MessageObject.IsValid())
                         {
-                            FString PlayerName = MessageObject->GetStringField(TEXT("userName"));
-                            FString ChatMessage = MessageObject->GetStringField(TEXT("chatContent"));
+                            // 필요한 필드들 가져오기 (userName, chatContent)
+                            FString UserName = MessageObject->GetStringField(TEXT("userName"));
+                            FString ChatContent = MessageObject->GetStringField(TEXT("chatContent"));
 
-                            // 채팅 메시지를 스크롤박스에 추가하는 함수 호출
-                            UpdateChat(PlayerName, ChatMessage);
+                            // ScrollBox에 추가
+                            UpdateChat(UserName, ChatContent);
                         }
                     }
+
+                    // 새로운 메시지가 추가되면 스크롤을 끝으로 이동
+                    Chat_ScrollBox->ScrollToEnd();
                 }
             }
             else
@@ -206,9 +209,9 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
     }
     else
     {
-        // 요청 실패 처리
         UE_LOG(LogTemp, Error, TEXT("Failed to get chat history from server"));
     }
 }
+
 
 
