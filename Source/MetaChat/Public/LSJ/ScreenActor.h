@@ -64,4 +64,9 @@ public:
 	TObjectPtr <class UTextureRenderTarget2D> RenderTarget;
 	UPROPERTY(EditDefaultsOnly, Category = "Capture")
 	class USceneCaptureComponent2D* SceneCapture;
+
+
+    UPROPERTY()
+    class APostProcessVolume* PostProcessVolume;
+	class UMaterialInstanceDynamic* PostProcessDynamicMaterial;
 };

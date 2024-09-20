@@ -38,6 +38,8 @@ class METACHAT_API ULSJMainWidget : public UUserWidget
 	class AScreenActor* ScreenActor;
 	UPROPERTY(meta = (BindWidget))
 	class UImage* ImageCoveringScreen;
+	UPROPERTY(meta = (BindWidget))
+    class UImage* ImageWindowScreen;
 	bool bStreaming;
 	bool bLookStreaming;
 	UFUNCTION()
@@ -56,6 +58,8 @@ protected:
 	virtual void NativeConstruct() override;
 	void SetButtonStyle(UButton* Button, UTexture2D* NormalTexture, UTexture2D* PressedTexture, UTexture2D* HoveredTexture);
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+
+	UTexture2D* GetImageTexture();
 	void VisibleSwitcher(bool bIsVisible);
 private:
 	// 버튼을 눌렀을 때, 호출될 델리게이트에 등록할 함수
@@ -64,6 +68,7 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void OnButtonLookSharingScreen();
 public:
+	void SetImageTexture(class UTexture2D* Texture);
 	void SetScreenActor(class AScreenActor* Actor);
 	FString GetCurrentSessionID();
 	//SharingUser 버튼 초기화
