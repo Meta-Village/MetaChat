@@ -426,7 +426,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
         ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-        ZoneName = "ROOM2";  // 가정된 존 이름
+        ZoneName = "ROOM3";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
         if(IsLocallyControlled())
@@ -446,7 +446,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 
         // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
         ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
-        ZoneName = "ROOM2";  // 가정된 존 이름
+        ZoneName = "ROOM4";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
         WorldId = gi->WorldID; // 세션 아이디
         if(IsLocallyControlled())

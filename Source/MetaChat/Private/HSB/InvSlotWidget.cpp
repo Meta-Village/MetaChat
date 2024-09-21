@@ -111,16 +111,16 @@ void UInvSlotWidget::OnItemClicked()
                 FSoftObjectPath SoftObjectPath(AssetPath);
                 UAssetManager::GetStreamableManager().RequestAsyncLoad(SoftObjectPath, [this, SoftObjectPath]()
                 {
-                            USkeletalMesh* LoadedMesh = Cast<USkeletalMesh>(SoftObjectPath.TryLoad());
-                            if (LoadedMesh)
-                            {
-                                Character->HairMeshComp->SetSkeletalMesh(LoadedMesh);
-                                UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh dynamically."));
-                            }
-                            else
-                            {
-                                UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh dynamically."));
-                            }
+                    USkeletalMesh* LoadedMesh = Cast<USkeletalMesh>(SoftObjectPath.TryLoad());
+                    if (LoadedMesh)
+                    {
+                        Character->HairMeshComp->SetSkeletalMesh(LoadedMesh);
+                        UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh dynamically."));
+                    }
+                    else
+                    {
+                        UE_LOG(LogTemp, Error, TEXT("Failed to load SkeletalMesh dynamically."));
+                    }
                 });
             }
             else
@@ -151,7 +151,7 @@ void UInvSlotWidget::OnItemClicked()
                     USkeletalMesh* LoadedMesh = Cast<USkeletalMesh>(SoftObjectPath.TryLoad());
                     if (LoadedMesh)
                     {
-                        Character->HairMeshComp->SetSkeletalMesh(LoadedMesh);
+                        Character->UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                         UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh dynamically."));
                     }
                     else
@@ -170,7 +170,7 @@ void UInvSlotWidget::OnItemClicked()
                     USkeletalMesh* LoadedMesh = Cast<USkeletalMesh>(SoftObjectPath.TryLoad());
                     if (LoadedMesh)
                     {
-                        Character->HairMeshComp->SetSkeletalMesh(LoadedMesh);
+                        Character->UpperBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                         UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh dynamically."));
                     }
                     else
@@ -202,7 +202,7 @@ void UInvSlotWidget::OnItemClicked()
                     USkeletalMesh* LoadedMesh = Cast<USkeletalMesh>(SoftObjectPath.TryLoad());
                     if (LoadedMesh)
                     {
-                        Character->HairMeshComp->SetSkeletalMesh(LoadedMesh);
+                        Character->LowerBodyMeshComp->SetSkeletalMesh(LoadedMesh);
                         UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh dynamically."));
                     }
                     else
@@ -213,15 +213,15 @@ void UInvSlotWidget::OnItemClicked()
             }
             else if (clickcnt == 1)
             {
-                USkeletalMesh* MeshAsset1 = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/XR_HSB/Character/Cloth_Pants1.Cloth_Pants1"));
-                FString AssetPath = TEXT("/Game/XR_HSB/Character/Cloth_Pants1.Cloth_Pants1");
+                USkeletalMesh* MeshAsset1 = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/XR_HSB/Character/Player_Pants_Short.Player_Pants_Short"));
+                FString AssetPath = TEXT("/Game/XR_HSB/Character/Player_Pants_Short.Player_Pants_Short");
                 FSoftObjectPath SoftObjectPath(AssetPath);
                 UAssetManager::GetStreamableManager().RequestAsyncLoad(SoftObjectPath, [this, SoftObjectPath]()
                 {
                     USkeletalMesh* LoadedMesh = Cast<USkeletalMesh>(SoftObjectPath.TryLoad());
                     if (LoadedMesh)
                     {
-                        Character->HairMeshComp->SetSkeletalMesh(LoadedMesh);
+                        Character->LowerBodyMeshComp->SetSkeletalMesh(nullptr);
                         UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh dynamically."));
                     }
                     else
@@ -253,7 +253,7 @@ void UInvSlotWidget::OnItemClicked()
                     USkeletalMesh* LoadedMesh = Cast<USkeletalMesh>(SoftObjectPath.TryLoad());
                     if (LoadedMesh)
                     {
-                        Character->HairMeshComp->SetSkeletalMesh(LoadedMesh);
+                        Character->FeetMeshComp->SetSkeletalMesh(LoadedMesh);
                         UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh dynamically."));
                     }
                     else
@@ -264,15 +264,15 @@ void UInvSlotWidget::OnItemClicked()
             }
             else if (clickcnt == 1)
             {
-                USkeletalMesh* MeshAsset1 = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/XR_HSB/Character/Player_test_shoes1.Player_test_shoes1"));
-                FString AssetPath = TEXT("/Game/XR_HSB/Character/Player_test_shoes1.Player_test_shoes1");
+                USkeletalMesh* MeshAsset1 = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/XR_HSB/Character/Player_Shoes_v1.Player_Shoes_v1"));
+                FString AssetPath = TEXT("/Game/XR_HSB/Character/Player_Shoes_v1.Player_Shoes_v1");
                 FSoftObjectPath SoftObjectPath(AssetPath);
                 UAssetManager::GetStreamableManager().RequestAsyncLoad(SoftObjectPath, [this, SoftObjectPath]()
                 {
                     USkeletalMesh* LoadedMesh = Cast<USkeletalMesh>(SoftObjectPath.TryLoad());
                     if (LoadedMesh)
                     {
-                        Character->HairMeshComp->SetSkeletalMesh(LoadedMesh);
+                        Character->FeetMeshComp->SetSkeletalMesh(nullptr);
                         UE_LOG(LogTemp, Warning, TEXT("Success to load Mesh dynamically."));
                     }
                     else

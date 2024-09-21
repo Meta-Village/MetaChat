@@ -83,12 +83,12 @@ void UCustomWidget::InitSlot()
 
     int32 Row = 0;
     int32 Column = 0;
+    int32 num = 0;
 
     // 아이템 데이터 바탕으로 슬롯 생성 및 추가
     for(const FSlot* fSlot : FilteredItems)
 	{
         // 카테고리 필터링
-        int32 num = 0;
         if(fSlot && fSlot->Category == DesiredCategory)
 		{
             InvSlot = CastChecked<UInvSlotWidget>(CreateWidget(GetWorld(), InvFactory));
@@ -125,7 +125,7 @@ void UCustomWidget::InitSlot()
                     return;
                 }
 
-                InvSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
+                //InvSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
             }
 		}
 	}
@@ -248,7 +248,7 @@ void UCustomWidget::OnButtonApply()
 		if ( Character->FeetMeshComp )
 		{
 			FString MeshPath = Character->FeetMeshComp->SkeletalMesh->GetPathName();
-			SaveGameInstance->SavedMeshes.Add("Feet" , MeshPath);
+			SaveGameInstance->SavedMeshes.Add("Shoes" , MeshPath);
 		}
 
 		// SaveGame 저장
