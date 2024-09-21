@@ -467,6 +467,9 @@ void ACustomCharacter::Load()
     UCustomSaveGame* LoadedGameInstance = Cast<UCustomSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("CharacterMeshSaveSlot"), 0));
     if (LoadedGameInstance)
     {
+        FString SaveGamePath = FPaths::ProjectSavedDir();  // Save 디렉토리 경로 확인
+        UE_LOG(LogTemp, Log, TEXT("Save game loaded from: %s"), *SaveGamePath);
+
         // HairMesh 로드 및 적용
         FString* MeshPath_h = LoadedGameInstance->SavedMeshes.Find("Hair");
         UE_LOG(LogTemp, Warning, TEXT("%s"), **MeshPath_h);

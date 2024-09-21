@@ -252,6 +252,10 @@ void UCustomWidget::OnButtonApply()
 		// SaveGame 저장
 		UGameplayStatics::SaveGameToSlot(SaveGameInstance , TEXT("CharacterMeshSaveSlot") , 0);
 		UE_LOG(LogTemp , Warning , TEXT("Mesh states have been saved."));
+
+        // 저장할 경로 확인 및 로그 출력
+        FString SaveGamePath = FPaths::ProjectSavedDir();  // Save 디렉토리 경로
+        UE_LOG(LogTemp, Log, TEXT("Save game will be saved at: %s"), *SaveGamePath);
 	}
 }
 
