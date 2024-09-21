@@ -11,19 +11,35 @@
 
 void UYWKHttpUI::NativeConstruct()
 {
-	Super::NativeConstruct();
+    Super::NativeConstruct();
 
-	if (SendButton)
-	{
-		SendButton->OnClicked.AddDynamic(this, &UYWKHttpUI::OnSendButtonClicked);
-	}
+    // 수동으로 위젯 바인딩 (Try to bind widgets manually if auto-binding is failing)
+    if (!LogCheckBox)
+    {
+        LogCheckBox = Cast<UTextBlock>(GetWidgetFromName(TEXT("LogCheckBox")));
+        if (LogCheckBox)
+        {
+            UE_LOG(LogTemp, Log, TEXT("LogCheckBox is successfully bound manually in NativeConstruct."));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("LogCheckBox is still null after manual binding in NativeConstruct!"));
+        }
+    }
 
+    // SendButton 클릭 이벤트 바인딩
+    if (SendButton)
+    {
+        SendButton->OnClicked.AddDynamic(this, &UYWKHttpUI::OnSendButtonClicked);
+    }
 }
+
 
 // 파일 전송 버튼 클릭
 void UYWKHttpUI::OnSendButtonClicked()
 {
     UE_LOG(LogTemp, Log, TEXT("Send Button Clicked"));
+
 
     // 텍스트를 "회의 요약 중..." 으로 설정
     if (LogCheckBox)
@@ -62,15 +78,25 @@ void UYWKHttpUI::OnSendButtonClicked()
 
 void UYWKHttpUI::SetTextLog(const FString& NewLog)
 {
+    // 만약 LogCheckBox가 null이면 다시 수동으로 바인딩을 시도
+    if (!LogCheckBox)
+    {
+        LogCheckBox = Cast<UTextBlock>(GetWidgetFromName(TEXT("LogCheckBox")));
+        if (!LogCheckBox)
+        {
+            UE_LOG(LogTemp, Error, TEXT("LogCheckBox is null, cannot update text"));
+            return;
+        }
+    }
+
     // 타이머 정지 (깜빡임 멈추기)
     GetWorld()->GetTimerManager().ClearTimer(BlinkTimerHandle);
 
-	if (LogCheckBox)
-	{
-		// TextBlock에 텍스트를 설정
-		LogCheckBox->SetText(FText::FromString(NewLog));
-	}
+    // 텍스트 업데이트
+    LogCheckBox->SetText(FText::FromString(NewLog));
+    UE_LOG(LogTemp, Log, TEXT("LogCheckBox updated with text: %s"), *NewLog);
 }
+
 
 void UYWKHttpUI::ToggleBlinkingText()
 {
@@ -93,13 +119,17 @@ void UYWKHttpUI::ToggleBlinkingText()
 // 요약본 관련
 void UYWKHttpUI::UpdateSummaryText(const FString& SummaryText)
 {
-    if (SummaryTextBlock) // 텍스트 블럭이 UMG에서 바인딩된 변수
+    if (SummaryTextBlock)
     {
         SummaryTextBlock->SetText(FText::FromString(SummaryText));
         if (ScrollBox)
         {
-            ScrollBox->ScrollToEnd(); // 텍스트 길어지면 자동으로 스크롤
+            ScrollBox->ScrollToEnd(); // 텍스트가 길어지면 자동으로 스크롤
         }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("SummaryTextBlock not found"));
     }
 }
 

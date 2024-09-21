@@ -26,21 +26,28 @@ AYWKHttpActor::AYWKHttpActor()
 void AYWKHttpActor::BeginPlay()
 {
 	Super::BeginPlay();
+    // BeginPlay 호출 확인
+    UE_LOG(LogTemp, Log, TEXT("AYWKHttpActor BeginPlay called"));
 
-	if (!YWKHttpUI && HttpUIFactory)
-	{
-		YWKHttpUI = Cast<UYWKHttpUI>(CreateWidget(GetWorld(), HttpUIFactory));
+    if (!YWKHttpUI && HttpUIFactory)  // YWKHttpUI가 존재하지 않으면 생성
+    {
+        YWKHttpUI = Cast<UYWKHttpUI>(CreateWidget(GetWorld(), HttpUIFactory));
 
-		if (YWKHttpUI)
-		{
-			YWKHttpUI->AddToViewport();
-			UE_LOG(LogTemp, Log, TEXT("YWKHttpUI successfully created and added to viewport."));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to create HttpUI widget."));
-		}
-	}
+        if (YWKHttpUI)
+        {
+            YWKHttpUI->AddToViewport();
+            UE_LOG(LogTemp, Log, TEXT("YWKHttpUI successfully created and added to viewport."));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create YWKHttpUI widget."));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("YWKHttpUI already exists, skipping creation."));
+    }
+
 	// 채팅 내역을 요청하기 전에 조건을 확인(플레이어가 존재하는지, worldId가 유효한지)
 	APlayerController* PlayerController = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PlayerController)
@@ -126,74 +133,49 @@ void AYWKHttpActor::RsqPostTest(FString url, FString json)
 
 void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully)
 {
-	if (bConnectedSuccessfully && Response.IsValid())
-	{
-		FString ResponseString = Response->GetContentAsString(); // 서버로부터 받은 응답
-		UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *ResponseString);
+    if (bConnectedSuccessfully && Response.IsValid())
+    {
+        FString ResponseString = Response->GetContentAsString();
+        UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *ResponseString);
 
-		// JSON 파싱
-		TSharedPtr<FJsonObject> JsonObject;
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
-		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
-		{
-			// 1. 여기는 서버 응답에서 'chatMessages' 배열을 가져옴(방 나갔다 들어올 때 채팅내역 받는 부분)
-			if (JsonObject->HasField("chatMessages"))
-			{
-				TArray<TSharedPtr<FJsonValue>> ChatArray = JsonObject->GetArrayField("chatMessages");
+        TSharedPtr<FJsonObject> JsonObject;
+        TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
+        if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+        {
+            if (JsonObject->HasField("messages"))
+            {
+                FString MeetingSummary = JsonObject->GetStringField("messages");
+                UE_LOG(LogTemp, Log, TEXT("Meeting summary: %s"), *MeetingSummary);
 
-				// 채팅 메시지가 없을 경우 처리
-				if (ChatArray.Num() == 0)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("No chat messages found."));
-					return; // 채팅 메시지가 없으면 리턴
-				}
+                // YWKHttpUI가 null인 경우 재생성
+                if (!YWKHttpUI)
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("YWKHttpUI is null, trying to create it again."));
+                    if (HttpUIFactory)
+                    {
+                        YWKHttpUI = Cast<UYWKHttpUI>(CreateWidget(GetWorld(), HttpUIFactory));
+                        if (YWKHttpUI)
+                        {
+                            YWKHttpUI->AddToViewport();
+                            UE_LOG(LogTemp, Log, TEXT("YWKHttpUI successfully recreated and added to viewport."));
+                        }
+                        else
+                        {
+                            UE_LOG(LogTemp, Error, TEXT("Failed to recreate YWKHttpUI widget."));
+                        }
+                    }
+                }
 
-				// 배열을 순회하면서 각 메시지를 ChatPanel에 추가
-				for (TSharedPtr<FJsonValue> Value : ChatArray)
-				{
-					TSharedPtr<FJsonObject> ChatObject = Value->AsObject();
-					FString PlayerName = ChatObject->GetStringField("userName");
-					FString ChatMessage = ChatObject->GetStringField("chatContent");
-
-					// ChatPanel에 채팅 메시지를 업데이트
-					UChatPanel* ChatPanel = FindObject<UChatPanel>(GetWorld(), TEXT("ChatPanel")); // ChatPanel을 찾아서
-					if (ChatPanel)
-					{
-						ChatPanel->UpdateChat(PlayerName, ChatMessage); // 채팅창에 메시지 업데이트
-					}
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("chatMessages field not found."));
-			}
-			// 2. 회의 요약 가져오기
-			if (JsonObject->HasField("messages") && !JsonObject->GetField<EJson::None>("messages")->IsNull())
-			{
-				FString MeetingSummary = JsonObject->GetStringField("messages");
-				UE_LOG(LogTemp, Log, TEXT("Meeting summary: %s"), *MeetingSummary);
-
-				//UI 업데이트 - YWKHttpUI에서 SetTextLog를 호출하여 텍스트 설정
-				if (YWKHttpUI)
-				{
-					YWKHttpUI->SetTextLog(MeetingSummary); // 회의 요약을 UI의 TextBlock에서 처리
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("messages field not found or null"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON response"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("OnResPostTest Fail.."));
-	}
+                // YWKHttpUI가 유효하면 미팅 로그 업데이트
+                if (YWKHttpUI)
+                {
+                    YWKHttpUI->SetTextLog(MeetingSummary);
+                }
+            }
+        }
+    }
 }
+
 
 bool AYWKHttpActor::LoadWavFileToBinary(const FString& FilePath, TArray<uint8>& OutBinaryData)
 {
