@@ -88,6 +88,7 @@ void UCustomWidget::InitSlot()
     for(const FSlot* fSlot : FilteredItems)
 	{
         // 카테고리 필터링
+        int32 num = 0;
         if(fSlot && fSlot->Category == DesiredCategory)
 		{
             InvSlot = CastChecked<UInvSlotWidget>(CreateWidget(GetWorld(), InvFactory));
@@ -100,6 +101,7 @@ void UCustomWidget::InitSlot()
                 TArray<FSlot> SlotArray;
                 SlotArray.Add(*fSlot);
 
+                InvSlot->clickcnt = num++;
                 InvSlot->SetItemData(SlotArray);
                 // `InvSlot`의 `Category` 값 설정
                 InvSlot->Category = DesiredCategory;
@@ -253,9 +255,7 @@ void UCustomWidget::OnButtonApply()
 		UGameplayStatics::SaveGameToSlot(SaveGameInstance , TEXT("CharacterMeshSaveSlot") , 0);
 		UE_LOG(LogTemp , Warning , TEXT("Mesh states have been saved."));
 
-        // 저장할 경로 확인 및 로그 출력
-        FString SaveGamePath = FPaths::ProjectSavedDir();  // Save 디렉토리 경로
-        UE_LOG(LogTemp, Log, TEXT("Save game will be saved at: %s"), *SaveGamePath);
+
 	}
 }
 
