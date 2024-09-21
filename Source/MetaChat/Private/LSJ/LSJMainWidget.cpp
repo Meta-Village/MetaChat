@@ -32,6 +32,8 @@
 #include "HSB/CustomCharacter.h"
 #include "YWK/Recorderactor.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PawnMovementComponent.h"
+
 
 
 void ULSJMainWidget::SetUserID(FString ID)
@@ -248,6 +250,11 @@ void ULSJMainWidget::OnButtonWindowScreen()
 	FString streamID = "Editor";
 	if (Streaming())
 	{
+		//캐릭터 가만히 있기
+		ACustomCharacter* player = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (nullptr == player)
+			return;
+		player->GetMovementComponent()->Deactivate();
 		//TextWindowScreen->SetText(FText::FromString(TEXT("공유중")));
 		//ImageWindowScreen->SetVisibility(ESlateVisibility::Visible);
 		//ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
@@ -351,6 +358,7 @@ void ULSJMainWidget::OnButtonWindowScreen()
 				return;
 			if (nullptr == player->AreaActor)
 				return;
+			player->GetMovementComponent()->Activate();
 			player->ServerUpdateUserInfoToRecordActor(player->AreaActor, ScreenActor->UserID, "");
 		}
 		//// 1. PixelStreaming 모듈을 가져옵니다.
