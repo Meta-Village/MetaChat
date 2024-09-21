@@ -13,6 +13,7 @@
 #include "HSB/CustomCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/IHttpRequest.h"
+#include "YWK/ChatMassege.h"
 
 void UChatPanel::NativeConstruct()
 {
@@ -128,11 +129,17 @@ void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& 
     TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
     FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-    // HTTP 액터를 사용해서 서버로 JSON 데이터를 보내기
-    AYWKHttpActor* HttpActor = GetWorld()->SpawnActor<AYWKHttpActor>(); // HTTP 액터를 생성하거나 찾아서 사용
+    // 월드에서 이미 생성된 AYWKHttpActor를 찾기
+    AYWKHttpActor* HttpActor = Cast<AYWKHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AYWKHttpActor::StaticClass()));
+
+    // HTTP 액터를 찾았는지 확인
     if (HttpActor)
     {
         HttpActor->RsqPostTest(TEXT("http://125.132.216.190:8126/api/chat"), OutputString);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("HttpActor not found in the world"));
     }
 }
 void UChatPanel::RequestChatHistory()
@@ -151,12 +158,18 @@ void UChatPanel::RequestChatHistory()
     FString RequestUrl = FString::Printf(TEXT("http://125.132.216.190:8126/api/chat/%d?userId=%s"),WorldId, *UserId);
 
 
-    // HTTP 액터를 통해 채팅 기록 요청
-    AYWKHttpActor* HttpActor = GetWorld()->SpawnActor<AYWKHttpActor>();
+    // 월드에서 이미 생성된 AYWKHttpActor를 찾기
+    AYWKHttpActor* HttpActor = Cast<AYWKHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AYWKHttpActor::StaticClass()));
+
+    // HTTP 액터를 찾았는지 확인
     if (HttpActor)
     {
         // 채팅 내역을 요청하는 GET 요청을 보낸다.
         HttpActor->RsqGetTest(RequestUrl);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("HttpActor not found in the world"));
     }
 }
 
@@ -180,7 +193,15 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
                 if (JsonObject->TryGetArrayField(TEXT("data"), ChatMessages))
                 {
                     // 기존 채팅 기록 초기화
-                    Chat_ScrollBox->ClearChildren();
+                    if (Chat_ScrollBox)
+                    {
+                        Chat_ScrollBox->ClearChildren();
+                        UE_LOG(LogTemp, Log, TEXT("Chat_ScrollBox successfully cleared."));
+                    }
+                    else
+                    {
+                        UE_LOG(LogTemp, Error, TEXT("Chat_ScrollBox is null!"));
+                    }
 
                     // 서버로부터 받은 각 메시지를 ScrollBox에 추가
                     for (const TSharedPtr<FJsonValue>& MessageValue : *ChatMessages)
@@ -188,26 +209,54 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
                         TSharedPtr<FJsonObject> MessageObject = MessageValue->AsObject();
                         if (MessageObject.IsValid())
                         {
-                            // userName과 chatContent 추출
                             FString UserName = MessageObject->GetStringField(TEXT("userName"));
                             FString ChatContent = MessageObject->GetStringField(TEXT("chatContent"));
 
-                            // 로그로 확인
                             UE_LOG(LogTemp, Log, TEXT("Parsed Message - User: %s, Content: %s"), *UserName, *ChatContent);
 
-                            // ScrollBox에 추가
-                            UpdateChat(UserName, ChatContent);
+                            // UChatMassege 위젯 생성
+                            UChatMassege* ChatMessageWidget = CreateWidget<UChatMassege>(GetWorld(), UChatMassege::StaticClass());
+
+                            if (ChatMessageWidget)
+                            {
+                                // 위젯에 데이터를 설정
+                                ChatMessageWidget->SetChatData(UserName, ChatContent);
+                                UE_LOG(LogTemp, Log, TEXT("ChatMessageWidget successfully set data."));
+
+                                // ScrollBox에 위젯 추가
+                                if (Chat_ScrollBox)
+                                {
+                                    Chat_ScrollBox->AddChild(ChatMessageWidget);
+                                    UE_LOG(LogTemp, Log, TEXT("Widget added to ScrollBox"));
+                                }
+                                else
+                                {
+                                    UE_LOG(LogTemp, Error, TEXT("Chat_ScrollBox is null when trying to add widget!"));
+                                }
+                            }
+                            else
+                            {
+                                UE_LOG(LogTemp, Error, TEXT("Failed to create ChatMessageWidget"));
+                            }
                         }
                     }
 
                     // 새로운 메시지가 추가되면 스크롤을 끝으로 이동
-                    Chat_ScrollBox->ScrollToEnd();
+                    if (Chat_ScrollBox)
+                    {
+                        Chat_ScrollBox->ScrollToEnd();
+                        UE_LOG(LogTemp, Log, TEXT("Scrolled to end of Chat_ScrollBox."));
+                    }
                 }
             }
             else
             {
                 UE_LOG(LogTemp, Warning, TEXT("Failed to retrieve chat history. Status: %d"), status);
             }
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON response"));
         }
     }
     else

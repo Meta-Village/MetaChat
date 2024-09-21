@@ -13,19 +13,19 @@ void UChatMassege::NativeConstruct()
 
 void UChatMassege::SetChatData(const FString& InputPlayerName, const FString& ChatMessage)
 {
-    auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
-    if (!gi)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("GameInstance is null, cannot send chat"));
-        return;
-    }
+	auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+	if (!gi)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GameInstance is null, cannot send chat"));
+		return;
+	}
 
-    FString PlayerName = gi->UserID;
+	FString PlayerName = gi->UserID;
 
     if (PlayerName_Text)
     {
-        PlayerName_Text->SetText(FText::FromString(PlayerName));
-        UE_LOG(LogTemp, Log, TEXT("PlayerName set in widget: %s"), *PlayerName);
+        PlayerName_Text->SetText(FText::FromString(InputPlayerName));
+        UE_LOG(LogTemp, Log, TEXT("PlayerName set in widget: %s"), *InputPlayerName);
     }
 
     if (ChatMessage_Text_1)
