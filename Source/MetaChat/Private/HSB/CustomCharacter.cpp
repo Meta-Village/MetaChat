@@ -247,7 +247,7 @@ void ACustomCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
         // 오버랩 된 액터의 방향과 같은 방향으로 앉도록
         FRotator Rot = OtherActor->GetActorRotation();
         FVector Loc = OtherActor->GetActorLocation();
-// //         Rot.Yaw += 180.f;
+        Rot.Yaw += 90.f;
         this->SetActorLocationAndRotation(Loc, Rot);
 
 
