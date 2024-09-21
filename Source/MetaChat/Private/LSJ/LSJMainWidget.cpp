@@ -68,6 +68,7 @@ void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 					ScreenActor->ChangeLookSharingScreen();
 					ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
 					LookStreaming(true);
+					ImageCoveringScreen->SetVisibility(ESlateVisibility::Visible);
 				}
 				else
 				{
@@ -512,6 +513,10 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
 void ULSJMainWidget::LookStreaming(bool val)
 {
 	 bLookStreaming = val; 
-	 if(false==val)
+	 if (false == val)
+	 {
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
+		ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
+	 }
+		
 }

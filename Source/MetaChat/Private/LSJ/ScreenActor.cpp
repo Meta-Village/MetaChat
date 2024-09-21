@@ -88,7 +88,7 @@ void AScreenActor::UpdateTexture()
 		{
 			// BaseTexture 파라미터에 텍스처 설정
 			CapturedTexture->SRGB = true;
-			DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
+			//DynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
 			PostProcessDynamicMaterial->SetTextureParameterValue(TEXT("Base"), CapturedTexture);
 			PostProcessVolume->AddOrUpdateBlendable(DynamicMaterial);
 			
