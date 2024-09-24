@@ -36,9 +36,6 @@ void AHttpActor::BeginPlay()
 		{
 			HttpUI->AddToViewport(2);
 			HttpUI->SetHttpActor(this);
-			//FVector position = GetActorLocation() + GetActorUpVector() * 100;
-			//AActor* spawnViewer = GetWorld()->SpawnActor<AActor>(windowViewer, position, GetActorRotation());
-			//HttpUI->SetViewer(spawnViewer);
 		}
 	}
 	else if (CurrentWorldName == RogoMap)

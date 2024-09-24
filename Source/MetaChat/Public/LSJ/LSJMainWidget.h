@@ -45,6 +45,8 @@ class METACHAT_API ULSJMainWidget : public UUserWidget
 	UFUNCTION()
 	void SetUserID(FString ID);
 	UFUNCTION()
+	void OnWindowFocusChanged(bool bIsFocused);
+	UFUNCTION()
 	void ClickSlot(FString ID, bool bClick);
 	FString PreviousZoneName = TEXT("");
 	AActor* PreviousZoneActor;
