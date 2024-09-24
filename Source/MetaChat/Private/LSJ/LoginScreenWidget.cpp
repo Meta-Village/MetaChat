@@ -15,6 +15,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "LSJ/MetaChatGameInstance.h"
 
+void ULoginScreenWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+    Super::NativeTick(MyGeometry,InDeltaTime);
+    currentTime+=InDeltaTime;
+}
+
 void ULoginScreenWidget::NativeConstruct()
 {
     Super::NativeConstruct();
@@ -84,7 +90,9 @@ void ULoginScreenWidget::OnButtonLoginResponse(FString result,int code)
             auto* gi = Cast<UMetaChatGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
             gi->UserID =  WBP_Login->EditID->GetText().ToString();
             gi->UserToken = UserToken;
+            gi->currentTime = currentTime;
             UGameplayStatics::OpenLevel(GetWorld(),*HttpActor->CustomCharacterMap);
+
         }
             
    }

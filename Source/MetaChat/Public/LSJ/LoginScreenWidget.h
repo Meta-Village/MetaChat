@@ -31,6 +31,7 @@ class METACHAT_API ULoginScreenWidget : public UUserWidget
 	class UImage* ImageFailInput;
 	
 protected:
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);	
 	virtual void NativeConstruct();
 public:
 	UFUNCTION()
@@ -44,7 +45,7 @@ public:
 	void OnButtonRegisterClose();
 	UFUNCTION()
 	void OnButtonRegisterSend();
-
+	float currentTime;
 	void OnButtonRegisterResponse(FString result, int code);
 	class AHttpActor* HttpActor;
 	void SetHttpActor(AHttpActor* MyHttpActor);
