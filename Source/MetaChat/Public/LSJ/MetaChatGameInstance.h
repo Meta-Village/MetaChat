@@ -23,6 +23,7 @@ class METACHAT_API UMetaChatGameInstance : public UGameInstance
 
 public:
 	UMetaChatGameInstance();
+
 	class IOnlineSubsystem* OnlineSub;
 	IOnlineSessionPtr OnlineSessionInterface;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
@@ -35,6 +36,7 @@ public:
 	//FOnDestroySessionCompleteDelegate	DestroySessionCompleteDelegate;
 	void JoinGameSession();
 	void DestroyGameSession();
+
 	void CreateGameSession();
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionsComplete(bool bWasSuccessful);
@@ -52,6 +54,12 @@ public:
 	int32 WorldID;
 	UPROPERTY(BlueprintReadWrite)
 	FString WorldPW;
+
+	UPROPERTY(BlueprintReadWrite)
+	class USoundBase* MainBackgroundSound;
+
+	UPROPERTY(BlueprintReadWrite)
+	float currentTime;
 	/*
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnFindSessionComplete(bool bWasSuccessful);

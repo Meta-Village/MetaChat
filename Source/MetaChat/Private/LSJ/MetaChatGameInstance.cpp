@@ -5,13 +5,22 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "Online/OnlineSessionNames.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 UMetaChatGameInstance::UMetaChatGameInstance()
 	/*: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
 	, FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete))
 	, JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplate))*/
 {
+	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset(TEXT("/Game/Sound/LoginBGM"));
+    if (SoundAsset.Succeeded())
+    {
+        MainBackgroundSound = SoundAsset.Object;  // 로드된 사운드를 StaticSound에 할당
+        UE_LOG(LogTemp, Warning, TEXT("Sound Loaded and Assigned to StaticSound"));
+    }
 
 }
+
 void UMetaChatGameInstance::CreateGameSession()
 {
 	OnlineSub = IOnlineSubsystem::Get();
@@ -146,6 +155,8 @@ void UMetaChatGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSess
 void UMetaChatGameInstance::Init()
 {
 	Super::Init();
+
+
 
 	// OnlineSubsystem에 Access
 	//IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
