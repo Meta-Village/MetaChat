@@ -33,6 +33,7 @@
 #include "YWK/Recorderactor.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Framework/Application/SlateApplication.h"
 
 
 
@@ -40,6 +41,22 @@ void ULSJMainWidget::SetUserID(FString ID)
 {
 	ScreenActor->SetViewSharingUserID(ID);
 }
+
+void ULSJMainWidget::OnWindowFocusChanged(bool bIsFocused)
+{
+	if (bIsFocused)
+	{
+		if(Streaming())
+			ScreenActor->PostProcessVolume->BlendWeight = 0.0f;
+	}
+	else
+	{
+		if(Streaming())
+			ScreenActor->PostProcessVolume->BlendWeight = 1.0f;
+	}
+
+}
+
 void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 {
 	//시그널 서버와 처음부터 연결
@@ -115,6 +132,9 @@ void ULSJMainWidget::NativeOnInitialized()
 	TextureSharingClicked->AddToRoot();
 	TextureIdle->AddToRoot();
 	TextureClicked->AddToRoot();
+
+	FSlateApplication::Get().OnApplicationActivationStateChanged()
+		.AddUObject( this, &ULSJMainWidget::OnWindowFocusChanged );
 }
 void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -167,6 +187,8 @@ void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			VisibleSwitcher(false);
 		}
 	}
+
+
 }
 void ULSJMainWidget::SetImageTexture(class UTexture2D* Texture)
 {
@@ -260,7 +282,7 @@ void ULSJMainWidget::OnButtonWindowScreen()
 		//ImageWindowScreen->SetVisibility(ESlateVisibility::Visible);
 		//ScreenActor->WindowScreenPlaneMesh->SetVisibility(true);
 		//ScreenActor->BeginStreaming();
-		ScreenActor->PostProcessVolume->BlendWeight = 1.0f;
+		//ScreenActor->PostProcessVolume->BlendWeight = 1.0f;
 		// 1. PixelStreaming 모듈을 가져옵니다.
 		if (GIsEditor)
 		{
