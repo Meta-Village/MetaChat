@@ -48,11 +48,27 @@ void ULSJMainWidget::OnWindowFocusChanged(bool bIsFocused)
 	{
 		if(Streaming())
 			ScreenActor->PostProcessVolume->BlendWeight = 0.0f;
+		ACustomCharacter* player = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (nullptr == player)
+			return;
+		if (!player->GetMovementComponent()->IsActive())
+		{
+			//캐릭터 가만히 있기
+			player->GetMovementComponent()->Activate();
+		}
+
 	}
 	else
 	{
 		if(Streaming())
 			ScreenActor->PostProcessVolume->BlendWeight = 1.0f;
+		ACustomCharacter* player = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (nullptr == player)
+			return;
+		if (player->GetMovementComponent()->IsActive())
+		{
+			player->GetMovementComponent()->Deactivate();
+		}
 	}
 
 }
