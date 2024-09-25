@@ -44,7 +44,6 @@ void USharingUserSlot::SetButtonStyle(UButton* Button, UTexture2D* NormalTexture
 }
 void USharingUserSlot::ViewButtonOnClick()
 {
-	
 	bClicked = !bClicked;
 	//FUserIDButtonDelegate_OneParam.Execute(TextUserID->GetText().ToString());
 	if (bClicked)

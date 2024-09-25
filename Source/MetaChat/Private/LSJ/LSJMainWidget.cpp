@@ -42,7 +42,13 @@ void ULSJMainWidget::SetUserID(FString ID)
 {
 	ScreenActor->SetViewSharingUserID(ID);
 }
-
+void ULSJMainWidget::SetConnectText(bool Value)
+{
+	if(Value)
+		TextConnectingStreamID->SetVisibility(ESlateVisibility::Visible);
+	else
+		TextConnectingStreamID->SetVisibility(ESlateVisibility::Hidden);
+}
 void ULSJMainWidget::OnWindowFocusChanged(bool bIsFocused)
 {
 	if (bIsFocused)
@@ -75,6 +81,11 @@ void ULSJMainWidget::OnWindowFocusChanged(bool bIsFocused)
 
 void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 {
+	//이미 연결중이라면 Text표시 //아니라면 진행
+	if(ScreenActor&& true == ScreenActor->bConnectingStreamID)
+		return;
+	ScreenActor->bConnectingStreamID = true;
+	
 	//시그널 서버와 처음부터 연결
 
 	//Button의 텍스트를 ID표시
@@ -95,6 +106,8 @@ void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 			{
 				if (bClick)
 				{
+					TextConnectingStreamID->SetText(FText::FromString(TEXT("연 결 중...")));
+					TextConnectingStreamID->SetVisibility(ESlateVisibility::Visible);
 					ScreenActor->ViewSharingUserStreamID = IDInfo.UserStreamID;
 					//ScreenActor->BeginLookSharingScreen();
 					ScreenActor->ChangeLookSharingScreen();
@@ -104,6 +117,8 @@ void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 				}
 				else
 				{
+					TextConnectingStreamID->SetText(FText::FromString(TEXT("연결끊는중...")));
+					TextConnectingStreamID->SetVisibility(ESlateVisibility::Visible);
 					//보기 종료
 					ScreenActor->StopLookSharingScreenWidget();
 					/*ScreenActor->ViewSharingUserStreamID = "";
@@ -503,7 +518,7 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
 				// 슬롯 가시성 및 레이아웃 확인
 				SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
 				SharingUserSlot->SetUserID(IDInfo.UserID);
-				if(IDInfo.bClicked)
+				if(IDInfo.bClicked || ScreenActor->ViewSharingUserStreamID.Equals(IDInfo.UserStreamID))
 					SetButtonStyle(SharingUserSlot->ViewButton,TextureClicked,TextureClicked,TextureClicked);
 				else
 					SetButtonStyle(SharingUserSlot->ViewButton,TextureIdle,TextureIdle,TextureIdle);

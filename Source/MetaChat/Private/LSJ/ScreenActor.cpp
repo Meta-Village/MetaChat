@@ -290,6 +290,11 @@ void AScreenActor::ChangeLookSharingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
 	}
 }
+void AScreenActor::ConnectedStreamID()
+{
+	bConnectingStreamID = false;
+	MainWidget->SetConnectText(false);
+}
 
 // Called when the game starts or when spawned
 void AScreenActor::BeginPlay()
