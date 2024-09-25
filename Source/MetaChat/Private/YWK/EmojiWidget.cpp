@@ -42,7 +42,6 @@ void UEmojiWidget::OnReCeiveEmoji(const FString& Filename)
 {
 	// 서버에서 이모티콘 받아올 함수
 	ServerShowEmoji(Filename);
-
 }
 
 void UEmojiWidget::LoadEmojiFromUrl(const FString& ImageUrl)
@@ -87,7 +86,7 @@ void UEmojiWidget::OnImageDownloaded(FHttpRequestPtr Request, FHttpResponsePtr R
 	}
 }
 
-// 이모티콘 숨기기 함수
+// 이모티콘 숨기기 
 void UEmojiWidget::HideEmoji()
 {
 	if (IMG_Emoji)

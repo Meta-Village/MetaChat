@@ -40,6 +40,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void RecordStart();
+	void RecordStop();
 	void AddUser(FString pUserID, FString pStreamID);
 
 

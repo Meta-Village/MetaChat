@@ -10,6 +10,8 @@
 #include "Interfaces/IHttpResponse.h"  // IHttpResponse 헤더 파일 포함
 #include "JsonUtilities.h"
 #include "Serialization/JsonSerializer.h"
+#include "YWK/YWKHttpActor.h"
+#include "YWK/Recorderactor.h"
 
 void UMeetingButton::NativeConstruct()
 {
@@ -68,6 +70,18 @@ void UMeetingButton::MeetingEnd_Clicked()
 
 	// 종료 시간과 함께 PATCH요청을 보내기
 	SendMeetingEnd(this->meetingId, meetEndTime);
+
+	auto* pc = Cast<ACustomCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (pc)
+	{
+		if (pc->AreaActor)
+		{
+			auto* recordactor = Cast<ARecorderactor>(pc->AreaActor);
+			recordactor->RecordStop();
+		}
+
+	}
+
 }
 
 void UMeetingButton::OnMeetingStart(int32 InMeetingId, const FString& meetStartTime, const FString& meetEndTime, const FString& ZoneName, int32 WorldId)
@@ -75,12 +89,13 @@ void UMeetingButton::OnMeetingStart(int32 InMeetingId, const FString& meetStartT
 	this->meetingId = InMeetingId;
 	//Json형식으로 만들기
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
-	JsonObject->SetNumberField(TEXT("meetingId"), InMeetingId);
+	//JsonObject->SetNumberField(TEXT("meetingId"), InMeetingId);
 	JsonObject->SetStringField(TEXT("meetStartTime"),meetStartTime);
-	JsonObject->SetStringField(TEXT("meetEndTime"),meetEndTime); // 시작때는 빈칸
-	JsonObject->SetStringField(TEXT("ZoneName"),ZoneName);
-	JsonObject->SetNumberField(TEXT("WorldId"),WorldId);
+	JsonObject->SetStringField(TEXT("meetEndTime"), meetStartTime); // 시작때는 빈칸
+	JsonObject->SetStringField(TEXT("zoneName"),ZoneName);
+	JsonObject->SetNumberField(TEXT("worldId"),WorldId);
 
+	
 	// JSON 직렬화 (문자열로 변환)
 	FString OutputString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
@@ -141,9 +156,34 @@ void UMeetingButton::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePt
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
 			int32 Status = JsonObject->GetIntegerField(TEXT("status"));
+			int32 ID = JsonObject->GetIntegerField(TEXT("data"));
+			AYWKHttpActor* HttpActor = Cast<AYWKHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AYWKHttpActor::StaticClass()));
+			if (HttpActor)
+			{
+				// NewMeetingID 가져오기
+				 HttpActor->NewMeetingID = ID;
+				UE_LOG(LogTemp, Log, TEXT("New Meeting ID: %d"), ID);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Failed to find AYWKHttpActor in the world."));
+			}
 			FString Message = JsonObject->GetStringField(TEXT("message"));
 			UE_LOG(LogTemp, Log, TEXT("Status: %d, Message: %s"), Status, *Message);
 		}
+
+		auto* pc = Cast<ACustomCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		if (pc)
+		{
+			if (pc->AreaActor)
+			{
+				auto* recordactor = Cast<ARecorderactor>(pc->AreaActor);
+				recordactor->RecordStart();
+			}
+			
+		}
+	
+
 	}
 	else
 	{

@@ -30,7 +30,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* Bt_MeetingEnd;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void MeetingStart_Clicked();
 
 	UFUNCTION()
