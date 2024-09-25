@@ -12,6 +12,11 @@
 #include "Serialization/JsonSerializer.h"
 #include "YWK/YWKHttpActor.h"
 #include "YWK/Recorderactor.h"
+#include "Components/WidgetSwitcher.h"
+
+
+// 플레이어의 이전 존을 저장할 변수
+FString PreviousZoneNamed = TEXT("");
 
 void UMeetingButton::NativeConstruct()
 {
@@ -20,6 +25,38 @@ void UMeetingButton::NativeConstruct()
 	meetingId = 0;
 	Bt_MeetingStart->OnClicked.AddDynamic(this, &UMeetingButton::MeetingStart_Clicked);
 	Bt_MeetingEnd->OnClicked.AddDynamic(this, &UMeetingButton::MeetingEnd_Clicked);
+	
+	VisibleSwitcher(false);
+}
+
+void UMeetingButton::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	// 현재 플레이어 캐릭터 가져오기
+	ACustomCharacter* PlayerCharacter = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter)
+	{
+		// 현재 플레이어가 있는 존
+		FString CurrentZoneName = PlayerCharacter->GetCurrentZoneName();
+
+		// 존이 변경되었을 때만 로그 출력
+		if (CurrentZoneName != PreviousZoneNamed)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Current Zone: %s"), *CurrentZoneName);
+			PreviousZoneNamed = CurrentZoneName;  // 이전 존 업데이트
+		}
+
+		// 존이 ROOM1 또는 ROOM2이면 위젯을 보이게 설정
+		if (CurrentZoneName == "ROOM1" || CurrentZoneName == "ROOM2" || CurrentZoneName == "ROOM3" || CurrentZoneName == "ROOM4" || CurrentZoneName == "ROOM5")
+		{
+			VisibleSwitcher(true);
+		}
+		else
+		{
+			VisibleSwitcher(false);
+		}
+	}
 }
 
 void UMeetingButton::MeetingStart_Clicked()
@@ -189,6 +226,24 @@ void UMeetingButton::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePt
 	{
 		// 요청 실패 처리
 		UE_LOG(LogTemp, Error, TEXT("Failed to receive valid response from server"));
+	}
+}
+
+void UMeetingButton::VisibleSwitcher(bool bIsVisible)
+{
+	if (WidgetSwitcher_59)
+	{
+		// 보여야 할 때
+		if (bIsVisible)
+		{
+			//보이기
+			WidgetSwitcher_59->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			// 숨기기
+			WidgetSwitcher_59->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 }
 
