@@ -10,7 +10,7 @@
 #include "Components/EditableText.h"
 #include "Components/Image.h"
 #include "LSJ/MetaChatGameInstance.h"
-
+#include "Kismet/GameplayStatics.h"
 void USessionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -22,11 +22,20 @@ void USessionWidget::NativeConstruct()
 
 void USessionWidget::ClosePopup()
 {
+	OnClickPlaySound();
 	PanelSession->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void USessionWidget::OnClickPlaySound()
+{
+	auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
+	if(gi)
+		UGameplayStatics::PlaySound2D(GetWorld(),gi->ButtonSound);
 }
 
 void USessionWidget::OnButtonConfirm()
 {
+	OnClickPlaySound();
 	WorldName = RoomNum->GetText().ToString();
 	WorldPassword = RoomPwd->GetText().ToString();
 	WorldName = WorldName.TrimStartAndEnd();
@@ -52,6 +61,7 @@ void USessionWidget::OnButtonConfirm()
 
 void USessionWidget::OpenCreateSessionScreen()
 {
+	OnClickPlaySound();
 	bCreateSession = true;
 	PanelSession->SetVisibility(ESlateVisibility::Visible);
 	TextSessionName->SetText(FText::FromString(TEXT("회의실명")));
@@ -59,6 +69,7 @@ void USessionWidget::OpenCreateSessionScreen()
 
 void USessionWidget::OpenJoinSessionScreen()
 {
+	OnClickPlaySound();
 	bCreateSession = false;
 	PanelSession->SetVisibility(ESlateVisibility::Visible);
 	TextSessionName->SetText(FText::FromString(TEXT("코드")));
