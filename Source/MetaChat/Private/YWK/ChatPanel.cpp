@@ -100,6 +100,7 @@ void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& 
     int32 WorldId = gi->WorldID;
     FString UserId = gi->UserID;
     FString UserName = gi->UserID;
+    UE_LOG(LogTemp, Log, TEXT("UserID is: %s"), *UserId);
     // ZoneName을 초기화
     FString ZoneName = TEXT("");
     ACustomCharacter* PlayerCharacter = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
