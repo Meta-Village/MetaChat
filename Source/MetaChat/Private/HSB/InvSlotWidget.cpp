@@ -56,6 +56,12 @@ void UInvSlotWidget::SetItemData(const TArray<FSlot>& ItemsData)
 void UInvSlotWidget::OnItemClicked()
 {
     UE_LOG(LogTemp, Warning, TEXT("OnItemClicked called"));
+    USoundBase* ClickSound = LoadObject<USoundBase>(nullptr, TEXT("/Game/Sound/ClickSFX.ClickSFX"));
+
+    if (ClickSound)
+    {
+        UGameplayStatics::PlaySound2D(this, ClickSound, 1.0f, 1.0f, 0.0f);
+    }
 
     // 카테고리를 구분한다
     Character = CastChecked<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld() , 0));
