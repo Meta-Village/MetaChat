@@ -14,6 +14,7 @@
 #include <vector> 
 #include "YWKHttpUI.h"
 #include "YWK/ChatPanel.h"
+#include "YWK/MeetingButton.h"
 // Sets default values
 AYWKHttpActor::AYWKHttpActor()
 {
@@ -46,6 +47,26 @@ void AYWKHttpActor::BeginPlay()
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("YWKHttpUI already exists, skipping creation."));
+    }
+
+    // 미팅버튼
+    if (!MeetingUI && MeetingUIFactory)  // MeetingUI가 존재하지 않으면 생성
+    {
+        MeetingUI = Cast<UMeetingButton>(CreateWidget(GetWorld(), MeetingUIFactory));
+
+        if (MeetingUI)
+        {
+            MeetingUI->AddToViewport();
+            UE_LOG(LogTemp, Log, TEXT("MeetingUI successfully created and added to viewport."));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create MeetingUI widget."));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("MeetingUI already exists, skipping creation."));
     }
 
 	// 채팅 내역을 요청하기 전에 조건을 확인(플레이어가 존재하는지, worldId가 유효한지)
@@ -219,7 +240,7 @@ void AYWKHttpActor::RsqPostwavfile(FString url, FString FilePath, FString Meetin
 
     // FormData에 추가할 각 파트를 작성
     // 1. meetingId 파트 (텍스트)
-    FString MeetingIdPart = FString::Printf(TEXT("--%s\r\nContent-Disposition: form-data; name=\"meetingId\"\r\n\r\n%s\r\n"), *Boundary, *MeetingId);
+    FString MeetingIdPart = FString::Printf(TEXT("--%s\r\nContent-Disposition: form-data; name=\"meetingId\"\r\n\r\n%d\r\n"), *Boundary, NewMeetingID);
 
     // 2. voice 파트 (파일)
     FString FilePartHeader = FString::Printf(
