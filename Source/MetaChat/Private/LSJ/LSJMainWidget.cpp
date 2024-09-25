@@ -34,6 +34,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Framework/Application/SlateApplication.h"
+#include "LSJ/MetaChatGameInstance.h"
 
 
 
@@ -286,7 +287,10 @@ void ULSJMainWidget::SetButtonStyle(UButton* Button, UTexture2D* NormalTexture, 
 void ULSJMainWidget::OnButtonWindowScreen()
 {
 	Streaming(!Streaming());
+	auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
 	FString streamID = "Editor";
+	if(gi)
+		streamID = gi->UserID;
 	if (Streaming())
 	{
 		//캐릭터 가만히 있기
@@ -300,82 +304,84 @@ void ULSJMainWidget::OnButtonWindowScreen()
 		//ScreenActor->BeginStreaming();
 		//ScreenActor->PostProcessVolume->BlendWeight = 1.0f;
 		// 1. PixelStreaming 모듈을 가져옵니다.
-		if (GIsEditor)
+		//if (GIsEditor)
 		{
 			// 에디터에서 실행 중일 때
-			UE_LOG(LogTemp, Warning, TEXT("Running in Editor!"));
+			//UE_LOG(LogTemp, Warning, TEXT("Running in Editor!"));
 
-			IPixelStreamingModule* PixelStreamingModule = FModuleManager::Get().LoadModulePtr<IPixelStreamingModule>("PixelStreaming");
+	//		IPixelStreamingModule* PixelStreamingModule = FModuleManager::Get().LoadModulePtr<IPixelStreamingModule>("PixelStreaming");
 
-			if (PixelStreamingModule)
-			{
-				// 현재 세션의 아이디를 가져와서 Streamer를 생성한다.
-				CurrentStreamer = PixelStreamingModule->FindStreamer(streamID);//GetCurrentSessionID());
-				//TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->CreateStreamer("Test01");
-				if (CurrentStreamer.IsValid())
-				{
-					SetButtonStyle(ButtonWindowScreen,TextureSharingClicked,TextureSharingClicked,TextureSharingClicked);
-				
-					//TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
-					//Back Buffer를 비디오 입력으로 설정합니다.
-					CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
+	//		if (PixelStreamingModule)
+	//		{
+	//			// 현재 세션의 아이디를 가져와서 Streamer를 생성한다.
+	//			CurrentStreamer = PixelStreamingModule->FindStreamer(streamID);//GetCurrentSessionID());
+	//			//TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->CreateStreamer("Test01");
+	//			if (CurrentStreamer.IsValid())
+	//			{
+	//				SetButtonStyle(ButtonWindowScreen,TextureSharingClicked,TextureSharingClicked,TextureSharingClicked);
+	//			
+	//				//TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
+	//				//Back Buffer를 비디오 입력으로 설정합니다.
+	//				CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
 
-					
-					UGameViewportClient* GameViewport = GEngine->GameViewport;
-					ScreenActor->SceneCapture->Activate();
-	
-					
-	// 2. Pixel Streaming 비디오 입력으로 설정
-						VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
+	//				
+	//				UGameViewportClient* GameViewport = GEngine->GameViewport;
+	//				ScreenActor->SceneCapture->Activate();
+	//
+	//				
+	//// 2. Pixel Streaming 비디오 입력으로 설정
+	//					VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
 
-						CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
-	
-						//Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
-						CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
-					
-						//시그널 서버에 연결하고 StreamID 목록에서 비어있거나 추가할 StreamID를 탐색한다. 탐색 후 그 StreamID를 UserStreamID로 저장한다.
-						ScreenActor->BeginLookSharingScreen();
-					
-				}
-				else
-				{
-					UE_LOG(LogTemp, Error, TEXT("Could not find a valid streamer with the given ID."));
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("PixelStreamingModule is not available."));
-			}
-		}
-		else
-		{
-			// 패키징된 게임에서 실행 중일 때
-			UE_LOG(LogTemp, Warning, TEXT("Running in Packaged Game!"));
-
+	//					CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
+	//
+	//					//Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
+	//					CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
+	//				
+	//					//시그널 서버에 연결하고 StreamID 목록에서 비어있거나 추가할 StreamID를 탐색한다. 탐색 후 그 StreamID를 UserStreamID로 저장한다.
+	//					ScreenActor->BeginLookSharingScreen();
+	//				
+	//			}
+	//			else
+	//			{
+	//				UE_LOG(LogTemp, Error, TEXT("Could not find a valid streamer with the given ID."));
+	//			}
+	//		}
+	//		else
+	//		{
+	//			UE_LOG(LogTemp, Error, TEXT("PixelStreamingModule is not available."));
+	//		}
 			IPixelStreamingModule& PixelStreamingModule1 = FModuleManager::LoadModuleChecked<IPixelStreamingModule>("PixelStreaming");
 			CurrentStreamer = PixelStreamingModule1.CreateStreamer(streamID);
-			
+			if(nullptr==CurrentStreamer)
+				return;
 			SetButtonStyle(ButtonWindowScreen,TextureSharingClicked,TextureSharingClicked,TextureSharingClicked);
 				
 			//TSharedPtr<FPixelStreamingVideoInputBackBuffer> VideoInput = FPixelStreamingVideoInputBackBuffer::Create();
 			//Back Buffer를 비디오 입력으로 설정합니다.
 			CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
 
-					
-			UGameViewportClient* GameViewport = GEngine->GameViewport;
 			ScreenActor->SceneCapture->Activate();
 	
 					
-// 2. Pixel Streaming 비디오 입력으로 설정
+			// 2. Pixel Streaming 비디오 입력으로 설정
 			VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
 
 			CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
 	
 			//Streamer->SetVideoInput(FPixelStreamingVideoInputViewport::Create(Streamer));
 			CurrentStreamer->SetSignallingServerURL("ws://master-of-prediction.shop:8890");
-					
+			CurrentStreamer->StartStreaming();
+
+
+			if (nullptr == player->AreaActor)
+				return;
+			if (gi)
+			{
+				player->ServerUpdateUserInfoToRecordActor(player->AreaActor,  gi->UserID, streamID);
+			}
+				
 			//시그널 서버에 연결하고 StreamID 목록에서 비어있거나 추가할 StreamID를 탐색한다. 탐색 후 그 StreamID를 UserStreamID로 저장한다.
-			ScreenActor->BeginLookSharingScreen();
+			//ScreenActor->BeginLookSharingScreen();
 		}
 	}
 	else //스트리밍 종료

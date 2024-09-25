@@ -42,7 +42,7 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UImage* ImageDisConnect;
 	
-	
+	void OnClickPlaySound();
 	UFUNCTION()
 	void OnButtonConfirm();
 	UFUNCTION()
