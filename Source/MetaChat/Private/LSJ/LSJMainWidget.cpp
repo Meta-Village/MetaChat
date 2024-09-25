@@ -71,7 +71,6 @@ void ULSJMainWidget::OnWindowFocusChanged(bool bIsFocused)
 			player->GetMovementComponent()->Deactivate();
 		}
 	}
-
 }
 
 void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
@@ -94,8 +93,7 @@ void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 		{
 			if (IDInfo.UserID.Equals(ID))
 			{
-				IDInfo.bClicked = !(IDInfo.bClicked);
-				if (IDInfo.bClicked)
+				if (bClick)
 				{
 					ScreenActor->ViewSharingUserStreamID = IDInfo.UserStreamID;
 					//ScreenActor->BeginLookSharingScreen();
@@ -108,15 +106,12 @@ void ULSJMainWidget::ClickSlot(FString ID,bool bClick)
 				{
 					//보기 종료
 					ScreenActor->StopLookSharingScreenWidget();
-					IDInfo.bClicked = false;
 					/*ScreenActor->ViewSharingUserStreamID = "";
 					ScreenActor->StopLookSharingScreen();
 					ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 					LookStreaming(false);*/
 				}
 			}
-			else
-				IDInfo.bClicked = false;
 		}
 	}
 	//ChangeLookSharingScreen()로 StreamID로 스트림 화면 전환
@@ -482,6 +477,7 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
     SharingUserPanel->ClearChildren();
     int32 Row = 0;
     int32 Column = 0;
+	bool bPreviousLookStreaming = false;
 
 	ACustomCharacter* CustomPlayer = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
 	if(nullptr==CustomPlayer)
@@ -497,7 +493,10 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
 		{
 			if(IDInfo.UserStreamID.IsEmpty())
 				continue;
-
+			if (LookStreaming() && ScreenActor->ViewSharingUserStreamID.Equals(IDInfo.UserStreamID))
+			{
+				bPreviousLookStreaming = true;
+			}
 			SharingUserSlot = CastChecked<USharingUserSlot>(CreateWidget(GetWorld(), SharingUserSlotFactory));
 			if (SharingUserSlot)
 			{
@@ -525,6 +524,10 @@ void ULSJMainWidget::InitSlot(TArray<FString> Items)
 
 				//SharingUserSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
 			}
+		}
+		if (LookStreaming() && false == bPreviousLookStreaming)
+		{
+			ScreenActor->StopLookSharingScreenWidget();
 		}
 	}
  //   // 아이템 데이터 바탕으로 슬롯 생성 및 추가

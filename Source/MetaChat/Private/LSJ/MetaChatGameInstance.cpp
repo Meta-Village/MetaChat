@@ -155,7 +155,7 @@ void UMetaChatGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSess
 void UMetaChatGameInstance::Init()
 {
 	Super::Init();
-
+	ButtonSoundVolume = .3f;
 
 
 	// OnlineSubsystem에 Access

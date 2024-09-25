@@ -7,7 +7,7 @@
 #include "SharingUserSlot.generated.h"
 DECLARE_DELEGATE(FUserIDButtonDelegate)
 DECLARE_DELEGATE_OneParam(FUserIDButtonDelegate_OneParam, FString)
-DECLARE_DELEGATE_TwoParams(FUserIDButtonDelegate_TwoParams, FString, bool)
+DECLARE_DELEGATE_TwoParams(FUserIDButtonDelegate_TwoParams, FString, bool&)
 /**
  * 
  */
