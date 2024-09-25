@@ -58,7 +58,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	class USoundBase* MainBackgroundSound;
 	UPROPERTY(BlueprintReadWrite)
-	float ButtonSoundVolume = 0.1f;
+	float ButtonSoundVolume = 0.0f;
 	UPROPERTY(EditDefaultsOnly)
 	class USoundBase* ButtonSound;
 	UPROPERTY(BlueprintReadWrite)
