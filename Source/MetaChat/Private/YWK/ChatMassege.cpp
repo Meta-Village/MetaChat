@@ -10,7 +10,7 @@ void UChatMassege::NativeConstruct()
 {
 	Super::NativeConstruct();
 }
-
+// 채팅 칠 때 닉네임과 내용 
 void UChatMassege::SetChatData(const FString& InputPlayerName, const FString& ChatMessage)
 {
 	auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
@@ -20,8 +20,10 @@ void UChatMassege::SetChatData(const FString& InputPlayerName, const FString& Ch
 		return;
 	}
 
+    // 플레이어네임과 유저아이디 동일하게 
 	FString PlayerName = gi->UserID;
 
+    
     if (PlayerName_Text)
     {
         PlayerName_Text->SetText(FText::FromString(InputPlayerName));

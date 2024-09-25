@@ -27,6 +27,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UYWKHttpUI> HttpUIFactory;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UMeetingButton> MeetingUIFactory;
+
+	UPROPERTY(BlueprintReadWrite)
+	class UMeetingButton* MeetingUI;
+
 	UPROPERTY()
 	class UYWKHttpUI* YWKHttpUI;
 
@@ -43,7 +50,7 @@ public:
 	bool LoadWavFileToBinary(const FString& FilePath, TArray<uint8>& OutBinaryData);
 	void RsqPostwavfile(FString url, FString FilePath, FString MeetingId);
 
-
+	int32 NewMeetingID;
 
 	//window api viewer
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)

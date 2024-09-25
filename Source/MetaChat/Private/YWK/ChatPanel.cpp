@@ -198,10 +198,6 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
                         Chat_ScrollBox->ClearChildren();
                         UE_LOG(LogTemp, Log, TEXT("Chat_ScrollBox successfully cleared."));
                     }
-                    else
-                    {
-                        UE_LOG(LogTemp, Error, TEXT("Chat_ScrollBox is null!"));
-                    }
 
                     // 서버로부터 받은 각 메시지를 ScrollBox에 추가
                     for (const TSharedPtr<FJsonValue>& MessageValue : *ChatMessages)
@@ -228,10 +224,6 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
                                 {
                                     Chat_ScrollBox->AddChild(ChatMessageWidget);
                                     UE_LOG(LogTemp, Log, TEXT("Widget added to ScrollBox"));
-                                }
-                                else
-                                {
-                                    UE_LOG(LogTemp, Error, TEXT("Chat_ScrollBox is null when trying to add widget!"));
                                 }
                             }
                             else
@@ -264,3 +256,4 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
         UE_LOG(LogTemp, Error, TEXT("Failed to get chat history from server"));
     }
 }
+
