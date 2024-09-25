@@ -19,6 +19,7 @@ class METACHAT_API UChatPanel : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
 	class UScrollBox* Chat_ScrollBox;
 

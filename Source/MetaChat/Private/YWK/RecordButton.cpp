@@ -7,6 +7,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "HSB/CustomCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "YWK/MeetingButton.h"
 
 
 
@@ -19,6 +20,7 @@ void URecordButton::NativeConstruct()
 
 	// 맨 처음 위젯스위쳐 숨기기
 	VisibleSwitcher(false);
+
 }
 
 void URecordButton::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -38,11 +40,11 @@ void URecordButton::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			UE_LOG(LogTemp, Log, TEXT("Current Zone: %s"), *CurrentZoneName);
 			PreviousZoneName = CurrentZoneName;  // 이전 존 업데이트
 		}
-
+		
 		// 존이 ROOM1 또는 ROOM2이면 위젯을 보이게 설정
-		if (CurrentZoneName == "ROOM1" || CurrentZoneName == "ROOM2" || CurrentZoneName == "ROOM3" || CurrentZoneName == "ROOM4")
+		if (CurrentZoneName == "ROOM1" || CurrentZoneName == "ROOM2" || CurrentZoneName == "ROOM3" || CurrentZoneName == "ROOM4" || CurrentZoneName == "ROOM5")
 		{
-			VisibleSwitcher(true);
+			VisibleSwitcher(false);
 		}
 		else
 		{
