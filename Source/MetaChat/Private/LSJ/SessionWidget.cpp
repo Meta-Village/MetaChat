@@ -116,6 +116,7 @@ void USessionWidget::RecvCreatingWorldInfo(FString result, int32 resultCode)
 		auto* gi = Cast<UMetaChatGameInstance>(GetWorld()->GetGameInstance());
 		gi->WorldID =RecvWorldID;
 		gi->WorldPW = WorldPassword;
+		gi->WorldName = WorldName;
 		CreateSession(RecvWorldID);
 		RemoveFromParent();
 	}

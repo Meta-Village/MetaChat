@@ -69,6 +69,8 @@ public:
 	//블루프린트 함수 호출
 	//공유된 화면 다른 StreamID로 교체
 	void ChangeLookSharingScreen();
+	UFUNCTION(BlueprintCallable)
+	void ConnectedStreamID();
 	//유저 아이디
 	UPROPERTY(BlueprintReadWrite)
 	FString UserID;
@@ -90,4 +92,8 @@ public:
     UPROPERTY()
     class APostProcessVolume* PostProcessVolume;
 	class UMaterialInstanceDynamic* PostProcessDynamicMaterial;
+
+	//PixelStreamingPlayer : StreamID에 연결중인지 확인
+	UPROPERTY(BlueprintReadWrite)
+	bool bConnectingStreamID = false;
 };
