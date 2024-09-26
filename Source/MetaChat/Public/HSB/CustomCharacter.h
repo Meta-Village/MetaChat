@@ -56,6 +56,9 @@ public:
     void Sit();
     void SitIdle();
 
+    UFUNCTION()
+    void DisableMovement();
+    UFUNCTION()
     void EnableMovement();
 
     FTimerHandle animHandle;
