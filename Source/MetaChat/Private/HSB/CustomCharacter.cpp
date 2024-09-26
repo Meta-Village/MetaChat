@@ -33,6 +33,7 @@
 #include "Engine/AssetManager.h"
 #include "Engine/SkinnedAssetCommon.h"
 #include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -190,8 +191,32 @@ void ACustomCharacter::Sit()
         CustomAnimInstance->IsSitting = true;
         CustomAnimInstance->WasSit = false;
         CustomAnimInstance->PlaySitMontage();
-        // 몇 초 뒤에 PlaySitIdleMontage() 실행
-        GetWorldTimerManager().SetTimer(handle, this, &ACustomCharacter::SitIdle, 2.f, false);
+
+        // 움직임 비활성화하여 캐릭터가 움직이지 못하게 설정
+        APlayerController* PlayerController = Cast<APlayerController>(GetController());
+        UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+        if (PlayerController && MovementComponent)
+        {
+            // 2초 동안 움직임 비활성화
+            DisableInput(PlayerController);
+            MovementComponent->DisableMovement();
+            // 2초 후에 움직임 다시 활성화
+            GetWorldTimerManager().SetTimer(controlHandle, this, &ACustomCharacter::EnableMovement, 2.f, false);
+        }
+        // 2초 뒤에 PlaySitIdleMontage() 실행
+        GetWorldTimerManager().SetTimer(animHandle, this, &ACustomCharacter::SitIdle, 2.f, false);
+    }
+}
+
+void ACustomCharacter::EnableMovement()
+{
+    APlayerController* PlayerController = Cast<APlayerController>(GetController());
+    UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+    if (PlayerController && MovementComponent)
+    {
+        // 움직임 활성화
+        EnableInput(PlayerController);
+        MovementComponent->SetMovementMode(EMovementMode::MOVE_Walking);
     }
 }
 
@@ -569,6 +594,8 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
         if (CurrentLevelName == "AlphaMain")
         {
+            // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
+
             // HairMesh 로드 및 적용
             FString* MeshPath_h = LoadedGameInstance->SavedMeshes.Find("Hair");
             UE_LOG(LogTemp, Warning, TEXT("%s"), **MeshPath_h);
@@ -578,23 +605,6 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
                 USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_h);
                 if (LoadedMesh)
                 {
-                    // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
-                    // LoadedMesh의 경로를 가져와 비교
-                    FString LoadedMeshPath = LoadedMesh->GetPathName();
-                    UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedMeshPath);
-                    // 몸통이랑 헤드 머터리얼 변경
-                    UMaterialInterface* NewHeadMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Character_Material.Character_Material"));
-                    FString MatPath = TEXT("/Game/TA_JSG/Character/Material/Character_Material.Character_Material");
-                    FSoftObjectPath BodySoftObjectPath(MatPath);
-                    UAssetManager::GetStreamableManager().RequestAsyncLoad(BodySoftObjectPath, [this, BodySoftObjectPath]()
-                    {
-                        UMaterialInterface* LoadedBodyMat = Cast<UMaterialInterface>(BodySoftObjectPath.TryLoad());
-                        if (LoadedBodyMat)
-                        {
-                            GetMesh()->SetMaterial(0, LoadedBodyMat);
-                            HeadMeshComp->SetMaterial(0, LoadedBodyMat);
-                        }
-                    });
                     // Hair 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
                     //여자 헤어
                     UMaterialInterface* NewHairMaterial1 = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/XR_HSB/Character/Hair_Long_v001_Mt1.Hair_Long_v001_Mt1"));

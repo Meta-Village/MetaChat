@@ -13,6 +13,12 @@ struct FCharacterCustomizationData
     GENERATED_BODY()
 public:
     // TSoftObjectPtr로 선언하면 객체가 사용될 때 로드될 수 있음
+    // Body
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
+    USkeletalMesh* BodyMesh;
+    // Head
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
+    USkeletalMesh* HeadMesh;
     // Hair
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite , Category = "Customization")
     USkeletalMesh* HairMesh;
@@ -50,7 +56,10 @@ public:
     void Sit();
     void SitIdle();
 
-    FTimerHandle handle;
+    void EnableMovement();
+
+    FTimerHandle animHandle;
+    FTimerHandle controlHandle;
 
     UPROPERTY()
 	class UCustomAnimInstance* CustomAnimInstance;
