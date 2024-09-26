@@ -186,7 +186,7 @@ void ULSJMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		}
 
 		// 존이 ROOM1 또는 ROOM2이면 위젯을 보이게 설정
-		if (CurrentZoneName == "ROOM1" || CurrentZoneName == "ROOM2" || CurrentZoneName == "ROOM3" || CurrentZoneName == "ROOM4")
+		if (CurrentZoneName == "ROOM1" || CurrentZoneName == "ROOM2" || CurrentZoneName == "ROOM3" || CurrentZoneName == "ROOM4" || CurrentZoneName == "ROOM5")
 		{
 			VisibleSwitcher(true);
 			PreviousZoneActor = PlayerCharacter->AreaActor;
