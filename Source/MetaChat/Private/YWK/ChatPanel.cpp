@@ -1,7 +1,5 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
-
 #include "YWK/ChatPanel.h"
 #include "Components/ScrollBox.h"
 #include "Components/EditableTextBox.h"
@@ -14,6 +12,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/IHttpRequest.h"
 #include "YWK/ChatMassege.h"
+#include "YWK/EmojiWidget.h"
+#include "ImageUtils.h"
 
 void UChatPanel::NativeConstruct()
 {
@@ -51,6 +51,9 @@ void UChatPanel::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMeth
 
         // 서버로 채팅 전송(서버)
         SendChatToServerHttp(PlayerName, ChatMessage);
+
+        // 이모티콘 서버로 채팅 전송
+        SendChatToServerEmoji(PlayerName, ChatMessage);
 
         // 채팅 입력 필드 초기화
         if (ChatInputBox)
@@ -257,4 +260,66 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
         UE_LOG(LogTemp, Error, TEXT("Failed to get chat history from server"));
     }
 }
+
+void UChatPanel::SendChatToServerEmoji(const FString& PlayerName, const FString& ChatMessage)
+{
+    // Json 형식 만들기
+    TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+
+    // 채팅 메시지를 minutes 필드로 추가
+    JsonObject->SetStringField(TEXT("minutes"), ChatMessage);
+
+    // Json 객체를 문자열로 변환
+    FString OutputString;
+    TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
+    FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+    // HTTP 요청 보내기
+    AYWKHttpActor* HttpActor = Cast<AYWKHttpActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AYWKHttpActor::StaticClass()));
+    if (HttpActor)
+    {
+        // 서버 요청 보내기 전에 로그 출력
+        UE_LOG(LogTemp, Log, TEXT("Sending POST request to server with message: %s"), *ChatMessage);
+
+        // 이모티콘을 요청하는 URL로 POST 요청
+        HttpActor->RsqPostTest(TEXT("http://125.132.216.190:8126/emote"), OutputString);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("HttpActor not found in the world"));
+    }
+}
+
+
+
+void UChatPanel::ReceiveToServerEmoji(const FString& EmojiFileName)
+{
+    UEmojiWidget* EmojiWidget = CreateWidget<UEmojiWidget>(GetWorld(), UEmojiWidget::StaticClass());
+    if (EmojiWidget)
+    {
+        // 서버로부터 받은 파일명을 기반으로 이모티콘 표시를 위한 요청 전송
+        EmojiWidget->SendEmojiRequestToServer(EmojiFileName);
+        UE_LOG(LogTemp, Log, TEXT("Emoji request sent to server with filename: %s"), *EmojiFileName);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to create UEmojiWidget"));
+    }
+}
+
+void UChatPanel::ReceiveImageDataFromServer(const TArray<uint8>& ImageData)
+{
+    UEmojiWidget* EmojiWidget = CreateWidget<UEmojiWidget>(GetWorld(), UEmojiWidget::StaticClass());
+    if (EmojiWidget)
+    {
+        // 이미지 데이터를 이모티콘 위젯으로 전달하여 표시
+        EmojiWidget->SetEmojiImageFromData(ImageData);
+        UE_LOG(LogTemp, Log, TEXT("Emoji image displayed from received data"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to create UEmojiWidget"));
+    }
+}
+
 

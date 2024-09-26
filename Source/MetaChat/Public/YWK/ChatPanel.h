@@ -35,6 +35,15 @@ public:
 	// 채팅내역 다시 받기
 	void RequestChatHistory();
 
+	// 이모티콘 관련 서버로 채팅 보내기
+	void SendChatToServerEmoji(const FString& PlayerName, const FString& ChatMessage);
+
+	// 서버로 부터 이모티콘 받기
+	void ReceiveToServerEmoji(const FString& EmojiFileName);
+
+	UFUNCTION()
+	void ReceiveImageDataFromServer(const TArray<uint8>& ImageData);
+
 private:
 	void SendChatToServer(const FString& PlayerName, const FString& ChatMessage);
 

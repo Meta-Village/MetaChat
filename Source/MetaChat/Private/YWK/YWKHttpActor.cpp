@@ -15,6 +15,7 @@
 #include "YWKHttpUI.h"
 #include "YWK/ChatPanel.h"
 #include "YWK/MeetingButton.h"
+#include "YWK/EmojiWidget.h"
 // Sets default values
 AYWKHttpActor::AYWKHttpActor()
 {
@@ -156,46 +157,143 @@ void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Resp
 {
     if (bConnectedSuccessfully && Response.IsValid())
     {
-        FString ResponseString = Response->GetContentAsString();
-        UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *ResponseString);
+        // 서버 응답 헤더에서 Content-Type을 확인
+        FString ContentType = Response->GetHeader(TEXT("Content-Type"));
 
-        TSharedPtr<FJsonObject> JsonObject;
-        TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
-        if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+        if (ContentType.Contains(TEXT("image/png")) || ContentType.Contains(TEXT("image/jpeg")))
         {
-            if (JsonObject->HasField("messages"))
-            {
-                FString MeetingSummary = JsonObject->GetStringField("messages");
-                UE_LOG(LogTemp, Log, TEXT("Meeting summary: %s"), *MeetingSummary);
+            // 이미지 데이터를 직접 처리 (이모티콘 이미지 응답)
+            TArray<uint8> ImageData = Response->GetContent();
+            UE_LOG(LogTemp, Log, TEXT("Image data received from server, size: %d"), ImageData.Num());
 
-                // YWKHttpUI가 null인 경우 재생성
-                if (!YWKHttpUI)
+            // EmojiWidget을 통해 이모티콘 이미지를 표시 (ImageData 사용)
+            UEmojiWidget* EmojiWidget = CreateWidget<UEmojiWidget>(GetWorld(), UEmojiWidget::StaticClass());
+            if (EmojiWidget)
+            {
+                EmojiWidget->AddToViewport();  // 필요시 위젯을 화면에 추가
+                EmojiWidget->SetEmojiImageFromData(ImageData);  // 이미지 데이터를 처리하는 함수 호출
+                UE_LOG(LogTemp, Log, TEXT("Emoji image successfully passed to EmojiWidget."));
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("Failed to create UEmojiWidget"));
+            }
+        }
+        else
+        {
+            // JSON 데이터를 처리
+            FString ResponseString = Response->GetContentAsString();
+            UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *ResponseString);
+
+            TSharedPtr<FJsonObject> JsonObject;
+            TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
+            if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+            {
+                // 메시지 요약 처리
+                if (JsonObject->HasField("messages"))
                 {
-                    UE_LOG(LogTemp, Warning, TEXT("YWKHttpUI is null, trying to create it again."));
-                    if (HttpUIFactory)
+                    FString MeetingSummary = JsonObject->GetStringField("messages");
+                    UE_LOG(LogTemp, Log, TEXT("Meeting summary: %s"), *MeetingSummary);
+
+                    // YWKHttpUI가 null인 경우 재생성
+                    if (!YWKHttpUI)
                     {
-                        YWKHttpUI = Cast<UYWKHttpUI>(CreateWidget(GetWorld(), HttpUIFactory));
-                        if (YWKHttpUI)
+                        UE_LOG(LogTemp, Warning, TEXT("YWKHttpUI is null, trying to create it again."));
+                        if (HttpUIFactory)
                         {
-                            YWKHttpUI->AddToViewport();
-                            UE_LOG(LogTemp, Log, TEXT("YWKHttpUI successfully recreated and added to viewport."));
+                            YWKHttpUI = Cast<UYWKHttpUI>(CreateWidget(GetWorld(), HttpUIFactory));
+                            if (YWKHttpUI)
+                            {
+                                YWKHttpUI->AddToViewport();
+                                UE_LOG(LogTemp, Log, TEXT("YWKHttpUI successfully recreated and added to viewport."));
+                            }
+                            else
+                            {
+                                UE_LOG(LogTemp, Error, TEXT("Failed to recreate YWKHttpUI widget."));
+                            }
                         }
-                        else
-                        {
-                            UE_LOG(LogTemp, Error, TEXT("Failed to recreate YWKHttpUI widget."));
-                        }
+                    }
+
+                    // YWKHttpUI가 유효하면 미팅 로그 업데이트
+                    if (YWKHttpUI)
+                    {
+                        YWKHttpUI->SetTextLog(MeetingSummary);
                     }
                 }
 
-                // YWKHttpUI가 유효하면 미팅 로그 업데이트
-                if (YWKHttpUI)
+                // 이모티콘 파일명 처리
+                if (JsonObject->HasField("emojiFileName"))
                 {
-                    YWKHttpUI->SetTextLog(MeetingSummary);
+                    FString EmojiFileName = JsonObject->GetStringField("emojiFileName");
+                    UE_LOG(LogTemp, Log, TEXT("Emoji file name received: %s"), *EmojiFileName);
+
+                    // 이모티콘을 받을 URL로 이미지 요청
+                    FString EmojiUrl = FString::Printf(TEXT("https://eagle-prepared-octopus.ngrok-free.app/chatbot/emote?filename=%s"), *EmojiFileName);
+
+                    // GET 요청을 통해 이모티콘 이미지 다운로드
+                    FHttpModule* Http = &FHttpModule::Get();
+                    if (Http)
+                    {
+                        TSharedRef<IHttpRequest, ESPMode::ThreadSafe> GetRequest = Http->CreateRequest();
+                        GetRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+                        {
+                            if (bWasSuccessful && Response->GetContentLength() > 0)
+                            {
+                                // 서버로부터 받은 이미지 데이터를 처리
+                                TArray<uint8> ImageData = Response->GetContent();
+
+                                // EmojiWidget을 통해 이미지 처리
+                                UEmojiWidget* EmojiWidget = CreateWidget<UEmojiWidget>(GetWorld(), UEmojiWidget::StaticClass());
+                                if (EmojiWidget)
+                                {
+                                    EmojiWidget->AddToViewport();  // 필요시 위젯을 화면에 추가
+                                    EmojiWidget->SetEmojiImageFromData(ImageData);  // 이미지 데이터를 처리하는 함수 호출
+                                    UE_LOG(LogTemp, Log, TEXT("Emoji image successfully passed to EmojiWidget."));
+                                }
+                                else
+                                {
+                                    UE_LOG(LogTemp, Error, TEXT("Failed to create UEmojiWidget"));
+                                }
+                            }
+                            else
+                            {
+                                UE_LOG(LogTemp, Error, TEXT("Failed to download emoji image"));
+                            }
+                        });
+
+                        GetRequest->SetURL(EmojiUrl);
+                        GetRequest->SetVerb("GET");
+                        GetRequest->ProcessRequest();
+                    }
                 }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("No emojiFileName found in server response"));
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("Failed to parse server response: %s"), *ResponseString);
             }
         }
     }
+    else
+    {
+        // 요청이 실패한 경우
+        if (Response.IsValid())
+        {
+            FString ErrorMessage = Response->GetContentAsString();
+            UE_LOG(LogTemp, Error, TEXT("Server response error: %s"), *ErrorMessage);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to connect to server or invalid response"));
+        }
+    }
 }
+
+
+
 
 
 bool AYWKHttpActor::LoadWavFileToBinary(const FString& FilePath, TArray<uint8>& OutBinaryData)
@@ -274,4 +372,59 @@ void AYWKHttpActor::RsqPostwavfile(FString url, FString FilePath, FString Meetin
 
     // 서버에 요청 전송
     req->ProcessRequest();
+}
+
+void AYWKHttpActor::SendEmojiRequest(const FString& ChatMessage)
+{
+    // HTTP 모듈 생성
+    FHttpModule& HttpModule = FHttpModule::Get();
+
+    // Json 형식으로 서버에 보낼 데이터 생성
+    TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+    JsonObject->SetStringField(TEXT("minutes"), ChatMessage);
+
+    FString OutputString;
+    TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+    FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+    // HTTP 요청 설정
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = HttpModule.CreateRequest();
+    Request->OnProcessRequestComplete().BindUObject(this, &AYWKHttpActor::OnEmojiResponseReceived);
+    Request->SetURL(TEXT("https://eagle-prepared-octopus.ngrok-free.app/chatbot/emote"));  // FastAPI 라우트 URL
+    Request->SetVerb(TEXT("POST"));
+    Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+    Request->SetContentAsString(OutputString);
+    Request->ProcessRequest();
+}
+
+void AYWKHttpActor::OnEmojiResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully)
+{
+    if (bConnectedSuccessfully && Response.IsValid())
+    {
+        // 서버 응답 내용 확인
+        FString ResponseString = Response->GetContentAsString();
+        UE_LOG(LogTemp, Log, TEXT("Emoji response received from server: %s"), *ResponseString);
+
+        // 응답이 성공했는지 여부 확인 (예: 상태 코드가 200인지 확인)
+        int32 ResponseCode = Response->GetResponseCode();
+        if (ResponseCode == 200)  // 200 OK 응답일 경우 처리
+        {
+            UE_LOG(LogTemp, Log, TEXT("Emoji request successfully processed by server"));
+
+            // 서버에서 반환된 이미지 URL을 받아서 처리
+            if (UChatPanel* ChatPanel = Cast<UChatPanel>(FindObject<UChatPanel>(ANY_PACKAGE, TEXT("ChatPanel"))))
+            {
+                ChatPanel->ReceiveToServerEmoji(ResponseString);  // 이모티콘 URL을 전송
+            }
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Server responded but with error code: %d"), ResponseCode);
+        }
+    }
+    else
+    {
+        // 통신 실패
+        UE_LOG(LogTemp, Error, TEXT("Failed to receive response from server"));
+    }
 }
