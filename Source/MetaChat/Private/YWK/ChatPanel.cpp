@@ -11,6 +11,7 @@
 #include "HSB/CustomCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/IHttpRequest.h"
+#include "Components/WidgetComponent.h"
 #include "YWK/ChatMassege.h"
 #include "YWK/EmojiWidget.h"
 #include "ImageUtils.h"
@@ -294,31 +295,49 @@ void UChatPanel::SendChatToServerEmoji(const FString& PlayerName, const FString&
 
 void UChatPanel::ReceiveToServerEmoji(const FString& EmojiFileName)
 {
-    UEmojiWidget* EmojiWidget = CreateWidget<UEmojiWidget>(GetWorld(), UEmojiWidget::StaticClass());
-    if (EmojiWidget)
+    // 이미 캐릭터에 존재하는 위젯을 찾아서 사용
+    ACustomCharacter* Character = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+    if (Character && Character->EmojiUIComp)
     {
-        // 서버로부터 받은 파일명을 기반으로 이모티콘 표시를 위한 요청 전송
-        EmojiWidget->SendEmojiRequestToServer(EmojiFileName);
-        UE_LOG(LogTemp, Log, TEXT("Emoji request sent to server with filename: %s"), *EmojiFileName);
+        UEmojiWidget* EmojiWidget = Cast<UEmojiWidget>(Character->EmojiUIComp->GetUserWidgetObject());
+        if (EmojiWidget)
+        {
+            // 서버로부터 받은 파일명을 기반으로 이모티콘 표시를 위한 요청 전송
+            EmojiWidget->SendEmojiRequestToServer(EmojiFileName);
+            UE_LOG(LogTemp, Log, TEXT("Emoji request sent to server with filename: %s"), *EmojiFileName);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to find UEmojiWidget in Character's EmojiUIComp"));
+        }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to create UEmojiWidget"));
+        UE_LOG(LogTemp, Error, TEXT("Failed to find Character or EmojiUIComp"));
     }
 }
 
 void UChatPanel::ReceiveImageDataFromServer(const TArray<uint8>& ImageData)
 {
-    UEmojiWidget* EmojiWidget = CreateWidget<UEmojiWidget>(GetWorld(), UEmojiWidget::StaticClass());
-    if (EmojiWidget)
+    // 이미 캐릭터에 존재하는 위젯을 찾아서 사용
+    ACustomCharacter* Character = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+    if (Character && Character->EmojiUIComp)
     {
-        // 이미지 데이터를 이모티콘 위젯으로 전달하여 표시
-        EmojiWidget->SetEmojiImageFromData(ImageData);
-        UE_LOG(LogTemp, Log, TEXT("Emoji image displayed from received data"));
+        UEmojiWidget* EmojiWidget = Cast<UEmojiWidget>(Character->EmojiUIComp->GetUserWidgetObject());
+        if (EmojiWidget)
+        {
+            // 이미지 데이터를 이모티콘 위젯으로 전달하여 표시
+            EmojiWidget->SetEmojiImageFromData(ImageData);
+            UE_LOG(LogTemp, Log, TEXT("Emoji image displayed from received data"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to find UEmojiWidget in Character's EmojiUIComp"));
+        }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to create UEmojiWidget"));
+        UE_LOG(LogTemp, Error, TEXT("Failed to find Character or EmojiUIComp"));
     }
 }
 
