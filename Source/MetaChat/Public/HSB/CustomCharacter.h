@@ -128,6 +128,7 @@ public:
     // 서버에 보낼 데이터들
     FDateTime EntryTime;
     FDateTime ExitTime;
+    UPROPERTY(BlueprintReadWrite)
     FString ZoneName;
     FString UserId;
     int32 WorldId;

@@ -32,6 +32,7 @@
 #include "Materials/MaterialInterface.h"
 #include "Engine/AssetManager.h"
 #include "Engine/SkinnedAssetCommon.h"
+#include "Engine/World.h"
 
 // Sets default values
 ACustomCharacter::ACustomCharacter()
@@ -423,10 +424,6 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         AreaActor = nullptr;
         // 서버에 정보 전송
         SendLocationInfoToServer(EntryTime, ExitTime, ZoneName, UserId, WorldId);
-
-        // 서버에 정보 보낸 이후엔 현위치 로비
-        ZoneName = "ROOM0";
-        UE_LOG(LogTemp, Warning, TEXT("Left Room1, Location Info: %d"), WorldId);
     }
 
     // 다른 액터에 "Room1" 태그가 있는지 확인
@@ -457,7 +454,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
     {
         UE_LOG(LogTemp, Warning, TEXT("Left Room2"));
 
-        // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        // 캐릭터가 Section2을 떠났을 때 서버로 정보 전송
         ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM2";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
@@ -470,14 +467,14 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 
         // 서버에 정보 보낸 이후엔 현위치 로비
         ZoneName = "ROOM0";
-        UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
+        UE_LOG(LogTemp, Warning, TEXT("Left Section2, Location Info: %d"), WorldId);
     }
     // 다른 액터에 "Room3" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room3")))
     {
         UE_LOG(LogTemp, Warning, TEXT("Left Room3"));
 
-        // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        // 캐릭터가 Section3을 떠났을 때 서버로 정보 전송
         ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM3";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
@@ -490,14 +487,14 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 
         // 서버에 정보 보낸 이후엔 현위치 로비
         ZoneName = "ROOM0";
-        UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
+        UE_LOG(LogTemp, Warning, TEXT("Left Section3, Location Info: %d"), WorldId);
     }
     // 다른 액터에 "Room4" 태그가 있는지 확인
     if (OtherActor && OtherActor->ActorHasTag(FName("Room4")))
     {
         UE_LOG(LogTemp, Warning, TEXT("Left Room4"));
 
-        // 캐릭터가 Section1을 떠났을 때 서버로 정보 전송
+        // 캐릭터가 Section4을 떠났을 때 서버로 정보 전송
         ExitTime = FDateTime::Now();  // 현재 시간을 ExitTime으로 설정
         ZoneName = "ROOM4";  // 가정된 존 이름
         UserId = gi->UserID;  // 유저 아이디
@@ -510,7 +507,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
         
         // 서버에 정보 보낸 이후엔 현위치 로비
         ZoneName = "ROOM0";
-        UE_LOG(LogTemp, Warning, TEXT("Left Section1, Location Info: %d"), WorldId);
+        UE_LOG(LogTemp, Warning, TEXT("Left Section4, Location Info: %d"), WorldId);
     }
  }
 
@@ -522,6 +519,153 @@ void ACustomCharacter::Load()
     {
         FString SaveGamePath = FPaths::ProjectSavedDir();  // Save 디렉토리 경로 확인
         UE_LOG(LogTemp, Log, TEXT("Save game loaded from: %s"), *SaveGamePath);
+
+        // 레벨 들어가면 메쉬의 material 변경됨
+        UWorld* World = GetWorld();
+        if (!World)
+            return;
+        FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
+        if (CurrentLevelName == "AlphaMain")
+        {
+            // 몸통이랑 헤드 머터리얼 변경
+            UMaterialInterface* NewHeadMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Character_Material.Character_Material"));
+            FString MatPath = TEXT("/Game/TA_JSG/Character/Material/Character_Material.Character_Material");
+            FSoftObjectPath BodySoftObjectPath(MatPath);
+            UAssetManager::GetStreamableManager().RequestAsyncLoad(BodySoftObjectPath, [this, BodySoftObjectPath]()
+            {
+                UMaterialInterface* LoadedBodyMat = Cast<UMaterialInterface>(BodySoftObjectPath.TryLoad());
+                if (LoadedBodyMat)
+                {
+                    GetMesh()->SetMaterial(0, LoadedBodyMat);
+                    HeadMeshComp->SetMaterial(0, LoadedBodyMat);
+                }
+            });
+            // Hair 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
+            // LoadedMesh의 경로를 가져와 비교
+            FString LoadedMeshPath = HairMeshComp->GetPathName();
+            UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedMeshPath);
+            // 비교하고자 하는 경로
+            FString ExpectedMeshPath1 = TEXT("/Game/XR_HSB/Character/Hair_Long_v001.Hair_Long_v001");
+            FString ExpectedMeshPath2 = TEXT("/Game/XR_HSB/Character/Hair_mt1.Hair_mt1");
+
+            if (LoadedMeshPath == ExpectedMeshPath1)
+            {
+                UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt"));
+                FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt");
+                FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+                UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
+                {
+                        UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
+                        if (LoadedMat)
+                        {
+                            FeetMeshComp->SetMaterial(0, LoadedMat);
+                            UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
+                        }
+                        else
+                        {
+                            UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
+                        }
+                });
+            }
+            else if (LoadedMeshPath == ExpectedMeshPath2)
+            {
+                UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Hair_mt.Hair_mt"));
+                FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Hair_mt.Hair_mt");
+                FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+                UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
+                {
+                        UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
+                        if (LoadedMat)
+                        {
+                            FeetMeshComp->SetMaterial(0, LoadedMat);
+                            UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
+                        }
+                        else
+                        {
+                            UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
+                        }
+                });
+            }
+            // Upper 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
+            // LoadedMesh의 경로를 가져와 비교
+            FString LoadedMeshPath = HairMeshComp->GetPathName();
+            UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedMeshPath);
+            // 비교하고자 하는 경로
+            FString ExpectedMeshPath1 = TEXT("/Game/XR_HSB/Character/Player_Cloth_LongTop_Mt1.Player_Cloth_LongTop_Mt1");
+            FString ExpectedMeshPath2 = TEXT("/Game/XR_HSB/Character/Cloth_Top_Short_Base_color_Mat1.Cloth_Top_Short_Base_color_Mat1");
+            if (LoadedMeshPath == ExpectedMeshPath1)
+            {
+                UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt"));
+                FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt");
+                FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+                UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
+                {
+                        UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
+                        if (LoadedMat)
+                        {
+                            FeetMeshComp->SetMaterial(0, LoadedMat);
+                            UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
+                        }
+                        else
+                        {
+                            UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
+                        }
+                });
+            }
+            else if (LoadedMeshPath == ExpectedMeshPath2)
+            {
+                UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Top_Short_Base_color_Mat.Cloth_Top_Short_Base_color_Mat"));
+                FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Top_Short_Base_color_Mat.Cloth_Top_Short_Base_color_Mat");
+                FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+                UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
+                {
+                        UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
+                        if (LoadedMat)
+                        {
+                            FeetMeshComp->SetMaterial(0, LoadedMat);
+                            UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
+                        }
+                        else
+                        {
+                            UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
+                        }
+                });
+            }
+            // Lower 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
+            UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants"));
+            FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants");
+            FSoftObjectPath LowerSoftObjectPath(AssetPath);
+            UAssetManager::GetStreamableManager().RequestAsyncLoad(LowerSoftObjectPath, [this, LowerSoftObjectPath]()
+            {
+                    UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(LowerSoftObjectPath.TryLoad());
+                    if (LoadedMat)
+                    {
+                        LowerBodyMeshComp->SetMaterial(0, LoadedMat);
+                        UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
+                    }
+                    else
+                    {
+                        UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
+                    }
+            });
+            // Shoes 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
+            UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes"));
+            FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes");
+            FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+            UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
+            {
+                    UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
+                    if (LoadedMat)
+                    {
+                        FeetMeshComp->SetMaterial(0, LoadedMat);
+                        UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
+                    }
+                    else
+                    {
+                        UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
+                    }
+            });
+        }
 
         // HairMesh 로드 및 적용
         FString* MeshPath_h = LoadedGameInstance->SavedMeshes.Find("Hair");
@@ -537,7 +681,6 @@ void ACustomCharacter::Load()
                  // LoadedMesh의 경로를 가져와 비교
                 FString LoadedMeshPath = LoadedMesh->GetPathName();
                 UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedMeshPath);
-
                 ServerSetSkeletalMesh(LoadedMesh,"Hair");
             }
         }
@@ -554,7 +697,6 @@ void ACustomCharacter::Load()
                 // LoadedMesh의 경로를 가져와 비교
                 FString LoadedMeshPath = LoadedMesh->GetPathName();
                 UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedMeshPath);
-
                 ServerSetSkeletalMesh(LoadedMesh,"Upper");
             }
         }
@@ -582,7 +724,6 @@ void ACustomCharacter::Load()
             {
                 // SavedMeshes에서 데이터를 가져와 FCharacterCustomizationData 구조체로 변환
                 FString LoadedMeshPath = LoadedMesh->GetPathName();
-                /*LoadedMesh->Set*/
                 ServerSetSkeletalMesh(LoadedMesh,"Feet");
                 UE_LOG(LogTemp, Warning, TEXT("Feet mesh has been applied from save."));
             }
@@ -597,116 +738,25 @@ void ACustomCharacter::Load()
 void ACustomCharacter::ServerSetSkeletalMesh_Implementation(USkeletalMesh* NewMesh, FName MeshCategory)
 {
     // 메쉬를 서버에서 업데이트
-    // 레벨 들어가면 메쉬의 material 변경됨
-
-    // 몸통이랑 헤드 머터리얼 변경
-    UMaterialInterface* NewHeadMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Character_Material.Character_Material"));
-    FString MatPath = TEXT("/Game/TA_JSG/Character/Material/Character_Material.Character_Material");
-    FSoftObjectPath BodySoftObjectPath(MatPath);
-    UAssetManager::GetStreamableManager().RequestAsyncLoad(BodySoftObjectPath, [this, BodySoftObjectPath]()
-    {
-        UMaterialInterface* LoadedBodyMat = Cast<UMaterialInterface>(BodySoftObjectPath.TryLoad());
-        if (LoadedBodyMat)
-        {
-            GetMesh()->SetMaterial(0, LoadedBodyMat);
-            HeadMeshComp->SetMaterial(0, LoadedBodyMat);
-        }
-    });
-
-    ///////////////////////////////////////////////////////////////////////////////
     if (MeshCategory == "Hair" && HairMeshComp)
     {
         HairMeshComp->SetSkeletalMesh(NewMesh);
         CustomizationData.HairMesh = NewMesh;
-        
-        // 비교하고자 하는 경로
-        FString ExpectedMeshPath1 = TEXT("/Game/XR_HSB/Character/Hair_Long_v001.Hair_Long_v001");
-        FString ExpectedMeshPath2 = TEXT("/Game/XR_HSB/Character/Hair_Short_.Hair_Short_");
-
-        UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt"));
-        FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt");
-        FSoftObjectPath HairSoftObjectPath(AssetPath);
-        UAssetManager::GetStreamableManager().RequestAsyncLoad(HairSoftObjectPath, [this, HairSoftObjectPath]()
-        {
-            UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(HairSoftObjectPath.TryLoad());
-            if (LoadedMat)
-            {
-                HairMeshComp->SetMaterial(0, LoadedMat);
-                UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
-            }
-        });
     }
     if (MeshCategory == "Upper" && UpperBodyMeshComp)
     {
         UpperBodyMeshComp->SetSkeletalMesh(NewMesh);
         CustomizationData.UpperBodyMesh = NewMesh;
-        
-        // 비교하고자 하는 경로
-        FString ExpectedMeshPath1 = TEXT("/Game/XR_HSB/Character/Player_Top_Long.Player_Top_Long");
-        FString ExpectedMeshPath2 = TEXT("/Game/XR_HSB/Character/Player_Top_Short.Player_Top_Short");
-
-        UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt"));
-        FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt");
-        FSoftObjectPath UpperSoftObjectPath(AssetPath);
-        UAssetManager::GetStreamableManager().RequestAsyncLoad(UpperSoftObjectPath, [this, UpperSoftObjectPath]()
-        {
-            UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(UpperSoftObjectPath.TryLoad());
-            if (LoadedMat)
-            {
-                UpperBodyMeshComp->SetMaterial(0, LoadedMat);
-                UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
-            }
-        });
     }
     if (MeshCategory == "Lower" && LowerBodyMeshComp)
     {
         LowerBodyMeshComp->SetSkeletalMesh(NewMesh);
         CustomizationData.LowerBodyMesh = NewMesh;
-
-        // 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
-        UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants"));
-        FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants");
-        FSoftObjectPath LowerSoftObjectPath(AssetPath);
-        UAssetManager::GetStreamableManager().RequestAsyncLoad(LowerSoftObjectPath, [this, LowerSoftObjectPath]()
-        {
-            UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(LowerSoftObjectPath.TryLoad());
-            if (LoadedMat)
-            {
-                LowerBodyMeshComp->SetMaterial(0, LoadedMat);
-                UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
-            }
-        });
     }
     if (MeshCategory == "Shoes" && FeetMeshComp)
     {
         FeetMeshComp->SetSkeletalMesh(NewMesh);
         CustomizationData.FeetMesh = NewMesh;
-
-        // 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
-        UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes"));
-        FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes");
-        FSoftObjectPath ShoesSoftObjectPath(AssetPath);
-        UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
-        {
-            UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
-            if (LoadedMat)
-            {
-                FeetMeshComp->SetMaterial(0, LoadedMat);
-                UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
-            }
-        });
     }
 
     // 모든 클라이언트에 이 변경사항을 브로드캐스트
@@ -715,101 +765,22 @@ void ACustomCharacter::ServerSetSkeletalMesh_Implementation(USkeletalMesh* NewMe
 
 void ACustomCharacter::MulticastUpdateSkeletalMesh_Implementation(USkeletalMesh* NewMesh, FName MeshCategory)
 {
-    UMaterialInterface* NewHeadMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Character_Material.Character_Material"));
-    FString MatPath = TEXT("/Game/TA_JSG/Character/Material/Character_Material.Character_Material");
-    FSoftObjectPath BodySoftObjectPath(MatPath);
-    UAssetManager::GetStreamableManager().RequestAsyncLoad(BodySoftObjectPath, [this, BodySoftObjectPath]()
-    {
-        UMaterialInterface* LoadedBodyMat = Cast<UMaterialInterface>(BodySoftObjectPath.TryLoad());
-        if (LoadedBodyMat)
-        {
-            GetMesh()->SetMaterial(0, LoadedBodyMat);
-            HeadMeshComp->SetMaterial(0, LoadedBodyMat);
-        }
-    });
-
     // 모든 클라이언트에서 메쉬 업데이트
     if (MeshCategory == "Hair" && HairMeshComp)
     {
         HairMeshComp->SetSkeletalMesh(NewMesh);
-
-        UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt"));
-        FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt");
-        FSoftObjectPath HairSoftObjectPath(AssetPath);
-        UAssetManager::GetStreamableManager().RequestAsyncLoad(HairSoftObjectPath, [this, HairSoftObjectPath]()
-        {
-            UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(HairSoftObjectPath.TryLoad());
-            if (LoadedMat)
-            {
-                HairMeshComp->SetMaterial(0, LoadedMat);
-                UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
-            }
-        });
     }
     if (MeshCategory == "Upper" && UpperBodyMeshComp)
     {
         UpperBodyMeshComp->SetSkeletalMesh(NewMesh);
-
-        UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt"));
-        FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt");
-        FSoftObjectPath SoftObjectPath(AssetPath);
-        UAssetManager::GetStreamableManager().RequestAsyncLoad(SoftObjectPath, [this, SoftObjectPath]()
-        {
-            UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(SoftObjectPath.TryLoad());
-            if (LoadedMat)
-            {
-                HairMeshComp->SetMaterial(0, LoadedMat);
-                UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
-            }
-        });
     }
     if (MeshCategory == "Lower" && LowerBodyMeshComp)
     {
         LowerBodyMeshComp->SetSkeletalMesh(NewMesh);
-
-        // 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
-        UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants"));
-        FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants");
-        FSoftObjectPath SoftObjectPath(AssetPath);
-        UAssetManager::GetStreamableManager().RequestAsyncLoad(SoftObjectPath, [this, SoftObjectPath]()
-        {
-            UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(SoftObjectPath.TryLoad());
-            if (LoadedMat)
-            {
-                LowerBodyMeshComp->SetMaterial(0, LoadedMat);
-                UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
-            }
-        });
     }
     if (MeshCategory == "Shoes" && FeetMeshComp)
     {
         FeetMeshComp->SetSkeletalMesh(NewMesh);
-
-        // 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
-        UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes"));
-        FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes");
-        FSoftObjectPath SoftObjectPath(AssetPath);
-        UAssetManager::GetStreamableManager().RequestAsyncLoad(SoftObjectPath, [this, SoftObjectPath]()
-        {
-            UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(SoftObjectPath.TryLoad());
-            if (LoadedMat)
-            {
-                FeetMeshComp->SetMaterial(0, LoadedMat);
-                UE_LOG(LogTemp, Warning, TEXT("Success to load Material dynamically."));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to load Material dynamically."));
-            }
-        });
     }
 
     UpdateState();
