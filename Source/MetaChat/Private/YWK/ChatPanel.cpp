@@ -178,87 +178,43 @@ void UChatPanel::RequestChatHistory()
     }
 }
 
-void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UChatPanel::OnChatHistoryReceived(TArray<FString> ID, TArray<FString>Chat)
 {
-    if (bWasSuccessful && Response.IsValid())
+    // 기존 채팅 기록 초기화
+    if (Chat_ScrollBox)
     {
-        FString ResponseContent = Response->GetContentAsString();
-        UE_LOG(LogTemp, Log, TEXT("Chat history response: %s"), *ResponseContent);
+        Chat_ScrollBox->ClearChildren();
+        UE_LOG(LogTemp, Log, TEXT("Chat_ScrollBox successfully cleared."));
+    }
+    // 서버로부터 받은 각 메시지를 ScrollBox에 추가
+    for (int i = 0 ; i <ID.Num(); i++)
+    {
+         // UChatMassege 위젯 생성
+         UChatMassege* ChatMessageWidget = CreateWidget<UChatMassege>(GetWorld(), UChatMassege::StaticClass());
 
-        TSharedPtr<FJsonObject> JsonObject;
-        TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseContent);
-
-        // Json 데이터 파싱
-        if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
-        {
-            int32 status = JsonObject->GetIntegerField(TEXT("status"));
-            if (status == 200)
+            if (ChatMessageWidget)
             {
-                const TArray<TSharedPtr<FJsonValue>>* ChatMessages;
-                if (JsonObject->TryGetArrayField(TEXT("data"), ChatMessages))
+                // 위젯에 데이터를 설정
+                ChatMessageWidget->SetChatData(ID[i], Chat[i]);
+                UE_LOG(LogTemp, Log, TEXT("ChatMessageWidget successfully set data."));
+
+                // ScrollBox에 위젯 추가
+                if (Chat_ScrollBox)
                 {
-                    // 기존 채팅 기록 초기화
-					if (Chat_ScrollBox)
-					{
-						Chat_ScrollBox->ClearChildren();
-						UE_LOG(LogTemp, Log, TEXT("Chat_ScrollBox successfully cleared."));
-					}
-
-                    // 서버로부터 받은 각 메시지를 ScrollBox에 추가
-                    for (const TSharedPtr<FJsonValue>& MessageValue : *ChatMessages)
-                    {
-                        TSharedPtr<FJsonObject> MessageObject = MessageValue->AsObject();
-                        if (MessageObject.IsValid())
-                        {
-                            FString UserName = MessageObject->GetStringField(TEXT("userName"));
-                            FString ChatContent = MessageObject->GetStringField(TEXT("chatContent"));
-
-                            UE_LOG(LogTemp, Log, TEXT("Parsed Message - User: %s, Content: %s"), *UserName, *ChatContent);
-
-                            // UChatMassege 위젯 생성
-                            UChatMassege* ChatMessageWidget = CreateWidget<UChatMassege>(GetWorld(), UChatMassege::StaticClass());
-
-                            if (ChatMessageWidget)
-                            {
-                                // 위젯에 데이터를 설정
-                                ChatMessageWidget->SetChatData(UserName, ChatContent);
-                                UE_LOG(LogTemp, Log, TEXT("ChatMessageWidget successfully set data."));
-
-                                // ScrollBox에 위젯 추가
-                                if (Chat_ScrollBox)
-                                {
-                                    Chat_ScrollBox->AddChild(ChatMessageWidget);
-                                    UE_LOG(LogTemp, Log, TEXT("Widget added to ScrollBox"));
-                                }
-                            }
-                            else
-                            {
-                                UE_LOG(LogTemp, Error, TEXT("Failed to create ChatMessageWidget"));
-                            }
-                        }
-                    }
-
-                    // 새로운 메시지가 추가되면 스크롤을 끝으로 이동
-                    if (Chat_ScrollBox)
-                    {
-                        Chat_ScrollBox->ScrollToEnd();
-                        UE_LOG(LogTemp, Log, TEXT("Scrolled to end of Chat_ScrollBox."));
-                    }
+                    Chat_ScrollBox->AddChild(ChatMessageWidget);
+                    UE_LOG(LogTemp, Log, TEXT("Widget added to ScrollBox"));
                 }
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("Failed to retrieve chat history. Status: %d"), status);
+                UE_LOG(LogTemp, Error, TEXT("Failed to create ChatMessageWidget"));
             }
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON response"));
-        }
     }
-    else
+    // 새로운 메시지가 추가되면 스크롤을 끝으로 이동
+    if (Chat_ScrollBox)
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to get chat history from server"));
+        Chat_ScrollBox->ScrollToEnd();
+        UE_LOG(LogTemp, Log, TEXT("Scrolled to end of Chat_ScrollBox."));
     }
 }
 
