@@ -34,37 +34,7 @@ void AMetaChatPlayerController::BeginPlay()
 
 	UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 }
-//------------------------------------------------------------------------------------
-// void AMetaChatPlayerController::RequestTravelToCustomizationLevel()
-// {
-// 	if (HasAuthority())  // 서버에서 처리
-// 	{
-// 		GetWorld()->ServerTravel("/Game/TopDown/Maps/TopDownMap.TopDownMap");  // 메인 맵으로 이동
-// 	}
-// 	else  // 클라이언트에서 요청
-// 	{
-// 		ServerRequestTravelToCustomLevel();  // 서버에 레벨 전환 요청
-// 	}
-// }
-// 
-// void AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Implementation()
-// {
-// 	GetWorld()->ServerTravel("/Game/TopDown/Maps/TopDownMap.TopDownMap");
-// }
-// 
-// bool AMetaChatPlayerController::ServerRequestTravelToCustomLevel_Validate()
-// {
-// 	return true;
-// }
 
-// 커스텀 데이터를 캐릭터에 전달하는 중간 역할
-// void AMetaChatPlayerController::SubmitcustomizationData(const FCharacterCustomizationData& NewData)
-// {
-// 	if(ACustomCharacter* ControlledCharacter = Cast<ACustomCharacter>(GetPawn()))
-// 		ControlledCharacter->ServerUpdateCustomizationData(NewData);
-// }
-
-//------------------------------------------------------------------------------------
 void AMetaChatPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
