@@ -111,10 +111,10 @@ public:
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
     UFUNCTION(Server, Reliable)
-    void ServerSetSkeletalMesh(USkeletalMesh* NewMesh, FName MeshCategory);
+    void ServerSetSkeletalMesh(USkeletalMesh* NewMesh, UMaterialInterface* NewMat, FName MeshCategory);
 
     UFUNCTION(NetMulticast, Reliable)
-    void MulticastUpdateSkeletalMesh(USkeletalMesh* NewMesh, FName MeshCategory);
+    void MulticastUpdateSkeletalMesh(USkeletalMesh* NewMesh, UMaterialInterface* NewMat, FName MeshCategory);
 
     // 캐릭터 커스터마이징 상태
     UPROPERTY(ReplicatedUsing = OnRep_CustomizationData)
