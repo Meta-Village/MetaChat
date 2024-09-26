@@ -27,6 +27,38 @@ AMetaChatPlayerController::AMetaChatPlayerController()
 	FollowTime = 0.f;
 }
 
+void AMetaChatPlayerController::AddChats(TArray<FString>& ArrayUserID, TArray<FString>& ArrayChatContent)
+{
+	// 블루프린트 함수 이름
+	FName FunctionName(TEXT("AddChats")); // 블루프린트에서 정의한 함수명
+
+	// 블루프린트 함수 가져오기
+	UFunction* Function = FindFunction(FunctionName);
+
+	if (Function)
+	{
+		struct FMyFunctionParams
+		{
+			TArray<FString> ParamsArrayUserID;
+			TArray<FString> ParamsArrayChatContent;
+		};
+
+		// 구조체에 파라미터 값 세팅
+		FMyFunctionParams Params;
+		Params.ParamsArrayUserID = ArrayUserID;         // int32
+		Params.ParamsArrayChatContent = ArrayChatContent;      // float
+
+		// ProcessEvent로 블루프린트 함수 호출, 파라미터로 구조체 전달
+		ProcessEvent(Function, &Params);
+		// 블루프린트 함수 호출 (매개변수가 없는 경우)
+		//ProcessEvent(Function, ArrayUserID,ArrayChatContent);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Function not found: %s"), *FunctionName.ToString());
+	}
+}
+
 void AMetaChatPlayerController::BeginPlay()
 {
 	// Call the base class  
