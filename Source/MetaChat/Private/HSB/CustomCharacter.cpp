@@ -81,7 +81,7 @@ ACustomCharacter::ACustomCharacter()
 
     // 캐릭터 머리 위 이모지
     EmojiUIComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("EmojiUIComp"));
-    EmojiUIComp->SetupAttachment(RootComponent);
+    EmojiUIComp->SetupAttachment(SpringArm);
 }
 
 void ACustomCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -252,7 +252,6 @@ void ACustomCharacter::ServerAddUserInfoToRecordActor_Implementation(AActor* pRe
 			return;
 		RecorderActor->AddUser(pUserID,pStreamID);
 	}
-    //MulticastAddUserInfoToRecordActor(pRecordActor,pUserID,pStreamID);
 }
 
 void ACustomCharacter::ServerUpdateUserInfoToRecordActor_Implementation(AActor* pRecordActor, const FString& pUserID, const FString& pStreamID)
