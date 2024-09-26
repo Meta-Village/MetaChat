@@ -238,7 +238,7 @@ void UInvSlotWidget::OnItemClicked()
             }
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-        else if ( Category == "Shoes" )
+        else if ( Category == "Feet" )
         {
             // 해당 그림에 맞는 Skeletal mesh를 찾는다
 
