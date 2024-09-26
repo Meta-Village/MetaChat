@@ -735,7 +735,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
             }
             
             // FeetMesh 로드 및 적용
-            FString* MeshPath_f = LoadedGameInstance->SavedMeshes.Find("Feet");
+            FString* MeshPath_f = LoadedGameInstance->SavedMeshes.Find("Shoes");
             if (MeshPath_f)
             {
                 USkeletalMesh* LoadedMesh = LoadObject<USkeletalMesh>(nullptr, **MeshPath_f);
@@ -756,7 +756,7 @@ void ACustomCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
                             if (LoadedMesh->Materials.IsValidIndex(0))
                             {
                                 LoadedMesh->Materials[0] = LoadedMat;
-                                ServerSetSkeletalMesh(LoadedMesh, LoadedMat, "Feet");
+                                ServerSetSkeletalMesh(LoadedMesh, LoadedMat, "Shoes");
                             }
                             UE_LOG(LogTemp, Warning, TEXT("Success to load Feet Material dynamically."));
                         }
@@ -796,7 +796,7 @@ void ACustomCharacter::ServerSetSkeletalMesh_Implementation(USkeletalMesh* NewMe
         LowerBodyMeshComp->SetSkeletalMesh(NewMesh);
         CustomizationData.LowerBodyMesh = NewMesh;
     }
-    if (MeshCategory == "Feet" && FeetMeshComp)
+    if (MeshCategory == "Shoes" && FeetMeshComp)
     {
         FeetMeshComp->SetMaterial(0, NewMat);
         FeetMeshComp->SetSkeletalMesh(NewMesh);
