@@ -44,10 +44,11 @@ public:
 	UFUNCTION()
 	void ReceiveImageDataFromServer(const TArray<uint8>& ImageData);
 
+	UFUNCTION(BlueprintCallable)
+	void OnChatHistoryReceived(TArray<FString> ID, TArray<FString>Chat);
+
 private:
 	void SendChatToServer(const FString& PlayerName, const FString& ChatMessage);
 
 	void SendChatToServerHttp(const FString& PlayerName, const FString& ChatMessage);
-
-	void OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 };
