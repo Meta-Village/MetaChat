@@ -31,7 +31,8 @@ export class Flags {
     static TouchInput = 'TouchInput' as const;
     static GamepadInput = 'GamepadInput' as const;
     static XRControllerInput = 'XRControllerInput' as const;
-    static WaitForStreamer = "WaitForStreamer" as const;
+    static WaitForStreamer = 'WaitForStreamer' as const;
+    static HideUI = 'HideUI' as const;
 }
 
 export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
@@ -48,6 +49,7 @@ const isFlagId = (id: string): id is FlagsIds =>
  */
 export class NumericParameters {
     static AFKTimeoutSecs = 'AFKTimeout' as const;
+    static AFKCountdownSecs = 'AFKCountdown' as const;
     static MinQP = 'MinQP' as const;
     static MaxQP = 'MaxQP' as const;
     static WebRTCFPS = 'WebRTCFPS' as const;
@@ -500,6 +502,19 @@ export class Config {
                 useUrlParams
             )
         );
+        
+        this.flags.set(
+            Flags.HideUI,
+            new SettingFlag(
+                Flags.HideUI,
+                'Hide the UI overlay',
+                'Will hide all UI overlay details',
+                settings && settings.hasOwnProperty(Flags.HideUI) ?
+                    settings[Flags.HideUI] :
+                    false,
+                useUrlParams
+            )
+        );
 
         /**
          * Numeric parameters
@@ -519,6 +534,19 @@ export class Config {
                 useUrlParams
             )
         );
+
+        this.numericParameters.set(
+            NumericParameters.AFKCountdownSecs,
+            new SettingNumber(
+                NumericParameters.AFKCountdownSecs,
+                'AFK countdown',
+                'The time (in seconds) for a user to respond before the stream is ended after an AFK timeout.',
+                10 /*min*/,
+                180 /*max*/,
+                10 /*value*/,
+                useUrlParams
+            )
+        )
 
         this.numericParameters.set(
             NumericParameters.MaxReconnectAttempts,
