@@ -48,6 +48,8 @@ public:
 	UPROPERTY()
 	class UCustomAnimInstance* CustomAnimInstance;
 
+	void AddChats(TArray<FString>& ArrayUserID, TArray<FString>& ArrayChatContent);
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;

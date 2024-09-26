@@ -19,6 +19,7 @@
 #include "HSB/CustomCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
+#include "../MetaChatPlayerController.h"
 // Sets default values
 AYWKHttpActor::AYWKHttpActor()
 {
@@ -115,27 +116,35 @@ void AYWKHttpActor::RsqGetTest(FString url)
 
 void AYWKHttpActor::OnRsqGetTest(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully)
 {
-	if (bConnectedSuccessfully)
-	{
-		// 통신 성공
-		FString result = Response->GetContentAsString(); // 응답 데이터를 문자열로 받음
+    if (bConnectedSuccessfully)
+    {
+        // 통신 성공
+        FString result = Response->GetContentAsString(); // 응답 데이터를 문자열로 받음
 
-		// 1. 서버 응답 데이터를 로그로 출력
-		UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *result);
+        // 1. 서버 응답 데이터를 로그로 출력
+        UE_LOG(LogTemp, Log, TEXT("Response from server: %s"), *result);
 
-		// 2. 파싱 로직은 응답 데이터를 확인한 후 추가
-		/*
-		if (YWKHttpUI)
-		{
-			YWKHttpUI->SetTextLog(UYWKJsonParseLib::JsonParsePassword(result));
-		}
-		*/
-	}
-	else
-	{
-		// 통신 실패
-		UE_LOG(LogTemp, Error, TEXT("bConnectedSuccessfully Fail.."));
-	}
+        // 2. 파싱 로직은 응답 데이터를 확인한 후 추가
+        /*
+        if (YWKHttpUI)
+        {
+        YWKHttpUI->SetTextLog(UYWKJsonParseLib::JsonParsePassword(result));
+        }
+        */
+        TArray<FString> ArrayUserID;
+        TArray<FString> ArrayChatContent;
+        UYWKJsonParseLib::JsonParsePassword(result, ArrayUserID, ArrayChatContent);
+
+        //목표 캐릭터 컨트롤러에 접근한후 ChatPanel의 Chat_ScrollBox에 채팅을 추가하는 블루프린트 함수를 실행한다.
+        AMetaChatPlayerController* pc = Cast<AMetaChatPlayerController>(GetWorld()->GetFirstPlayerController());
+        if (pc)
+            pc->AddChats(ArrayUserID, ArrayChatContent);
+    }
+    else
+    {
+        // 통신 실패
+        UE_LOG(LogTemp, Error, TEXT("bConnectedSuccessfully Fail.."));
+    }
 }
 
 void AYWKHttpActor::RsqPostTest(FString url, FString json)
