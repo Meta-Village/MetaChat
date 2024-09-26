@@ -246,7 +246,7 @@ if (config.UseHTTPS) {
 	});
 }
 
-console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.3.`);
+console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.4.`);
 
 let nextPlayerId = 1;
 
@@ -1015,6 +1015,7 @@ if (config.UseMatchmaker) {
 		message = {
 			type: 'connect',
 			address: typeof serverPublicIp === 'undefined' ? '127.0.0.1' : serverPublicIp,
+			https: config.UseHTTPS,
 			port: config.UseHTTPS ? httpsPort : httpPort,
 			ready: streamers.size > 0,
 			playerConnected: playerConnected
