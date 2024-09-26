@@ -53,6 +53,8 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	int32 WorldID;
 	UPROPERTY(BlueprintReadWrite)
+	FString WorldName;
+	UPROPERTY(BlueprintReadWrite)
 	FString WorldPW;
 
 	UPROPERTY(BlueprintReadWrite)
