@@ -248,7 +248,7 @@ void UCustomWidget::OnButtonApply()
 		if ( Character->FeetMeshComp )
 		{
 			FString MeshPath = Character->FeetMeshComp->SkeletalMesh->GetPathName();
-			SaveGameInstance->SavedMeshes.Add("Feet" , MeshPath);
+			SaveGameInstance->SavedMeshes.Add("Shoes" , MeshPath);
 		}
 
 		// SaveGame 저장
