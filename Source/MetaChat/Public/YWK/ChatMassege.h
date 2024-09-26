@@ -19,11 +19,11 @@ public:
 	virtual void NativeConstruct() override;
 
 	// 텍스트 블럭(플레이어 이름)
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
 	class UTextBlock* PlayerName_Text;
 
 	// 텍스트 블럭(채팅 메세지)
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
 	class UTextBlock* ChatMessage_Text_1;
 
 	// 플레이어 이름과 채팅 메시지를 설정하는 함수
