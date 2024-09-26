@@ -24,11 +24,16 @@ public:
 
 	virtual void NativeConstruct() override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* Bt_MeetingStart;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* Bt_MeetingEnd;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UWidgetSwitcher* WidgetSwitcher_59;
 
 	UFUNCTION(BlueprintCallable)
 	void MeetingStart_Clicked();
@@ -46,4 +51,7 @@ public:
 	void SendMeetingEnd(int32 meetingId, const FString& meetEndTime);
 
 	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+	UFUNCTION()
+	void VisibleSwitcher(bool bIsVisible);
 };

@@ -53,11 +53,16 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	int32 WorldID;
 	UPROPERTY(BlueprintReadWrite)
+	FString WorldName;
+	UPROPERTY(BlueprintReadWrite)
 	FString WorldPW;
 
 	UPROPERTY(BlueprintReadWrite)
 	class USoundBase* MainBackgroundSound;
-
+	UPROPERTY(BlueprintReadWrite)
+	float ButtonSoundVolume = 0.0f;
+	UPROPERTY(EditDefaultsOnly)
+	class USoundBase* ButtonSound;
 	UPROPERTY(BlueprintReadWrite)
 	float currentTime;
 	/*

@@ -100,6 +100,7 @@ void UChatPanel::SendChatToServerHttp(const FString& PlayerName, const FString& 
     int32 WorldId = gi->WorldID;
     FString UserId = gi->UserID;
     FString UserName = gi->UserID;
+    UE_LOG(LogTemp, Log, TEXT("UserID is: %s"), *UserId);
     // ZoneName을 초기화
     FString ZoneName = TEXT("");
     ACustomCharacter* PlayerCharacter = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
@@ -193,11 +194,11 @@ void UChatPanel::OnChatHistoryReceived(FHttpRequestPtr Request, FHttpResponsePtr
                 if (JsonObject->TryGetArrayField(TEXT("data"), ChatMessages))
                 {
                     // 기존 채팅 기록 초기화
-                    if (Chat_ScrollBox)
-                    {
-                        Chat_ScrollBox->ClearChildren();
-                        UE_LOG(LogTemp, Log, TEXT("Chat_ScrollBox successfully cleared."));
-                    }
+					if (Chat_ScrollBox)
+					{
+						Chat_ScrollBox->ClearChildren();
+						UE_LOG(LogTemp, Log, TEXT("Chat_ScrollBox successfully cleared."));
+					}
 
                     // 서버로부터 받은 각 메시지를 ScrollBox에 추가
                     for (const TSharedPtr<FJsonValue>& MessageValue : *ChatMessages)

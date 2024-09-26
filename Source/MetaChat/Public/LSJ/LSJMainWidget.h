@@ -44,6 +44,7 @@ class METACHAT_API ULSJMainWidget : public UUserWidget
 	bool bLookStreaming;
 	UFUNCTION()
 	void SetUserID(FString ID);
+
 	UFUNCTION()
 	void OnWindowFocusChanged(bool bIsFocused);
 	UFUNCTION()
@@ -70,6 +71,7 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void OnButtonLookSharingScreen();
 public:
+	void SetConnectText(bool Value);
 	void SetImageTexture(class UTexture2D* Texture);
 	void SetScreenActor(class AScreenActor* Actor);
 	FString GetCurrentSessionID();
@@ -90,4 +92,7 @@ public:
 	void Streaming(bool val) { bStreaming = val; }
 	bool LookStreaming() const { return bLookStreaming; }
 	void LookStreaming(bool val);
+
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* TextConnectingStreamID;
 };
