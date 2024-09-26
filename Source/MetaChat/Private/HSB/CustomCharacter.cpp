@@ -542,17 +542,17 @@ void ACustomCharacter::Load()
             });
             // Hair 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
             // LoadedMesh의 경로를 가져와 비교
-            FString LoadedMeshPath = HairMeshComp->GetPathName();
-            UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedMeshPath);
+            FString LoadedHairMeshPath = HairMeshComp->GetPathName();
+            UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedHairMeshPath);
             // 비교하고자 하는 경로
-            FString ExpectedMeshPath1 = TEXT("/Game/XR_HSB/Character/Hair_Long_v001.Hair_Long_v001");
-            FString ExpectedMeshPath2 = TEXT("/Game/XR_HSB/Character/Hair_mt1.Hair_mt1");
+            FString ExpectedHairMeshPath1 = TEXT("/Game/XR_HSB/Character/Hair_Long_v001.Hair_Long_v001");
+            FString ExpectedHairMeshPath2 = TEXT("/Game/XR_HSB/Character/Hair_mt1.Hair_mt1");
 
-            if (LoadedMeshPath == ExpectedMeshPath1)
+            if (LoadedHairMeshPath == ExpectedHairMeshPath1)
             {
-                UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt"));
-                FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt");
-                FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+                UMaterialInterface* NewHairMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt"));
+                FString AssetHairPath = TEXT("/Game/TA_JSG/Character/Material/Hair_Long_v001_Mt.Hair_Long_v001_Mt");
+                FSoftObjectPath ShoesSoftObjectPath(AssetHairPath);
                 UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
                 {
                         UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
@@ -567,11 +567,11 @@ void ACustomCharacter::Load()
                         }
                 });
             }
-            else if (LoadedMeshPath == ExpectedMeshPath2)
+            else if (LoadedHairMeshPath == ExpectedHairMeshPath2)
             {
-                UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Hair_mt.Hair_mt"));
-                FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Hair_mt.Hair_mt");
-                FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+                UMaterialInterface* NewHairMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Hair_mt.Hair_mt"));
+                FString AssetHairPath = TEXT("/Game/TA_JSG/Character/Material/Hair_mt.Hair_mt");
+                FSoftObjectPath ShoesSoftObjectPath(AssetHairPath);
                 UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
                 {
                         UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
@@ -588,16 +588,16 @@ void ACustomCharacter::Load()
             }
             // Upper 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
             // LoadedMesh의 경로를 가져와 비교
-            FString LoadedMeshPath = HairMeshComp->GetPathName();
-            UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedMeshPath);
+            FString LoadedUpperMeshPath = UpperBodyMeshComp->GetPathName();
+            UE_LOG(LogTemp, Warning, TEXT("Loaded Mesh Path: %s"), *LoadedUpperMeshPath);
             // 비교하고자 하는 경로
-            FString ExpectedMeshPath1 = TEXT("/Game/XR_HSB/Character/Player_Cloth_LongTop_Mt1.Player_Cloth_LongTop_Mt1");
-            FString ExpectedMeshPath2 = TEXT("/Game/XR_HSB/Character/Cloth_Top_Short_Base_color_Mat1.Cloth_Top_Short_Base_color_Mat1");
-            if (LoadedMeshPath == ExpectedMeshPath1)
+            FString ExpectedUpperMeshPath1 = TEXT("/Game/XR_HSB/Character/Player_Cloth_LongTop_Mt1.Player_Cloth_LongTop_Mt1");
+            FString ExpectedUpperMeshPath2 = TEXT("/Game/XR_HSB/Character/Cloth_Top_Short_Base_color_Mat1.Cloth_Top_Short_Base_color_Mat1");
+            if (LoadedUpperMeshPath == ExpectedUpperMeshPath1)
             {
-                UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt"));
-                FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt");
-                FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+                UMaterialInterface* NewUpperMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt"));
+                FString AssetUpperPath = TEXT("/Game/TA_JSG/Character/Material/Player_Cloth_LongTop_Mt.Player_Cloth_LongTop_Mt");
+                FSoftObjectPath ShoesSoftObjectPath(AssetUpperPath);
                 UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
                 {
                         UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
@@ -612,7 +612,7 @@ void ACustomCharacter::Load()
                         }
                 });
             }
-            else if (LoadedMeshPath == ExpectedMeshPath2)
+            else if (LoadedUpperMeshPath == ExpectedUpperMeshPath2)
             {
                 UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Top_Short_Base_color_Mat.Cloth_Top_Short_Base_color_Mat"));
                 FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Top_Short_Base_color_Mat.Cloth_Top_Short_Base_color_Mat");
@@ -632,9 +632,9 @@ void ACustomCharacter::Load()
                 });
             }
             // Lower 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
-            UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants"));
-            FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants");
-            FSoftObjectPath LowerSoftObjectPath(AssetPath);
+            UMaterialInterface* NewLowerMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants"));
+            FString AssetLowerPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Pants.Cloth_Pants");
+            FSoftObjectPath LowerSoftObjectPath(AssetLowerPath);
             UAssetManager::GetStreamableManager().RequestAsyncLoad(LowerSoftObjectPath, [this, LowerSoftObjectPath]()
             {
                     UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(LowerSoftObjectPath.TryLoad());
@@ -649,9 +649,9 @@ void ACustomCharacter::Load()
                     }
             });
             // Shoes 머티리얼 설정 (첫 번째 머티리얼 슬롯에 설정)
-            UMaterialInterface* NewMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes"));
-            FString AssetPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes");
-            FSoftObjectPath ShoesSoftObjectPath(AssetPath);
+            UMaterialInterface* NewShoesMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes"));
+            FString AssetShoesPath = TEXT("/Game/TA_JSG/Character/Material/Cloth_Shoes.Cloth_Shoes");
+            FSoftObjectPath ShoesSoftObjectPath(AssetShoesPath);
             UAssetManager::GetStreamableManager().RequestAsyncLoad(ShoesSoftObjectPath, [this, ShoesSoftObjectPath]()
             {
                     UMaterialInterface* LoadedMat = Cast<UMaterialInterface>(ShoesSoftObjectPath.TryLoad());
