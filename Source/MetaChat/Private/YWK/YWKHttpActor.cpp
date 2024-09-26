@@ -16,6 +16,9 @@
 #include "YWK/ChatPanel.h"
 #include "YWK/MeetingButton.h"
 #include "YWK/EmojiWidget.h"
+#include "HSB/CustomCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/WidgetComponent.h"
 // Sets default values
 AYWKHttpActor::AYWKHttpActor()
 {
@@ -166,17 +169,25 @@ void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Resp
             TArray<uint8> ImageData = Response->GetContent();
             UE_LOG(LogTemp, Log, TEXT("Image data received from server, size: %d"), ImageData.Num());
 
-            // EmojiWidget을 통해 이모티콘 이미지를 표시 (ImageData 사용)
-            UEmojiWidget* EmojiWidget = CreateWidget<UEmojiWidget>(GetWorld(), UEmojiWidget::StaticClass());
-            if (EmojiWidget)
+            // 캐릭터의 EmojiWidget을 찾아서 이미지 처리
+            ACustomCharacter* Character = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+            if (Character && Character->EmojiUIComp)
             {
-                EmojiWidget->AddToViewport();  // 필요시 위젯을 화면에 추가
-                EmojiWidget->SetEmojiImageFromData(ImageData);  // 이미지 데이터를 처리하는 함수 호출
-                UE_LOG(LogTemp, Log, TEXT("Emoji image successfully passed to EmojiWidget."));
+                UEmojiWidget* EmojiWidget = Cast<UEmojiWidget>(Character->EmojiUIComp->GetUserWidgetObject());
+                if (EmojiWidget)
+                {
+                    // 이미지를 EmojiWidget에 표시
+                    EmojiWidget->SetEmojiImageFromData(ImageData);
+                    UE_LOG(LogTemp, Log, TEXT("Emoji image successfully passed to EmojiWidget."));
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("Failed to find UEmojiWidget in Character's EmojiUIComp."));
+                }
             }
             else
             {
-                UE_LOG(LogTemp, Error, TEXT("Failed to create UEmojiWidget"));
+                UE_LOG(LogTemp, Error, TEXT("Failed to find Character or EmojiUIComp."));
             }
         }
         else
@@ -242,22 +253,30 @@ void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Resp
                                 // 서버로부터 받은 이미지 데이터를 처리
                                 TArray<uint8> ImageData = Response->GetContent();
 
-                                // EmojiWidget을 통해 이미지 처리
-                                UEmojiWidget* EmojiWidget = CreateWidget<UEmojiWidget>(GetWorld(), UEmojiWidget::StaticClass());
-                                if (EmojiWidget)
+                                // 캐릭터의 EmojiWidget을 찾아서 이미지 처리
+                                ACustomCharacter* Character = Cast<ACustomCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+                                if (Character && Character->EmojiUIComp)
                                 {
-                                    EmojiWidget->AddToViewport();  // 필요시 위젯을 화면에 추가
-                                    EmojiWidget->SetEmojiImageFromData(ImageData);  // 이미지 데이터를 처리하는 함수 호출
-                                    UE_LOG(LogTemp, Log, TEXT("Emoji image successfully passed to EmojiWidget."));
+                                    UEmojiWidget* EmojiWidget = Cast<UEmojiWidget>(Character->EmojiUIComp->GetUserWidgetObject());
+                                    if (EmojiWidget)
+                                    {
+                                        // 이미지를 EmojiWidget에 표시
+                                        EmojiWidget->SetEmojiImageFromData(ImageData);
+                                        UE_LOG(LogTemp, Log, TEXT("Emoji image successfully passed to EmojiWidget."));
+                                    }
+                                    else
+                                    {
+                                        UE_LOG(LogTemp, Error, TEXT("Failed to find UEmojiWidget in Character's EmojiUIComp."));
+                                    }
                                 }
                                 else
                                 {
-                                    UE_LOG(LogTemp, Error, TEXT("Failed to create UEmojiWidget"));
+                                    UE_LOG(LogTemp, Error, TEXT("Failed to find Character or EmojiUIComp."));
                                 }
                             }
                             else
                             {
-                                UE_LOG(LogTemp, Error, TEXT("Failed to download emoji image"));
+                                UE_LOG(LogTemp, Error, TEXT("Failed to download emoji image."));
                             }
                         });
 
@@ -291,6 +310,7 @@ void AYWKHttpActor::OnResPostTest(FHttpRequestPtr Request, FHttpResponsePtr Resp
         }
     }
 }
+
 
 
 
