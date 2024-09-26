@@ -35,22 +35,27 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	class UBillboardComponent* EmojiBillboard;
 
-	// 서버로부터 이모티콘을 수신하는 함수
-	UFUNCTION()
-	void OnReCeiveEmoji(const FString& Filename);
+	    // 서버로 이모티콘 요청을 보낼 함수
+    void SendEmojiRequestToServer(const FString& ChatMessage);
 
-	// url에서 이미지 로드하는 함수
-	UFUNCTION()
-	void LoadEmojiFromUrl(const FString& ImageUrl);
+    // 서버 응답을 처리하는 함수
+    void OnEmojiResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
-	// 이미지 다운로드 완료 후 호출될 함수
-	void OnImageDownloaded(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+    // url에서 이미지 로드하는 함수
+    void LoadEmojiFromUrl(const FString& ImageUrl);
+
+    // 이미지 다운로드 완료 후 호출될 함수
+    void OnImageDownloaded(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
     // 서버에서 호출될 함수
     UFUNCTION(Server, Reliable)
     void ServerShowEmoji(const FString& Filename);
 
-    // 모든 클라이언트에서 호출될 함수 (Multicast)
-    UFUNCTION(NetMulticast, Reliable)
-    void MultiShowEmoji(const FString& ImageUrl);
+	UFUNCTION()
+	void SetEmojiImageFromData(const TArray<uint8>& ImageData);
+
+	// 이미지를 TArray<uint8>에서 UTexture2D로 변환하는 함수
+	UTexture2D* CreateTextureFromImageData(const TArray<uint8>& ImageData);
+
+
 };

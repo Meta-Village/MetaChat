@@ -50,6 +50,11 @@ public:
 	bool LoadWavFileToBinary(const FString& FilePath, TArray<uint8>& OutBinaryData);
 	void RsqPostwavfile(FString url, FString FilePath, FString MeetingId);
 
+	// 이모티콘 관련 
+	void SendEmojiRequest(const FString& ChatMessage);
+
+	void OnEmojiResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully);
+
 	int32 NewMeetingID;
 
 	//window api viewer
