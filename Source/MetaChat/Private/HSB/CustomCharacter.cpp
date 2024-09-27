@@ -200,7 +200,7 @@ void ACustomCharacter::Sit()
             // 2초 동안 움직임 비활성화
             DisableMovement();
             // 2초 후에 움직임 다시 활성화
-            GetWorldTimerManager().SetTimer(controlHandle, this, &ACustomCharacter::EnableMovement, 0.5f, false);
+            GetWorldTimerManager().SetTimer(controlHandle, this, &ACustomCharacter::EnableMovement, 2.0f, false);
         }
         // 2초 뒤에 PlaySitIdleMontage() 실행
         GetWorldTimerManager().SetTimer(animHandle, this, &ACustomCharacter::SitIdle, 2.f, false);
@@ -216,7 +216,8 @@ void ACustomCharacter::DisableMovement()
     {
         // 2초 동안 움직임 비활성화
         DisableInput(PlayerController);
-        MovementComponent->DisableMovement();
+        /*MovementComponent->DisableMovement();*/
+        PlayerController->StopMovement();
     }
 }
 
